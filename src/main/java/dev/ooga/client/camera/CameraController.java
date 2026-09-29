@@ -121,6 +121,13 @@ public final class CameraController {
 		lastAppliedPosition = position;
 	}
 
+	/** Direction the camera faces: the detached camera's while one is active, else the player's. */
+	public Vec3 viewVector(float partialTick) {
+		if (mode != null) return Vec3.directionFromRotation(mode.pitch(partialTick), mode.yaw(partialTick));
+		Minecraft mc = Minecraft.getInstance();
+		return mc.player == null ? new Vec3(0, 0, 1) : mc.player.getViewVector(partialTick);
+	}
+
 	public Vec3 lastAppliedPosition() {
 		return lastAppliedPosition;
 	}

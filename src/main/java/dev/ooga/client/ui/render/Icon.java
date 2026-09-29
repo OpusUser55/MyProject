@@ -71,6 +71,17 @@ public enum Icon {
 			}
 		}
 	},
+	RADAR {
+		@Override
+		void paint(GuiGraphics g, float x, float y, float s, float t, int c) {
+			// Radar: outer ring, sweep line and a contact dot.
+			int px = Math.max(1, Math.round(t * Render2D.guiScale()));
+			Render2D.outline(g, x + s * 0.06f, y + s * 0.06f, s * 0.88f, s * 0.88f, s * 0.44f, px, c);
+			Render2D.line(g, x + s * 0.5f, y + s * 0.5f, x + s * 0.8f, y + s * 0.22f, t, c);
+			Render2D.circle(g, x + s * 0.5f, y + s * 0.5f, s * 0.08f, c);
+			Render2D.circle(g, x + s * 0.3f, y + s * 0.66f, s * 0.08f, ColorUtil.fade(c, 0.7f));
+		}
+	},
 	HUD {
 		@Override
 		void paint(GuiGraphics g, float x, float y, float s, float t, int c) {

@@ -134,25 +134,40 @@ public class PanelClickGuiScreen extends Screen {
 		return result;
 	}
 
-	/** Lays out any panel without a saved position left to right, wrapping when full. */
+	/**
+	 * Places panels that have no saved position: left to right across the top, then any that
+	 * don't fit go under whichever column is currently shortest.
+	 */
 	private void placeDefaults() {
-		float x = MARGIN;
-		float y = MARGIN;
-		float rowBottom = y;
 		List<String> ids = new ArrayList<>();
-		for (Category c : categories()) ids.add(c.name());
+		List<Float> heights = new ArrayList<>();
+		for (Category c : categories()) {
+			ids.add(c.name());
+			heights.add(HEADER_H + ModuleManager.get().getModules(c).size() * rowH() + 3f);
+		}
 		ids.add(SEARCH_ID);
-		for (String id : ids) {
-			PanelLayout.Entry e = PanelLayout.get(id);
-			if (e.placed()) continue;
-			if (x + panelW() > screenW() - MARGIN) {
-				x = MARGIN;
-				y = rowBottom + GAP;
+		heights.add(HEADER_H + 46f);
+
+		List<float[]> columns = new ArrayList<>(); // {x, bottom}
+		for (float x = MARGIN; x + panelW() <= screenW() - MARGIN; x += panelW() + GAP) columns.add(new float[]{x, MARGIN - GAP});
+		if (columns.isEmpty()) columns.add(new float[]{MARGIN, MARGIN - GAP});
+
+		// Account for panels the user has already placed, so new ones don't land on top of them.
+		for (int i = 0; i < ids.size(); i++) {
+			PanelLayout.Entry e = PanelLayout.get(ids.get(i));
+			if (!e.placed()) continue;
+			for (float[] col : columns) {
+				if (Math.abs(col[0] - e.x) < panelW() / 2f) col[1] = Math.max(col[1], e.y + heights.get(i));
 			}
-			e.x = x;
-			e.y = y;
-			x += panelW() + GAP;
-			rowBottom = Math.max(rowBottom, y + 140f);
+		}
+		for (int i = 0; i < ids.size(); i++) {
+			PanelLayout.Entry e = PanelLayout.get(ids.get(i));
+			if (e.placed()) continue;
+			float[] target = columns.get(0);
+			for (float[] col : columns) if (col[1] < target[1]) target = col;
+			e.x = target[0];
+			e.y = target[1] + GAP;
+			target[1] = e.y + heights.get(i);
 		}
 	}
 

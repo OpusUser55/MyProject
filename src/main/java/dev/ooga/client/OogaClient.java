@@ -8,9 +8,12 @@ import dev.ooga.client.module.impl.client.MusicModule;
 import dev.ooga.client.module.impl.client.NotificationsModule;
 import dev.ooga.client.module.impl.render.FreecamModule;
 import dev.ooga.client.module.impl.render.FullbrightModule;
+import dev.ooga.client.render.WorldOverlay;
 import dev.ooga.client.ui.hud.HudManager;
 import dev.ooga.client.ui.notify.Notification;
 import dev.ooga.client.ui.notify.NotificationManager;
+import dev.ooga.client.world.BlockEntityTracker;
+import dev.ooga.client.world.ChunkScanner;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -37,6 +40,10 @@ public class OogaClient implements ClientModInitializer {
 		modules.addToggleListener(OogaClient::announceToggle);
 		modules.addDirtyListener(ConfigManager.get()::markDirty);
 
+		WorldOverlay.init();
+		BlockEntityTracker.init();
+		ChunkScanner.init();
+
 		HudElementRegistry.addLast(Identifier.fromNamespaceAndPath(MOD_ID, "hud"), HudManager.get()::render);
 
 		// Options and the window exist by the time the client has started, so restoring saved
@@ -53,12 +60,15 @@ public class OogaClient implements ClientModInitializer {
 		ClientTickEvents.START_CLIENT_TICK.register(client -> CameraController.get().tick());
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			modules.tick();
+			ChunkScanner.tick();
 			ConfigManager.get().tick();
 		});
 
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			modules.get(FreecamModule.class).setEnabled(false, false);
 			CameraController.get().exit();
+			BlockEntityTracker.clear();
+			ChunkScanner.clear();
 		});
 
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {

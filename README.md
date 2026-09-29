@@ -38,6 +38,18 @@ The mod jar lands in `build/libs/`. Drop it, together with
 
 Settings are saved automatically to `config/ooga/config.json`.
 
+### Base finding
+
+| Module | What it does |
+| --- | --- |
+| Storage ESP | Chests, shulkers, barrels, ender chests, hoppers and more through walls, colour-coded by kind, with optional tracers |
+| Spawner Finder | Announces each spawner once (chat + notification with coordinates) and highlights it |
+| Sus Chunk Finder | Scores chunks for player-placed blocks (hoppers, observers, pistons, shulkers, beacons…) and fully grown kelp, which only grows while a chunk stays loaded; flagged chunks are marked and announced |
+| Light Finder | Torches and lanterns below a set height, where caves generate none |
+| Tracers (Render) | Lines to nearby players, optionally hostile mobs |
+
+Finders scan chunks in the background a few per tick, so enabling them never stalls the game.
+
 ### Music widget
 
 The **Music** HUD module shows what's playing in any system media player: Spotify,

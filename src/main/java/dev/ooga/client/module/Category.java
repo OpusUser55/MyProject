@@ -7,6 +7,7 @@ public enum Category {
 	MOVEMENT("Movement", Icon.MOVEMENT),
 	RENDER("Render", Icon.RENDER),
 	WORLD("World", Icon.WORLD),
+	BASEFINDING("Base Finding", Icon.RADAR),
 	MISC("Misc", Icon.MISC),
 	HUD("HUD", Icon.HUD),
 	CLIENT("Client", Icon.CLIENT);

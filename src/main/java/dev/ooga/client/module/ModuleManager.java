@@ -1,5 +1,9 @@
 package dev.ooga.client.module;
 
+import dev.ooga.client.module.impl.basefinding.LightFinderModule;
+import dev.ooga.client.module.impl.basefinding.SpawnerFinderModule;
+import dev.ooga.client.module.impl.basefinding.StorageEspModule;
+import dev.ooga.client.module.impl.basefinding.SusChunkFinderModule;
 import dev.ooga.client.module.impl.client.ClickGuiModule;
 import dev.ooga.client.module.impl.client.ClientSettings;
 import dev.ooga.client.module.impl.client.InfoHudModule;
@@ -12,6 +16,7 @@ import dev.ooga.client.module.impl.movement.SprintModule;
 import dev.ooga.client.module.impl.render.EspModule;
 import dev.ooga.client.module.impl.render.FreecamModule;
 import dev.ooga.client.module.impl.render.FullbrightModule;
+import dev.ooga.client.module.impl.render.TracersModule;
 import dev.ooga.client.module.impl.render.ZoomModule;
 import dev.ooga.client.module.setting.SettingEvents;
 import org.slf4j.Logger;
@@ -55,6 +60,12 @@ public final class ModuleManager {
 		register(new FullbrightModule());
 		register(new ZoomModule());
 		register(new EspModule());
+		register(new TracersModule());
+
+		register(new StorageEspModule());
+		register(new SpawnerFinderModule());
+		register(new SusChunkFinderModule());
+		register(new LightFinderModule());
 
 		register(new SprintModule());
 
