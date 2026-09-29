@@ -1,5 +1,6 @@
 package dev.ooga.client.module;
 
+import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.Setting;
 import net.minecraft.client.Minecraft;
 
@@ -108,6 +109,10 @@ public abstract class Module {
 	public void onTick() {
 	}
 
+	/** Called once per client tick while disabled, e.g. to finish a fade-out. */
+	public void onDisabledTick() {
+	}
+
 	public boolean isEnabled() {
 		return enabled;
 	}
@@ -146,7 +151,15 @@ public abstract class Module {
 	}
 
 	public boolean isHiddenFromList() {
-		return hiddenFromList;
+		return hiddenFromList || (showInList != null && !showInList.get());
+	}
+
+	private BooleanSetting showInList;
+
+	/** Gives the module a per-module opt-out from the HUD list. Called once after construction. */
+	void addListSetting() {
+		if (hiddenFromList || settingsOnly || showInList != null) return;
+		showInList = add(new BooleanSetting("Show In List", "Show this module in the HUD module list while it's on.", true));
 	}
 
 	/** Short state shown next to the name in the module list, e.g. a mode. May be null. */

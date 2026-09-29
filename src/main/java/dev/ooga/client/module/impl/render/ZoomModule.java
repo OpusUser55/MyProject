@@ -15,6 +15,10 @@ public class ZoomModule extends Module {
 	public final BooleanSetting scroll = add(new BooleanSetting("Scroll Adjust", "Mouse wheel changes zoom while zoomed.", true));
 	public final BooleanSetting smooth = add(new BooleanSetting("Smooth", "Ease in and out of zoom.", true));
 	public final BooleanSetting sensitivity = add(new BooleanSetting("Scale Sensitivity", "Slow mouse look down while zoomed.", true));
+	public final BooleanSetting cinematic = add(new BooleanSetting("Cinematic Camera", "Smooth, weighted mouse look while zoomed.", false));
+	public final BooleanSetting hideHand = add(new BooleanSetting("Hide Hand", "Hide your hand and item while zoomed.", true));
+
+	private boolean savedSmoothCamera;
 
 	private final Anim progress = new Anim(1f, 12f);
 	private double scrollFactor = 1.0;
@@ -45,6 +49,17 @@ public class ZoomModule extends Module {
 	@Override
 	protected void onEnable() {
 		scrollFactor = 1.0;
+		savedSmoothCamera = mc.options.smoothCamera;
+		if (cinematic.get()) mc.options.smoothCamera = true;
+	}
+
+	@Override
+	protected void onDisable() {
+		if (cinematic.get()) mc.options.smoothCamera = savedSmoothCamera;
+	}
+
+	public boolean hidesHand() {
+		return isEnabled() && hideHand.get();
 	}
 
 	@Override

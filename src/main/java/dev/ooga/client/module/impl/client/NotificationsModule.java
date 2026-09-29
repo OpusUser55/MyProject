@@ -13,6 +13,8 @@ public class NotificationsModule extends Module {
 			"Bottom Right", "Top Right", "Bottom Left", "Top Left"));
 	public final NumberSetting duration = add(new NumberSetting("Duration", "How long each notification stays.", 2.2, 1.0, 6.0, 0.1, "s"));
 	public final NumberSetting maxVisible = add(new NumberSetting("Max Visible", "Most notifications shown at once.", 4, 1, 8, 1));
+	public final NumberSetting width = add(new NumberSetting("Width", "Width of each notification.", 138, 110, 200, 2, "px"));
+	public final BooleanSetting progress = add(new BooleanSetting("Timer Bar", "Thin bar showing time left.", true));
 	public final BooleanSetting toggles = add(new BooleanSetting("Module Toggles", "Notify when modules are enabled or disabled.", true));
 
 	public NotificationsModule() {

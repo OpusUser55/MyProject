@@ -12,8 +12,17 @@ import org.lwjgl.glfw.GLFW;
 public class ClickGuiModule extends Module {
 	public final ModeSetting layout = add(new ModeSetting("Layout", "Panels: a floating panel per category. Window: one window with a sidebar.", "Panels", "Panels", "Window"));
 	public final NumberSetting scale = add(new NumberSetting("Scale", "Size of the menu.", 1.0, 0.75, 1.25, 0.05, "x"));
+	public final NumberSetting panelWidth = add(new NumberSetting("Panel Width", "Width of each category panel.", 116, 96, 160, 2, "px")
+			.visibleWhen(() -> layout.is("Panels")));
+	public final ModeSetting density = add(new ModeSetting("Density", "Row height in panels.", "Normal", "Compact", "Normal", "Relaxed")
+			.visibleWhen(() -> layout.is("Panels")));
+	public final ModeSetting enabledStyle = add(new ModeSetting("Enabled Style", "How enabled modules are marked.", "Bar", "Bar", "Fill", "Text")
+			.visibleWhen(() -> layout.is("Panels")));
+	public final ModeSetting keybinds = add(new ModeSetting("Show Keybinds", "When to show a module's bound key.", "Hover", "Hover", "Always", "Never"));
+	public final BooleanSetting cascade = add(new BooleanSetting("Cascade Open", "Panels appear one after another when the menu opens.", true)
+			.visibleWhen(() -> layout.is("Panels")));
 	public final BooleanSetting descriptions = add(new BooleanSetting("Descriptions", "Window layout: show a one-line description under each module.", true));
-	public final BooleanSetting dim = add(new BooleanSetting("Dim World", "Darken the world behind the menu.", true));
+	public final NumberSetting dim = add(new NumberSetting("Dim World", "How much to darken the world behind the menu.", 0.6, 0.0, 1.0, 0.05));
 
 	public ClickGuiModule() {
 		super("ClickGUI", "The Ooga menu. Bind it to any key.", Category.CLIENT);

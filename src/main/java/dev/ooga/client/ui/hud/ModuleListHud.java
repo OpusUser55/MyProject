@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -45,9 +46,21 @@ public class ModuleListHud extends HudElement {
 		return module.isEnabled();
 	}
 
+	private String name(Module m) {
+		return switch (module.textCase.get()) {
+			case "lowercase" -> m.getName().toLowerCase(Locale.ROOT);
+			case "UPPERCASE" -> m.getName().toUpperCase(Locale.ROOT);
+			default -> m.getName();
+		};
+	}
+
+	private float rowHeight() {
+		return ROW_HEIGHT + module.spacing.getFloat();
+	}
+
 	private float labelWidth(Module m) {
 		String suffix = module.suffixes.get() ? m.getSuffix() : null;
-		float w = OogaFonts.width(m.getName(), Weight.REGULAR);
+		float w = OogaFonts.width(name(m), Weight.REGULAR);
 		if (suffix != null) w += 3f + OogaFonts.width(suffix, Weight.REGULAR);
 		return w;
 	}
@@ -71,9 +84,9 @@ public class ModuleListHud extends HudElement {
 
 		boolean right = anchoredRight();
 		float totalHeight = 0;
-		for (Module m : shown) totalHeight += ROW_HEIGHT * Anim.ease(rows.get(m).get());
+		for (Module m : shown) totalHeight += rowHeight() * Anim.ease(rows.get(m).get());
 		this.width = maxWidth * scale;
-		this.height = Math.max(ROW_HEIGHT, totalHeight) * scale;
+		this.height = Math.max(rowHeight(), totalHeight) * scale;
 
 		g.pose().pushMatrix();
 		g.pose().translate(x, y);
@@ -86,7 +99,7 @@ public class ModuleListHud extends HudElement {
 			float rowWidth = labelWidth(m) + PAD_X * 2 + 2f;
 			float slide = (1f - t) * (rowWidth + 6f);
 			float rowX = right ? maxWidth - rowWidth + slide : -slide;
-			float h = ROW_HEIGHT * t;
+			float h = rowHeight() * t;
 
 			Render2D.pushAlpha(t);
 			if (bg > 0) Render2D.rect(g, rowX, rowY, rowWidth, h, ColorUtil.withAlpha(0x0E0F12, Math.round(235 * bg)));
@@ -96,11 +109,12 @@ public class ModuleListHud extends HudElement {
 			}
 			float textX = rowX + PAD_X + (right ? 0 : 2f);
 			float textY = rowY + (h - 8f) / 2f;
-			OogaFonts.draw(g, m.getName(), textX, textY, OogaTheme.TEXT, Weight.REGULAR);
+			OogaFonts.draw(g, name(m), textX, textY, OogaTheme.TEXT, Weight.REGULAR);
 			String suffix = module.suffixes.get() ? m.getSuffix() : null;
 			if (suffix != null) {
-				float sx = textX + OogaFonts.width(m.getName(), Weight.REGULAR) + 3f;
-				OogaFonts.draw(g, suffix, sx, textY, OogaTheme.GOLD_TEXT, Weight.REGULAR);
+				float sx = textX + OogaFonts.width(name(m), Weight.REGULAR) + 3f;
+				int suffixColor = module.suffixColor.is("Muted") ? OogaTheme.TEXT_SECONDARY : OogaTheme.GOLD_TEXT;
+				OogaFonts.draw(g, suffix, sx, textY, suffixColor, Weight.REGULAR);
 			}
 			Render2D.popAlpha();
 			rowY += h;

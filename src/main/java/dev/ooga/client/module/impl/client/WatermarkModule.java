@@ -14,6 +14,10 @@ public class WatermarkModule extends Module {
 	public final NumberSetting opacity = add(new NumberSetting("Opacity", "Watermark opacity.", 1.0, 0.2, 1.0, 0.05));
 	public final NumberSetting glow = add(new NumberSetting("Glow Intensity", "Glow around the Ooga mark. Respects the global Glow toggle.", 0.8, 0.0, 2.0, 0.05));
 	public final BooleanSetting fps = add(new BooleanSetting("Show FPS", "Append the current frame rate.", true));
+	public final BooleanSetting time = add(new BooleanSetting("Show Time", "Append your local time.", false));
+	public final ModeSetting clock = add(new ModeSetting("Clock", "Time format.", "24h", "24h", "12h")
+			.visibleWhen(time::get));
+	public final BooleanSetting server = add(new BooleanSetting("Show Server", "Append the server address (or Singleplayer).", false));
 
 	public WatermarkModule() {
 		super("Watermark", "The Ooga mark in the corner of your screen.", Category.HUD);

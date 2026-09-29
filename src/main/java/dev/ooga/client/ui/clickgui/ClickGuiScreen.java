@@ -160,9 +160,8 @@ public class ClickGuiScreen extends Screen {
 
 	@Override
 	public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float delta) {
-		if (!config.dim.get()) return;
-		float t = Anim.ease(open.get());
-		Render2D.verticalGradient(g, 0, 0, width, height, ColorUtil.fade(0x70050507, t), ColorUtil.fade(0xA0050507, t));
+		float t = Anim.ease(open.get()) * config.dim.getFloat();
+		if (t > 0.01f) Render2D.rect(g, 0, 0, width, height, ColorUtil.fade(0xB0050507, t));
 	}
 
 	@Override
@@ -238,7 +237,7 @@ public class ClickGuiScreen extends Screen {
 		// Brand.
 		float cy = HEADER / 2f;
 		GlowRenderer.glow(g, PAD + 1.5f, cy - 3.5f, 7f, 7f, 3.5f, OogaTheme.GOLD, 0.7f);
-		Render2D.diamond(g, PAD + 5f, cy, 5.2f, 0x59F2C14E);
+		Render2D.diamond(g, PAD + 5f, cy, 5.2f, OogaTheme.accent(0x59));
 		Render2D.diamond(g, PAD + 5f, cy, 2.6f, OogaTheme.GOLD_BRIGHT);
 		float tx = PAD + 15f;
 		for (char c : "OOGA".toCharArray()) {
@@ -257,7 +256,7 @@ public class ClickGuiScreen extends Screen {
 		float by = cy - bh / 2f;
 		float bHover = hover("editHud", bx, by, bw, bh);
 		Render2D.roundRect(g, bx, by, bw, bh, OogaTheme.RADIUS_CONTROL + 1, ColorUtil.lerp(OogaTheme.SURFACE_CARD, OogaTheme.SURFACE_CARD_HOVER, bHover));
-		Render2D.outline(g, bx, by, bw, bh, OogaTheme.RADIUS_CONTROL + 1, ColorUtil.lerp(OogaTheme.BORDER, 0x66F2C14E, bHover));
+		Render2D.outline(g, bx, by, bw, bh, OogaTheme.RADIUS_CONTROL + 1, ColorUtil.lerp(OogaTheme.BORDER, OogaTheme.accent(0x66), bHover));
 		Icon.MOVE.draw(g, bx + 6f, cy - 3.5f, 7f, ColorUtil.lerp(OogaTheme.TEXT_SECONDARY, OogaTheme.GOLD, bHover));
 		OogaFonts.draw(g, hudLabel, bx + 16f, cy - 3.3f, OogaTheme.TEXT_SECONDARY, Weight.SEMIBOLD, 0.8f);
 		hits.add(new Hit(bx, by, bw, bh, (button, mx, my) -> {
@@ -273,7 +272,7 @@ public class ClickGuiScreen extends Screen {
 		float sHover = hover("search", sx, sy, SEARCH_W, SEARCH_H);
 		if (focus > 0.01f) GlowRenderer.glow(g, sx, sy, SEARCH_W, SEARCH_H, OogaTheme.RADIUS_CONTROL + 1, OogaTheme.GOLD, 0.35f * focus);
 		Render2D.roundRect(g, sx, sy, SEARCH_W, SEARCH_H, OogaTheme.RADIUS_CONTROL + 1, OogaTheme.SURFACE_INSET);
-		int border = ColorUtil.lerp(ColorUtil.lerp(OogaTheme.BORDER, OogaTheme.BORDER_STRONG, sHover), 0x99F2C14E, focus);
+		int border = ColorUtil.lerp(ColorUtil.lerp(OogaTheme.BORDER, OogaTheme.BORDER_STRONG, sHover), OogaTheme.accent(0x99), focus);
 		Render2D.outline(g, sx, sy, SEARCH_W, SEARCH_H, OogaTheme.RADIUS_CONTROL + 1, border);
 		Icon.SEARCH.draw(g, sx + 6f, cy - 3.5f, 7f, ColorUtil.lerp(OogaTheme.TEXT_MUTED, OogaTheme.GOLD, focus));
 		float textX = sx + 17f;
@@ -317,7 +316,7 @@ public class ClickGuiScreen extends Screen {
 			float iw = SIDEBAR - PAD * 2 + 6f;
 			float ih = CATEGORY_ROW - 3f;
 			Render2D.roundRect(g, ix, iy, iw, ih, OogaTheme.RADIUS_CARD, OogaTheme.GOLD_TINT);
-			Render2D.outline(g, ix, iy, iw, ih, OogaTheme.RADIUS_CARD, 0x2EF2C14E);
+			Render2D.outline(g, ix, iy, iw, ih, OogaTheme.RADIUS_CARD, OogaTheme.accent(0x2E));
 			GlowRenderer.glow(g, ix, iy + 4f, 2f, ih - 8f, 1f, OogaTheme.GOLD, 0.9f, 4f);
 			Render2D.roundRect(g, ix, iy + 4f, 2f, ih - 8f, 1f, OogaTheme.GOLD);
 		}
@@ -501,7 +500,7 @@ public class ClickGuiScreen extends Screen {
 
 		int fill = ColorUtil.lerp(OogaTheme.SURFACE_CARD, OogaTheme.SURFACE_CARD_HOVER, hv);
 		Render2D.roundRect(g, x, y, w, h, OogaTheme.RADIUS_CARD, fill);
-		int border = ColorUtil.lerp(OogaTheme.BORDER, 0x40F2C14E, on * 0.8f);
+		int border = ColorUtil.lerp(OogaTheme.BORDER, OogaTheme.accent(0x40), on * 0.8f);
 		Render2D.outline(g, x, y, w, h, OogaTheme.RADIUS_CARD, border);
 		if (on > 0.01f) {
 			// Gold spine marks enabled modules at a glance.
@@ -678,7 +677,7 @@ public class ClickGuiScreen extends Screen {
 		} else if (setting instanceof ModeSetting mode) {
 			float hv = hover(setting, x + w - 90f, y, 90f, h);
 			int fill = ColorUtil.lerp(OogaTheme.SURFACE_INSET, OogaTheme.SURFACE_CONTROL, hv);
-			float chipW = Widgets.chip(g, x + w, y + h / 2f, mode.get() + "  ›", OogaTheme.GOLD_TEXT, fill, ColorUtil.lerp(OogaTheme.BORDER, 0x55F2C14E, hv), 0.75f);
+			float chipW = Widgets.chip(g, x + w, y + h / 2f, mode.get() + "  ›", OogaTheme.GOLD_TEXT, fill, ColorUtil.lerp(OogaTheme.BORDER, OogaTheme.accent(0x55), hv), 0.75f);
 			hits.add(new Hit(x + w - chipW - 2, y, chipW + 2, h, (button, mx, my) -> {
 				if (button == 0) mode.cycle(true);
 				else if (button == 1) mode.cycle(false);

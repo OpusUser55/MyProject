@@ -23,7 +23,6 @@ import java.util.List;
  */
 public final class NotificationManager extends HudElement {
 	private static final NotificationManager INSTANCE = new NotificationManager();
-	private static final float WIDTH = 138f;
 	private static final float HEIGHT = 30f;
 	private static final float GAP = 5f;
 	private static final float MARGIN = 8f;
@@ -32,6 +31,11 @@ public final class NotificationManager extends HudElement {
 
 	private NotificationManager() {
 		super("notifications", "Notifications", Anchor.END, 1f, Anchor.END, 1f);
+	}
+
+	private static float cardWidth() {
+		NotificationsModule settings = NotificationsModule.instance();
+		return settings == null ? 138f : settings.width.getFloat();
 	}
 
 	public static NotificationManager get() {
@@ -92,8 +96,8 @@ public final class NotificationManager extends HudElement {
 			if (!n.leaving) slot++;
 
 			float y = bottom ? baseY - stack * (HEIGHT + GAP) : baseY + stack * (HEIGHT + GAP);
-			float offscreen = (WIDTH + MARGIN + 6) * (1f - slide);
-			float x = right ? sw - MARGIN - WIDTH + offscreen : MARGIN - offscreen;
+			float offscreen = (cardWidth() + MARGIN + 6) * (1f - slide);
+			float x = right ? sw - MARGIN - cardWidth() + offscreen : MARGIN - offscreen;
 			drawCard(g, n, x, y, slide);
 		}
 		Iterator<Notification> it = active.iterator();
@@ -101,7 +105,7 @@ public final class NotificationManager extends HudElement {
 			Notification n = it.next();
 			if (n.leaving && n.slide.get() <= 0.01f) it.remove();
 		}
-		width = WIDTH;
+		width = cardWidth();
 		height = HEIGHT;
 	}
 
@@ -111,9 +115,9 @@ public final class NotificationManager extends HudElement {
 		boolean info = n.kind == Notification.Kind.INFO;
 		int accent = on || info ? OogaTheme.GOLD : OogaTheme.TEXT_MUTED;
 
-		if (on) GlowRenderer.glow(g, x, y, WIDTH, HEIGHT, OogaTheme.RADIUS_CARD, OogaTheme.GOLD, 0.45f * visibility);
-		Render2D.roundRect(g, x, y, WIDTH, HEIGHT, OogaTheme.RADIUS_CARD, 0xF2121317);
-		Render2D.outline(g, x, y, WIDTH, HEIGHT, OogaTheme.RADIUS_CARD, on ? 0x40F2C14E : OogaTheme.BORDER);
+		if (on) GlowRenderer.glow(g, x, y, cardWidth(), HEIGHT, OogaTheme.RADIUS_CARD, OogaTheme.GOLD, 0.45f * visibility);
+		Render2D.roundRect(g, x, y, cardWidth(), HEIGHT, OogaTheme.RADIUS_CARD, 0xF2121317);
+		Render2D.outline(g, x, y, cardWidth(), HEIGHT, OogaTheme.RADIUS_CARD, on ? OogaTheme.accent(0x40) : OogaTheme.BORDER);
 
 		// Status indicator: filled gold dot when on, hollow ring when off.
 		float cx = x + 13f;
@@ -126,16 +130,21 @@ public final class NotificationManager extends HudElement {
 		}
 
 		float textX = x + 24f;
-		float maxText = WIDTH - 30f;
+		float maxText = cardWidth() - 30f;
 		OogaFonts.draw(g, OogaFonts.trim(n.title, Weight.SEMIBOLD, 1f, maxText), textX, y + 6f, OogaTheme.TEXT, Weight.SEMIBOLD);
 		String status = OogaFonts.trim(n.message, Weight.REGULAR, 0.85f, maxText);
 		OogaFonts.draw(g, status, textX, y + 17f, on ? OogaTheme.GOLD_TEXT : OogaTheme.TEXT_SECONDARY, Weight.REGULAR, 0.85f);
 
 		// Remaining-time hairline along the bottom edge.
+		NotificationsModule settings = NotificationsModule.instance();
+		if (settings != null && !settings.progress.get()) {
+			Render2D.popAlpha();
+			return;
+		}
 		float remaining = 1f - n.lifeProgress();
 		float barInset = OogaTheme.RADIUS_CARD;
-		float barWidth = (WIDTH - barInset * 2) * remaining;
-		Render2D.rect(g, x + barInset, y + HEIGHT - 1.5f, barWidth, 1f, on || info ? 0x99F2C14E : 0x55FFFFFF);
+		float barWidth = (cardWidth() - barInset * 2) * remaining;
+		Render2D.rect(g, x + barInset, y + HEIGHT - 1.5f, barWidth, 1f, on || info ? OogaTheme.accent(0x99) : 0x55FFFFFF);
 		Render2D.popAlpha();
 	}
 }

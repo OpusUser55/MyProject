@@ -16,6 +16,9 @@ public class InfoHudModule extends Module {
 	public final BooleanSetting facing = add(new BooleanSetting("Facing", "Compass direction you're looking.", true));
 	public final BooleanSetting speed = add(new BooleanSetting("Speed", "Horizontal speed in blocks per second.", false));
 	public final BooleanSetting ping = add(new BooleanSetting("Ping", "Latency to the server.", true));
+	public final NumberSetting decimals = add(new NumberSetting("Decimals", "Decimal places for coordinates.", 0, 0, 2, 1)
+			.visibleWhen(coords::get));
+	public final BooleanSetting labels = add(new BooleanSetting("Labels", "Show the small FPS / XYZ / DIR labels.", true));
 	public final NumberSetting scale = add(new NumberSetting("Scale", "Panel size.", 1.0, 0.5, 2.0, 0.05, "x"));
 
 	private Vec3 lastPosition;

@@ -53,7 +53,9 @@ public final class Widgets {
 		float y = cy - h / 2f;
 		Render2D.roundRect(g, x, y, w, h, OogaTheme.RADIUS_CONTROL, fill);
 		if (border != 0) Render2D.outline(g, x, y, w, h, OogaTheme.RADIUS_CONTROL, border);
-		OogaFonts.draw(g, text, x + 4.5f, cy - OogaFonts.height(scale) / 2f + 0.5f, textColor, Weight.SEMIBOLD, scale);
+		// Optically centred on the cap height rather than the full line box.
+		float capHeight = 9f * scale * 0.73f;
+		OogaFonts.draw(g, text, x + 4.5f, y + (h - capHeight) / 2f - 1.2f, textColor, Weight.SEMIBOLD, scale);
 		return w;
 	}
 

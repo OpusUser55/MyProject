@@ -58,6 +58,7 @@ public final class ModuleManager {
 
 		register(new SprintModule());
 
+		for (Module module : modules) module.addListSetting();
 		SettingEvents.listen(setting -> markDirty());
 	}
 
@@ -111,8 +112,11 @@ public final class ModuleManager {
 
 	public void tick() {
 		for (Module module : modules) {
-			if (!module.isEnabled()) continue;
 			try {
+				if (!module.isEnabled()) {
+					module.onDisabledTick();
+					continue;
+				}
 				module.onTick();
 			} catch (RuntimeException e) {
 				LOGGER.error("Module {} crashed while ticking; disabling it", module.getName(), e);

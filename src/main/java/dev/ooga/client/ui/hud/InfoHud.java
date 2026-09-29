@@ -51,13 +51,14 @@ public class InfoHud extends HudElement {
 		List<Line> lines = new ArrayList<>();
 		if (module.fps.get()) lines.add(new Line("FPS", Integer.toString(mc.getFps()), null));
 		if (module.coords.get() && player != null) {
-			String xyz = String.format("%.0f  %.0f  %.0f", player.getX(), player.getY(), player.getZ());
+			String f = "%." + module.decimals.getInt() + "f";
+			String xyz = String.format(f + "  " + f + "  " + f, player.getX(), player.getY(), player.getZ());
 			String extra = null;
 			if (module.otherDimension.get() && mc.level != null) {
 				if (mc.level.dimension() == Level.NETHER) {
-					extra = String.format("%.0f  %.0f", player.getX() * 8, player.getZ() * 8);
+					extra = String.format(f + "  " + f, player.getX() * 8, player.getZ() * 8);
 				} else if (mc.level.dimension() == Level.OVERWORLD) {
-					extra = String.format("%.0f  %.0f", player.getX() / 8, player.getZ() / 8);
+					extra = String.format(f + "  " + f, player.getX() / 8, player.getZ() / 8);
 				}
 			}
 			lines.add(new Line("XYZ", xyz, extra));
@@ -85,8 +86,10 @@ public class InfoHud extends HudElement {
 		}
 
 		float labelW = 0;
-		for (Line line : lines) labelW = Math.max(labelW, OogaFonts.width(line.label(), Weight.SEMIBOLD, LABEL_SCALE));
-		float valueX = PAD + labelW + 6f;
+		if (module.labels.get()) {
+			for (Line line : lines) labelW = Math.max(labelW, OogaFonts.width(line.label(), Weight.SEMIBOLD, LABEL_SCALE) + 6f);
+		}
+		float valueX = PAD + labelW;
 		float w = 0;
 		for (Line line : lines) {
 			float lw = valueX + OogaFonts.width(line.value(), Weight.REGULAR);
@@ -106,7 +109,7 @@ public class InfoHud extends HudElement {
 
 		float ly = PAD;
 		for (Line line : lines) {
-			OogaFonts.draw(g, line.label(), PAD, ly + 1.8f, OogaTheme.TEXT_MUTED, Weight.SEMIBOLD, LABEL_SCALE);
+			if (module.labels.get()) OogaFonts.draw(g, line.label(), PAD, ly + 1.8f, OogaTheme.TEXT_MUTED, Weight.SEMIBOLD, LABEL_SCALE);
 			OogaFonts.draw(g, line.value(), valueX, ly, OogaTheme.TEXT, Weight.REGULAR);
 			if (line.extra() != null) {
 				float ex = valueX + OogaFonts.width(line.value(), Weight.REGULAR) + 6f;

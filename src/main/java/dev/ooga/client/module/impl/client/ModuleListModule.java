@@ -14,6 +14,10 @@ public class ModuleListModule extends Module {
 	public final NumberSetting opacity = add(new NumberSetting("Background", "Opacity of each row's backing.", 0.75, 0.0, 1.0, 0.05));
 	public final BooleanSetting accentBar = add(new BooleanSetting("Accent Bar", "Gold edge on the screen side of each row.", true));
 	public final BooleanSetting suffixes = add(new BooleanSetting("Suffixes", "Show module modes next to names.", true));
+	public final ModeSetting suffixColor = add(new ModeSetting("Suffix Color", "Colour of the suffix text.", "Accent", "Accent", "Muted")
+			.visibleWhen(suffixes::get));
+	public final ModeSetting textCase = add(new ModeSetting("Text Case", "How module names are written.", "Normal", "Normal", "lowercase", "UPPERCASE"));
+	public final NumberSetting spacing = add(new NumberSetting("Row Spacing", "Extra space between rows.", 0, 0, 4, 0.5, "px"));
 
 	public ModuleListModule() {
 		super("Module List", "Lists your enabled modules on screen.", Category.HUD);

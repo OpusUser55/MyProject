@@ -5,6 +5,7 @@ import dev.ooga.client.module.Category;
 import dev.ooga.client.module.Module;
 import dev.ooga.client.module.ModuleManager;
 import dev.ooga.client.module.impl.client.ClickGuiModule;
+import dev.ooga.client.module.impl.client.ClientSettings;
 import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.ModeSetting;
 import dev.ooga.client.module.setting.NumberSetting;
@@ -40,12 +41,9 @@ import java.util.Map;
  * rest fade back.
  */
 public class PanelClickGuiScreen extends Screen {
-	private static final float PANEL_W = 116f;
 	private static final float HEADER_H = 19f;
-	private static final float ROW_H = 15f;
 	private static final float GAP = 8f;
 	private static final float MARGIN = 8f;
-	private static final float RADIUS = 5f;
 	private static final String SEARCH_ID = "search";
 
 	private final ClickGuiModule config = ModuleManager.get().get(ClickGuiModule.class);
@@ -95,6 +93,31 @@ public class PanelClickGuiScreen extends Screen {
 		return config.scale.getFloat();
 	}
 
+	private float panelW() {
+		return config.panelWidth.getFloat();
+	}
+
+	private float rowH() {
+		return switch (config.density.get()) {
+			case "Compact" -> 13f;
+			case "Relaxed" -> 17f;
+			default -> 15f;
+		};
+	}
+
+	/** Real font sizes, expressed as scales of the 9px base, so text is never resampled. */
+	private static final float S8 = 8f / 9f;
+	private static final float S7 = 7f / 9f;
+
+	/** Top of text of the given pixel size, optically centred in a box of height {@code h}. */
+	private static float textY(float top, float h, int size) {
+		return top + (h - size * 0.73f) / 2f - 1.2f;
+	}
+
+	private static float radius() {
+		return OogaTheme.corner(5f);
+	}
+
 	private float screenW() {
 		return width / scale();
 	}
@@ -122,13 +145,13 @@ public class PanelClickGuiScreen extends Screen {
 		for (String id : ids) {
 			PanelLayout.Entry e = PanelLayout.get(id);
 			if (e.placed()) continue;
-			if (x + PANEL_W > screenW() - MARGIN) {
+			if (x + panelW() > screenW() - MARGIN) {
 				x = MARGIN;
 				y = rowBottom + GAP;
 			}
 			e.x = x;
 			e.y = y;
-			x += PANEL_W + GAP;
+			x += panelW() + GAP;
 			rowBottom = Math.max(rowBottom, y + 140f);
 		}
 	}
@@ -156,12 +179,8 @@ public class PanelClickGuiScreen extends Screen {
 
 	@Override
 	public void renderBackground(GuiGraphics g, int mx, int my, float delta) {
-		float t = Anim.ease(open.get());
-		if (config.dim.get()) {
-			Render2D.verticalGradient(g, 0, 0, width, height, ColorUtil.fade(0x66050507, t), ColorUtil.fade(0x99050507, t));
-		}
-		// A low golden haze along the bottom edge, felt more than seen.
-		Render2D.verticalGradient(g, 0, height * 0.62f, width, height * 0.38f, 0x00F2C14E, ColorUtil.fade(0x1CF2C14E, t));
+		float t = Anim.ease(open.get()) * config.dim.getFloat();
+		if (t > 0.01f) Render2D.rect(g, 0, 0, width, height, ColorUtil.fade(0xB0050507, t));
 	}
 
 	@Override
@@ -210,14 +229,14 @@ public class PanelClickGuiScreen extends Screen {
 
 	/** Panels cascade in one after another when the menu opens, and leave together. */
 	private float stagger(int index, long elapsed, float open) {
-		if (closing) return Anim.ease(open);
+		if (closing || !config.cascade.get()) return Anim.ease(open);
 		Anim a = anim("panel#" + index, 0f, 13f);
 		return Anim.ease(a.update(elapsed > index * 35L ? 1f : 0f));
 	}
 
 	private float panelBodyHeight(Category c) {
 		float h = 0;
-		for (Module m : ModuleManager.get().getModules(c)) h += ROW_H + settingsHeight(m) * expandAmount(m);
+		for (Module m : ModuleManager.get().getModules(c)) h += rowH() + settingsHeight(m) * expandAmount(m);
 		return h + 3f;
 	}
 
@@ -230,42 +249,42 @@ public class PanelClickGuiScreen extends Screen {
 		boolean dragging = id.equals(draggingPanel);
 		float lift = anim("lift#" + id, 0f, 16f).update(dragging ? 1f : 0f);
 
-		GlowRenderer.glow(g, x, y, PANEL_W, h, RADIUS, OogaTheme.GOLD, 0.26f + 0.35f * lift, 6f);
-		Render2D.roundRect(g, x, y, PANEL_W, h, RADIUS, 0xEE0E0F12);
+		// Panels only glow while being moved; at rest the gold is reserved for enabled state.
+		if (lift > 0.01f) GlowRenderer.glow(g, x, y, panelW(), h, radius(), OogaTheme.GOLD, 0.4f * lift, 6f);
+		Render2D.roundRect(g, x, y, panelW(), h, radius(), ClientSettings.surface(0xEE0E0F12));
 
 		// Header: slightly lifted surface, gold icon, tracked caps title.
-		float headerHover = hover("header#" + id, x, y, PANEL_W, HEADER_H);
-		Render2D.roundRect(g, x, y, PANEL_W, Math.min(h, HEADER_H + RADIUS), RADIUS, ColorUtil.lerp(0xFF15171C, 0xFF1A1C22, headerHover));
-		if (h > HEADER_H + RADIUS) Render2D.rect(g, x, y + HEADER_H, PANEL_W, RADIUS, 0xEE0E0F12);
+		float headerHover = hover("header#" + id, x, y, panelW(), HEADER_H);
+		Render2D.roundRect(g, x, y, panelW(), Math.min(h, HEADER_H + radius()), radius(),
+				ClientSettings.surface(ColorUtil.lerp(0xF015171C, 0xF01A1C22, headerHover)));
+		if (h > HEADER_H + radius()) Render2D.rect(g, x, y + HEADER_H, panelW(), radius(), ClientSettings.surface(0xEE0E0F12));
 		icon.draw(g, x + 7f, y + HEADER_H / 2f - 4f, 8f, OogaTheme.GOLD);
 		float tx = x + 20f;
 		for (char ch : title.toUpperCase(Locale.ROOT).toCharArray()) {
 			String c = String.valueOf(ch);
-			OogaFonts.draw(g, c, tx, y + HEADER_H / 2f - 3.6f, OogaTheme.TEXT, Weight.SEMIBOLD, 0.82f);
-			tx += OogaFonts.width(c, Weight.SEMIBOLD, 0.82f) + 0.8f;
+			OogaFonts.draw(g, c, tx, textY(y, HEADER_H, 8), OogaTheme.TEXT, Weight.SEMIBOLD, S8);
+			tx += OogaFonts.width(c, Weight.SEMIBOLD, S8) + 0.8f;
 		}
 		if (badge != null) {
-			OogaFonts.draw(g, badge, tx + 4f, y + HEADER_H / 2f - 2.8f, OogaTheme.GOLD, Weight.SEMIBOLD, 0.66f);
+			OogaFonts.draw(g, badge, tx + 4f, textY(y, HEADER_H, 7), OogaTheme.TEXT_MUTED, Weight.SEMIBOLD, S7);
 		}
 
 		// Collapse chevron.
-		float cx = x + PANEL_W - 15f;
+		float cx = x + panelW() - 15f;
 		float chevHover = hover("chev#" + id, cx - 2, y + 3, 13, HEADER_H - 6);
 		float collapsed = Anim.ease(anim("collapse#" + id, e.collapsed ? 1f : 0f, 14f).get());
 		(collapsed > 0.5f ? Icon.CHEVRON_RIGHT : Icon.CHEVRON).draw(g, cx, y + HEADER_H / 2f - 4f, 8f,
 				ColorUtil.lerp(OogaTheme.TEXT_MUTED, OogaTheme.GOLD, chevHover));
 
-		// Gold hairline under the header, strongest at the left and fading out.
+		// Header divider: a plain hairline, with a short accent segment under the icon.
 		if (h > HEADER_H + 1) {
-			float lineW = PANEL_W - 12f;
-			Render2D.rect(g, x + 6f, y + HEADER_H, lineW, 1f, ColorUtil.fade(OogaTheme.GOLD, 0.22f));
-			GlowRenderer.glow(g, x + 6f, y + HEADER_H, lineW * 0.45f, 1f, 0.5f, OogaTheme.GOLD, 0.5f, 3f);
-			Render2D.rect(g, x + 6f, y + HEADER_H, lineW * 0.45f, 1f, ColorUtil.fade(OogaTheme.GOLD, 0.75f));
+			Render2D.rect(g, x, y + HEADER_H, panelW(), 1f, OogaTheme.DIVIDER);
+			Render2D.rect(g, x + 7f, y + HEADER_H, 8f, 1f, OogaTheme.GOLD);
 		}
-		Render2D.outline(g, x, y, PANEL_W, h, RADIUS, dragging ? 0x66F2C14E : OogaTheme.BORDER);
+		Render2D.outline(g, x, y, panelW(), h, radius(), dragging ? OogaTheme.accent(0x66) : OogaTheme.BORDER);
 
 		// Header hits: chevron toggles collapse, anything else drags. Chevron added last = wins.
-		hits.add(new Hit(x, y, PANEL_W, HEADER_H, (button, mx, my) -> {
+		hits.add(new Hit(x, y, panelW(), HEADER_H, (button, mx, my) -> {
 			if (button == 1) {
 				toggleCollapse(e);
 				return true;
@@ -306,7 +325,7 @@ public class PanelClickGuiScreen extends Screen {
 		drawPanelFrame(g, id, x, y, h, appear, c.getIcon(), c.getDisplayName(), active > 0 ? Integer.toString(active) : null);
 
 		if (body > 0.5f) {
-			g.enableScissor(Math.round(x), Math.round(y + HEADER_H + 1), Math.round(x + PANEL_W), Math.round(y + h));
+			g.enableScissor(Math.round(x), Math.round(y + HEADER_H + 1), Math.round(x + panelW()), Math.round(y + h));
 			float rowY = y + HEADER_H + 1.5f;
 			for (Module m : ModuleManager.get().getModules(c)) {
 				rowY = drawModuleRow(g, m, x, rowY, y + h);
@@ -321,49 +340,60 @@ public class PanelClickGuiScreen extends Screen {
 		boolean matched = matches(m);
 		float match = anim("match#" + m.getName(), 1f, 14f).update(matched ? 1f : 0.28f);
 		boolean visible = y < panelBottom;
-		float hv = visible ? hover("row#" + m.getName(), x, y, PANEL_W, ROW_H) : 0f;
+		float hv = visible ? hover("row#" + m.getName(), x, y, panelW(), rowH()) : 0f;
 		float expand = anim(m, 0f, 14f).update(expanded.getOrDefault(m, false) ? 1f : 0f);
 
 		Render2D.pushAlpha(match);
 		float inset = 3f;
-		if (on > 0.01f || hv > 0.01f) {
-			int fill = ColorUtil.lerp(ColorUtil.fade(0x0FFFFFFF, hv), 0x1CF2C14E, on);
-			Render2D.roundRect(g, x + inset, y + 0.5f, PANEL_W - inset * 2, ROW_H - 1f, 3f, fill);
+		float rowR = OogaTheme.corner(3f);
+		String style = config.enabledStyle.get();
+		boolean fillStyle = style.equals("Fill");
+		if (hv > 0.01f) {
+			Render2D.roundRect(g, x + inset, y + 0.5f, panelW() - inset * 2, rowH() - 1f, rowR, ColorUtil.fade(0x0DFFFFFF, hv));
 		}
-		if (on > 0.01f) {
-			GlowRenderer.glow(g, x + inset, y + 0.5f, PANEL_W - inset * 2, ROW_H - 1f, 3f, OogaTheme.GOLD, on * 0.22f, 3f);
-			GlowRenderer.glow(g, x + inset, y + 3.5f, 1.6f, ROW_H - 7f, 0.8f, OogaTheme.GOLD, on, 3.5f);
-			Render2D.roundRect(g, x + inset, y + 3.5f, 1.6f, ROW_H - 7f, 0.8f, ColorUtil.fade(OogaTheme.GOLD, on));
+		if (on > 0.01f && !style.equals("Text")) {
+			if (fillStyle) {
+				Render2D.roundRect(g, x + inset, y + 0.5f, panelW() - inset * 2, rowH() - 1f, rowR, ColorUtil.fade(OogaTheme.accent(0x24), on));
+			} else {
+				float barH = rowH() - 7f;
+				GlowRenderer.glow(g, x + inset, y + 3.5f, 1.5f, barH, 0.75f, OogaTheme.GOLD, on * 0.7f, 2.5f);
+				Render2D.roundRect(g, x + inset, y + 3.5f, 1.5f, barH, 0.75f, ColorUtil.fade(OogaTheme.GOLD, on));
+			}
 		}
 		if (!search.isEmpty() && matched) {
-			Render2D.outline(g, x + inset, y + 0.5f, PANEL_W - inset * 2, ROW_H - 1f, 3f, 0x80F2C14E);
+			Render2D.outline(g, x + inset, y + 0.5f, panelW() - inset * 2, rowH() - 1f, rowR, OogaTheme.accent(0x70));
 		}
 
 		int nameColor = ColorUtil.lerp(ColorUtil.lerp(OogaTheme.TEXT_SECONDARY, OogaTheme.TEXT, hv), OogaTheme.GOLD_TEXT, on);
 		if (m.isSettingsOnly()) nameColor = ColorUtil.lerp(OogaTheme.TEXT_SECONDARY, OogaTheme.TEXT, hv);
 		float controlsW = 24f;
-		String name = OogaFonts.trim(m.getName(), Weight.REGULAR, 0.85f, PANEL_W - 14f - controlsW);
-		OogaFonts.draw(g, name, x + 9f, y + ROW_H / 2f - 3.7f, nameColor, Weight.REGULAR, 0.85f);
+		String name = OogaFonts.trim(m.getName(), Weight.REGULAR, S8, panelW() - 14f - controlsW);
+		OogaFonts.draw(g, name, x + 9f, textY(y, rowH(), 8), nameColor, Weight.REGULAR, S8);
 
-		float cy = y + ROW_H / 2f;
+		float cy = y + rowH() / 2f;
 		if (binding == m) {
-			Widgets.chip(g, x + PANEL_W - 6f, cy, "...", OogaTheme.ON_GOLD, OogaTheme.GOLD, 0, 0.66f);
+			Widgets.chip(g, x + panelW() - 6f, cy, "...", OogaTheme.ON_GOLD, OogaTheme.GOLD, 0, 0.66f);
 		} else if (m.isSettingsOnly()) {
-			(expand > 0.5f ? Icon.CHEVRON : Icon.CHEVRON_RIGHT).draw(g, x + PANEL_W - 15f, cy - 3.5f, 7f,
+			(expand > 0.5f ? Icon.CHEVRON : Icon.CHEVRON_RIGHT).draw(g, x + panelW() - 15f, cy - 3.5f, 7f,
 					ColorUtil.lerp(OogaTheme.TEXT_MUTED, OogaTheme.GOLD, Math.max(hv * 0.5f, expand)));
 		} else {
-			if (m.getKey() != -1 && hv > 0.02f) {
-				Render2D.pushAlpha(hv);
-				Widgets.chip(g, x + PANEL_W - 28f, cy, keyName(m.getKey()), OogaTheme.TEXT_SECONDARY, OogaTheme.SURFACE_INSET, OogaTheme.BORDER, 0.6f);
+			float keyAlpha = switch (config.keybinds.get()) {
+				case "Always" -> 1f;
+				case "Never" -> 0f;
+				default -> hv;
+			};
+			if (m.getKey() != -1 && keyAlpha > 0.02f) {
+				Render2D.pushAlpha(keyAlpha);
+				Widgets.chip(g, x + panelW() - 28f, cy, keyName(m.getKey()), OogaTheme.TEXT_SECONDARY, OogaTheme.SURFACE_INSET, OogaTheme.BORDER, S7);
 				Render2D.popAlpha();
 			}
-			Widgets.toggle(g, x + PANEL_W - 22f, cy - 4f, 15f, 8f, on, hv);
+			Widgets.toggle(g, x + panelW() - 22f, cy - 4f, 15f, 8f, on, hv);
 		}
 		Render2D.popAlpha();
 
 		if (visible) {
-			hoveredTipIf(m, m.getDescription(), x, y, PANEL_W, ROW_H);
-			hits.add(new Hit(x, y, PANEL_W, ROW_H, (button, mx, my) -> {
+			hoveredTipIf(m, m.getDescription(), x, y, panelW(), rowH());
+			hits.add(new Hit(x, y, panelW(), rowH(), (button, mx, my) -> {
 				if (button == 0 && !m.isSettingsOnly()) m.toggle();
 				else if (button == 1 || button == 0) {
 					if (!m.getSettings().isEmpty()) expanded.put(m, !expanded.getOrDefault(m, false));
@@ -372,17 +402,17 @@ public class PanelClickGuiScreen extends Screen {
 			}));
 		}
 
-		float next = y + ROW_H;
+		float next = y + rowH();
 		if (expand > 0.01f && !m.getSettings().isEmpty()) {
 			float full = settingsHeight(m);
 			float shown = full * Anim.ease(expand);
 			Render2D.pushAlpha(Anim.ease(Math.min(1f, expand * 1.3f)) * match);
-			Render2D.roundRect(g, x + 3f, next, PANEL_W - 6f, shown, 3f, 0x66000000);
+			Render2D.roundRect(g, x + 3f, next, panelW() - 6f, shown, OogaTheme.corner(3f), 0x59000000);
 			float sy = next + 2f;
 			for (Setting<?> setting : m.getSettings()) {
 				if (!setting.isVisible()) continue;
 				if (sy > next + shown || sy > panelBottom) break;
-				sy = drawSetting(g, setting, x + 9f, sy, PANEL_W - 18f);
+				sy = drawSetting(g, setting, x + 9f, sy, panelW() - 18f);
 			}
 			Render2D.popAlpha();
 			next += shown;
@@ -391,7 +421,7 @@ public class PanelClickGuiScreen extends Screen {
 	}
 
 	private float settingsHeight(Module m) {
-		float h = 4f;
+		float h = 6f; // 2px above the first setting, 4px below the last
 		for (Setting<?> s : m.getSettings()) {
 			if (s.isVisible()) h += s instanceof NumberSetting ? 20f : 13f;
 		}
@@ -399,7 +429,7 @@ public class PanelClickGuiScreen extends Screen {
 	}
 
 	private float drawSetting(GuiGraphics g, Setting<?> setting, float x, float y, float w) {
-		float scale = 0.72f;
+		float scale = S7;
 		boolean number = setting instanceof NumberSetting;
 		float h = number ? 20f : 13f;
 		float hv = hover(setting, x - 4, y, w + 8, h);
@@ -407,7 +437,7 @@ public class PanelClickGuiScreen extends Screen {
 		hoveredTipIf(setting, setting.getDescription(), x - 4, y, w + 8, h);
 
 		if (setting instanceof BooleanSetting bool) {
-			OogaFonts.draw(g, OogaFonts.trim(setting.getName(), Weight.REGULAR, scale, w - 20f), x, y + 3.5f, label, Weight.REGULAR, scale);
+			OogaFonts.draw(g, OogaFonts.trim(setting.getName(), Weight.REGULAR, scale, w - 20f), x, textY(y, h, 7), label, Weight.REGULAR, scale);
 			float on = anim("bool#" + System.identityHashCode(setting), bool.get() ? 1f : 0f, 16f).update(bool.get() ? 1f : 0f);
 			Widgets.toggle(g, x + w - 12f, y + 3f, 12f, 7f, on, hv);
 			hits.add(new Hit(x - 4, y, w + 8, h, (button, mx, my) -> {
@@ -418,8 +448,8 @@ public class PanelClickGuiScreen extends Screen {
 		} else if (setting instanceof NumberSetting num) {
 			String value = num.format();
 			float vw = OogaFonts.width(value, Weight.SEMIBOLD, scale);
-			OogaFonts.draw(g, OogaFonts.trim(setting.getName(), Weight.REGULAR, scale, w - vw - 6f), x, y + 2.5f, label, Weight.REGULAR, scale);
-			OogaFonts.draw(g, value, x + w - vw, y + 2.5f, OogaTheme.GOLD_TEXT, Weight.SEMIBOLD, scale);
+			OogaFonts.draw(g, OogaFonts.trim(setting.getName(), Weight.REGULAR, scale, w - vw - 6f), x, y + 2f, label, Weight.REGULAR, scale);
+			OogaFonts.draw(g, value, x + w - vw, y + 2f, OogaTheme.GOLD_TEXT, Weight.SEMIBOLD, scale);
 			boolean active = draggingSlider == num;
 			Anim shown = anim("slider#" + System.identityHashCode(setting), (float) num.getProgress(), 28f);
 			float progress = active ? (float) num.getProgress() : shown.update((float) num.getProgress());
@@ -440,10 +470,10 @@ public class PanelClickGuiScreen extends Screen {
 				return true;
 			}));
 		} else if (setting instanceof ModeSetting mode) {
-			float chipW = OogaFonts.width(mode.get(), Weight.SEMIBOLD, 0.62f) + 9f;
-			OogaFonts.draw(g, OogaFonts.trim(setting.getName(), Weight.REGULAR, scale, w - chipW - 6f), x, y + 3.5f, label, Weight.REGULAR, scale);
+			float chipW = OogaFonts.width(mode.get(), Weight.SEMIBOLD, S7) + 9f;
+			OogaFonts.draw(g, OogaFonts.trim(setting.getName(), Weight.REGULAR, scale, w - chipW - 6f), x, textY(y, h, 7), label, Weight.REGULAR, scale);
 			Widgets.chip(g, x + w, y + h / 2f, mode.get(), OogaTheme.GOLD_TEXT, ColorUtil.lerp(OogaTheme.SURFACE_INSET, OogaTheme.SURFACE_CONTROL, hv),
-					ColorUtil.lerp(OogaTheme.BORDER, 0x55F2C14E, hv), 0.62f);
+					ColorUtil.lerp(OogaTheme.BORDER, OogaTheme.accent(0x55), hv), S7);
 			hits.add(new Hit(x - 4, y, w + 8, h, (button, mx, my) -> {
 				if (button == 0) mode.cycle(true);
 				else if (button == 1) mode.cycle(false);
@@ -473,32 +503,32 @@ public class PanelClickGuiScreen extends Screen {
 		Render2D.pushAlpha(appear);
 		drawPanelFrame(g, SEARCH_ID, x, y, h, appear, Icon.SEARCH, "Search", null);
 		if (body > 0.5f) {
-			g.enableScissor(Math.round(x), Math.round(y + HEADER_H + 1), Math.round(x + PANEL_W), Math.round(y + h));
+			g.enableScissor(Math.round(x), Math.round(y + HEADER_H + 1), Math.round(x + panelW()), Math.round(y + h));
 			// Field.
-			float fx = x + 6f, fy = y + HEADER_H + 6f, fw = PANEL_W - 12f, fh = 14f;
+			float fx = x + 6f, fy = y + HEADER_H + 6f, fw = panelW() - 12f, fh = 14f;
 			boolean typing = !search.isEmpty();
 			float focus = anim("searchFocus", 0f, 16f).update(typing ? 1f : 0f);
-			if (focus > 0.01f) GlowRenderer.glow(g, fx, fy, fw, fh, 3f, OogaTheme.GOLD, 0.4f * focus);
-			Render2D.roundRect(g, fx, fy, fw, fh, 3f, OogaTheme.SURFACE_INSET);
-			Render2D.outline(g, fx, fy, fw, fh, 3f, ColorUtil.lerp(OogaTheme.BORDER, 0x99F2C14E, focus));
+			if (focus > 0.01f) GlowRenderer.glow(g, fx, fy, fw, fh, OogaTheme.corner(3f), OogaTheme.GOLD, 0.3f * focus);
+			Render2D.roundRect(g, fx, fy, fw, fh, OogaTheme.corner(3f), OogaTheme.SURFACE_INSET);
+			Render2D.outline(g, fx, fy, fw, fh, OogaTheme.corner(3f), ColorUtil.lerp(OogaTheme.BORDER, OogaTheme.accent(0x99), focus));
 			if (typing) {
 				String shown = search.toString();
-				while (shown.length() > 1 && OogaFonts.width(shown, Weight.REGULAR, 0.8f) > fw - 12f) shown = shown.substring(1);
-				OogaFonts.draw(g, shown, fx + 5f, fy + 3.6f, OogaTheme.TEXT, Weight.REGULAR, 0.8f);
+				while (shown.length() > 1 && OogaFonts.width(shown, Weight.REGULAR, S8) > fw - 12f) shown = shown.substring(1);
+				OogaFonts.draw(g, shown, fx + 5f, fy + 3.6f, OogaTheme.TEXT, Weight.REGULAR, S8);
 				if ((System.currentTimeMillis() / 530) % 2 == 0) {
-					Render2D.rect(g, fx + 5.5f + OogaFonts.width(shown, Weight.REGULAR, 0.8f), fy + 3f, 0.75f, 8f, OogaTheme.GOLD);
+					Render2D.rect(g, fx + 5.5f + OogaFonts.width(shown, Weight.REGULAR, S8), fy + 3f, 0.75f, 8f, OogaTheme.GOLD);
 				}
 			} else {
-				OogaFonts.draw(g, "Type to search", fx + 5f, fy + 3.6f, OogaTheme.TEXT_MUTED, Weight.REGULAR, 0.8f);
+				OogaFonts.draw(g, "Type to search", fx + 5f, fy + 3.6f, OogaTheme.TEXT_MUTED, Weight.REGULAR, S8);
 			}
 
 			// Edit HUD button.
-			float bx = x + 6f, by = fy + fh + 5f, bw = PANEL_W - 12f, bh = 14f;
+			float bx = x + 6f, by = fy + fh + 5f, bw = panelW() - 12f, bh = 14f;
 			float bh2 = hover("editHud", bx, by, bw, bh);
-			Render2D.roundRect(g, bx, by, bw, bh, 3f, ColorUtil.lerp(0xFF15171C, 0x26F2C14E, bh2));
-			Render2D.outline(g, bx, by, bw, bh, 3f, ColorUtil.lerp(OogaTheme.BORDER, 0x80F2C14E, bh2));
+			Render2D.roundRect(g, bx, by, bw, bh, OogaTheme.corner(3f), ColorUtil.lerp(0xFF15171C, OogaTheme.accent(0x26), bh2));
+			Render2D.outline(g, bx, by, bw, bh, OogaTheme.corner(3f), ColorUtil.lerp(OogaTheme.BORDER, OogaTheme.accent(0x80), bh2));
 			Icon.MOVE.draw(g, bx + 6f, by + 3.5f, 7f, ColorUtil.lerp(OogaTheme.TEXT_SECONDARY, OogaTheme.GOLD, bh2));
-			OogaFonts.draw(g, "Edit HUD", bx + 17f, by + 3.8f, ColorUtil.lerp(OogaTheme.TEXT_SECONDARY, OogaTheme.TEXT, bh2), Weight.SEMIBOLD, 0.75f);
+			OogaFonts.draw(g, "Edit HUD", bx + 17f, by + 3.8f, ColorUtil.lerp(OogaTheme.TEXT_SECONDARY, OogaTheme.TEXT, bh2), Weight.SEMIBOLD, S7);
 			hits.add(new Hit(bx, by, bw, bh, (button, mx, my) -> {
 				if (button != 0) return false;
 				minecraft.setScreen(new HudEditorScreen(this));
@@ -542,7 +572,7 @@ public class PanelClickGuiScreen extends Screen {
 		float my = (float) event.y() / scale();
 		if (draggingPanel != null) {
 			PanelLayout.Entry e = PanelLayout.get(draggingPanel);
-			e.x = Math.max(0, Math.min(screenW() - PANEL_W, mx - dragDX));
+			e.x = Math.max(0, Math.min(screenW() - panelW(), mx - dragDX));
 			e.y = Math.max(0, Math.min(screenH() - HEADER_H, my - dragDY));
 			return true;
 		}

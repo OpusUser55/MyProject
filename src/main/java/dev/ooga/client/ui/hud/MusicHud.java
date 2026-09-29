@@ -109,11 +109,13 @@ public class MusicHud extends HudElement {
 				Render2D.roundRect(g, textX, barY, Math.max(2f, barW * progress), 2f, 1f, OogaTheme.GOLD);
 				GlowRenderer.glowCircle(g, textX + barW * progress, barY + 1f, 1.6f, OogaTheme.GOLD, 0.5f * play);
 			}
-			String elapsed = MediaInfo.formatTime(shown.positionAt(millis));
-			String total = shown.durationSeconds() > 0 ? MediaInfo.formatTime(shown.durationSeconds()) : "--:--";
-			OogaFonts.draw(g, elapsed, textX, barY + 3.5f, OogaTheme.TEXT_MUTED, Weight.REGULAR, 0.58f);
-			float tw = OogaFonts.width(total, Weight.REGULAR, 0.58f);
-			OogaFonts.draw(g, total, textX + barW - tw, barY + 3.5f, OogaTheme.TEXT_MUTED, Weight.REGULAR, 0.58f);
+			if (module.times.get()) {
+				String elapsed = MediaInfo.formatTime(shown.positionAt(millis));
+				String total = shown.durationSeconds() > 0 ? MediaInfo.formatTime(shown.durationSeconds()) : "--:--";
+				OogaFonts.draw(g, elapsed, textX, barY + 3.5f, OogaTheme.TEXT_MUTED, Weight.REGULAR, 0.58f);
+				float tw = OogaFonts.width(total, Weight.REGULAR, 0.58f);
+				OogaFonts.draw(g, total, textX + barW - tw, barY + 3.5f, OogaTheme.TEXT_MUTED, Weight.REGULAR, 0.58f);
+			}
 		}
 
 		if (module.controls.get()) drawControls(g, x, y, scale, playing, shown != null);
@@ -128,12 +130,12 @@ public class MusicHud extends HudElement {
 		float cy = y + r;
 		if (play > 0.01f) GlowRenderer.glowCircle(g, cx, cy, r, OogaTheme.GOLD, 0.35f * play);
 		Render2D.circle(g, cx, cy, r, 0xFF16181D);
-		Render2D.outline(g, cx - r, cy - r, r * 2, r * 2, r, 2, ColorUtil.lerp(0x55F2C14E, OogaTheme.GOLD, play));
+		Render2D.outline(g, cx - r, cy - r, r * 2, r * 2, r, 2, ColorUtil.lerp(OogaTheme.accent(0x55), OogaTheme.GOLD, play));
 		// Grooves.
 		Render2D.outline(g, cx - r * 0.72f, cy - r * 0.72f, r * 1.44f, r * 1.44f, r * 0.72f, 1, 0x14FFFFFF);
 		Render2D.outline(g, cx - r * 0.5f, cy - r * 0.5f, r, r, r * 0.5f, 1, 0x10FFFFFF);
 		// Label: the Ooga mark.
-		Render2D.diamond(g, cx, cy, r * 0.28f, ColorUtil.lerp(0x80F2C14E, OogaTheme.GOLD_BRIGHT, play));
+		Render2D.diamond(g, cx, cy, r * 0.28f, ColorUtil.lerp(OogaTheme.accent(0x80), OogaTheme.GOLD_BRIGHT, play));
 		// Orbiting highlight.
 		float orbit = r * 0.84f;
 		float dx = (float) Math.cos(discAngle) * orbit;
@@ -174,7 +176,7 @@ public class MusicHud extends HudElement {
 			box[3] = (ICON + 6f) * scale;
 			boolean over = interactive && active && mx >= box[0] && mx < box[0] + box[2] && my >= box[1] && my < box[1] + box[3];
 			float hv = buttonHover[i].update(over ? 1f : 0f);
-			if (hv > 0.01f) Render2D.circle(g, ix + ICON / 2f, by + ICON / 2f, ICON * 0.9f, ColorUtil.fade(0x1FF2C14E, hv));
+			if (hv > 0.01f) Render2D.circle(g, ix + ICON / 2f, by + ICON / 2f, ICON * 0.9f, ColorUtil.fade(OogaTheme.accent(0x1F), hv));
 			int base = i == 1 ? OogaTheme.TEXT : OogaTheme.TEXT_SECONDARY;
 			int color = active ? ColorUtil.lerp(base, OogaTheme.GOLD, hv) : OogaTheme.TEXT_MUTED;
 			icons[i].draw(g, ix, by, ICON, color);

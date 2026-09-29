@@ -9,7 +9,10 @@ import dev.ooga.client.ui.hud.KeystrokesHud;
 
 public class KeystrokesModule extends Module {
 	public final BooleanSetting mouse = add(new BooleanSetting("Mouse Buttons", "Show left and right click with CPS.", true));
+	public final BooleanSetting cps = add(new BooleanSetting("Show CPS", "Clicks per second under each mouse button.", true)
+			.visibleWhen(mouse::get));
 	public final BooleanSetting space = add(new BooleanSetting("Space Bar", "Show the jump key.", true));
+	public final NumberSetting keySize = add(new NumberSetting("Key Size", "Size of each key.", 18, 14, 26, 1, "px"));
 	public final NumberSetting scale = add(new NumberSetting("Scale", "Keystrokes size.", 1.0, 0.5, 2.0, 0.05, "x"));
 
 	public KeystrokesModule() {

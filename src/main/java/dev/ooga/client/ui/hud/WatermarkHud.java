@@ -9,6 +9,11 @@ import dev.ooga.client.ui.render.OogaFonts.Weight;
 import dev.ooga.client.ui.render.Render2D;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.multiplayer.ServerData;
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.StringJoiner;
 
 /**
  * The Ooga watermark: a charcoal capsule holding the diamond mark and a letter-spaced
@@ -17,6 +22,8 @@ import net.minecraft.client.gui.GuiGraphics;
 public class WatermarkHud extends HudElement {
 	private static final float BASE_HEIGHT = 17f;
 	private static final float TRACKING = 1.1f;
+	private static final DateTimeFormatter CLOCK_24 = DateTimeFormatter.ofPattern("HH:mm");
+	private static final DateTimeFormatter CLOCK_12 = DateTimeFormatter.ofPattern("h:mm a");
 
 	private final WatermarkModule module;
 
@@ -41,7 +48,7 @@ public class WatermarkHud extends HudElement {
 		String style = module.style.get();
 		boolean showWord = !style.equals("Mark");
 		boolean showFull = style.equals("Full");
-		String info = module.fps.get() ? Minecraft.getInstance().getFps() + " fps" : null;
+		String info = infoText();
 
 		// Measure in unscaled units first.
 		float pad = 6f;
@@ -68,7 +75,7 @@ public class WatermarkHud extends HudElement {
 		float cy = h / 2f;
 		float glowStrength = module.glow.getFloat();
 		if (glowStrength > 0) GlowRenderer.glow(g, cx - 3.5f, cy - 3.5f, 7f, 7f, 3.5f, OogaTheme.GOLD, glowStrength);
-		Render2D.diamond(g, cx, cy, markSize / 2f, 0x59F2C14E);
+		Render2D.diamond(g, cx, cy, markSize / 2f, OogaTheme.accent(0x59));
 		Render2D.diamond(g, cx, cy, markSize / 4f, OogaTheme.GOLD_BRIGHT);
 
 		float tx = pad + markSize + 5f;
@@ -88,6 +95,21 @@ public class WatermarkHud extends HudElement {
 
 		Render2D.popAlpha();
 		g.pose().popMatrix();
+	}
+
+	/** The trailing readout: any of FPS, time and server, separated by middots. */
+	private String infoText() {
+		Minecraft mc = Minecraft.getInstance();
+		StringJoiner joiner = new StringJoiner("  ·  ");
+		if (module.fps.get()) joiner.add(mc.getFps() + " fps");
+		if (module.time.get()) {
+			joiner.add(LocalTime.now().format(module.clock.is("12h") ? CLOCK_12 : CLOCK_24));
+		}
+		if (module.server.get()) {
+			ServerData server = mc.getCurrentServer();
+			joiner.add(server != null ? server.ip : "Singleplayer");
+		}
+		return joiner.length() == 0 ? null : joiner.toString();
 	}
 
 	private static float trackedWidth(String text, Weight weight, float scale) {

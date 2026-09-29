@@ -12,6 +12,7 @@ public class MusicModule extends Module {
 	public final NumberSetting scale = add(new NumberSetting("Scale", "Widget size.", 1.0, 0.5, 2.0, 0.05, "x"));
 	public final BooleanSetting hideIdle = add(new BooleanSetting("Hide When Idle", "Only show while something is playing.", true));
 	public final BooleanSetting controls = add(new BooleanSetting("Controls", "Previous, play/pause and next buttons (click them with chat open).", true));
+	public final BooleanSetting times = add(new BooleanSetting("Show Times", "Elapsed and total time under the progress bar.", true));
 	public final BooleanSetting marquee = add(new BooleanSetting("Scroll Titles", "Scroll titles that don't fit.", true));
 
 	private final MusicHud hud = new MusicHud(this);

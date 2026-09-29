@@ -1,5 +1,7 @@
 package dev.ooga.client.camera;
 
+import dev.ooga.client.module.ModuleManager;
+import dev.ooga.client.module.impl.render.ZoomModule;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.BlockPos;
@@ -21,6 +23,7 @@ public final class FirstPersonRenderer {
 	}
 
 	public static boolean shouldRenderHand() {
+		if (ModuleManager.get().get(ZoomModule.class).hidesHand()) return false;
 		CameraMode mode = CameraController.get().activeMode();
 		return mode == null || mode.renderHand();
 	}

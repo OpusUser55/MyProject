@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class KeystrokesHud extends HudElement {
-	private static final float KEY = 18f;
 	private static final float GAP = 2f;
 
 	private final KeystrokesModule module;
@@ -44,9 +43,10 @@ public class KeystrokesHud extends HudElement {
 	protected void render(GuiGraphics g, float x, float y, float delta) {
 		Options o = Minecraft.getInstance().options;
 		float scale = module.scale.getFloat();
-		float full = KEY * 3 + GAP * 2;
-		float h = KEY * 2 + GAP;
-		if (module.mouse.get()) h += GAP + KEY;
+		float key = module.keySize.getFloat();
+		float full = key * 3 + GAP * 2;
+		float h = key * 2 + GAP;
+		if (module.mouse.get()) h += GAP + key;
 		if (module.space.get()) h += GAP + 9f;
 		width = full * scale;
 		height = h * scale;
@@ -55,16 +55,16 @@ public class KeystrokesHud extends HudElement {
 		g.pose().translate(x, y);
 		g.pose().scale(scale, scale);
 
-		key(g, "W", o.keyUp, KEY + GAP, 0, KEY, KEY, null);
-		key(g, "A", o.keyLeft, 0, KEY + GAP, KEY, KEY, null);
-		key(g, "S", o.keyDown, KEY + GAP, KEY + GAP, KEY, KEY, null);
-		key(g, "D", o.keyRight, (KEY + GAP) * 2, KEY + GAP, KEY, KEY, null);
-		float rowY = (KEY + GAP) * 2;
+		key(g, "W", o.keyUp, key + GAP, 0, key, key, null);
+		key(g, "A", o.keyLeft, 0, key + GAP, key, key, null);
+		key(g, "S", o.keyDown, key + GAP, key + GAP, key, key, null);
+		key(g, "D", o.keyRight, (key + GAP) * 2, key + GAP, key, key, null);
+		float rowY = (key + GAP) * 2;
 		if (module.mouse.get()) {
 			float half = (full - GAP) / 2f;
-			key(g, "LMB", o.keyAttack, 0, rowY, half, KEY, ClickTracker.leftCps() + " CPS");
-			key(g, "RMB", o.keyUse, half + GAP, rowY, half, KEY, ClickTracker.rightCps() + " CPS");
-			rowY += KEY + GAP;
+			key(g, "LMB", o.keyAttack, 0, rowY, half, key, module.cps.get() ? ClickTracker.leftCps() + " CPS" : null);
+			key(g, "RMB", o.keyUse, half + GAP, rowY, half, key, module.cps.get() ? ClickTracker.rightCps() + " CPS" : null);
+			rowY += key + GAP;
 		}
 		if (module.space.get()) {
 			float t = anim("space", o.keyJump);

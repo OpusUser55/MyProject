@@ -10,20 +10,39 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 
 /**
- * Typography. Ooga ships Inter (see assets/ooga/font) in three weights and falls back to the
- * vanilla font per glyph for anything outside Latin. Users can switch back to the vanilla font
- * entirely from Client Settings.
+ * Typography. Ooga ships Inter (see assets/ooga/font) at several real sizes rather than one
+ * size scaled up and down: scaled glyphs go soft, glyphs rasterised at their size stay sharp.
+ * A requested scale picks the nearest real size and only the small remainder is scaled.
+ * Anything outside Latin falls back to the vanilla font per glyph, and users can switch back
+ * to the vanilla font entirely from Client Settings.
  */
 public final class OogaFonts {
 	public enum Weight {
-		REGULAR("ui"),
-		SEMIBOLD("ui_bold"),
-		DISPLAY("display");
+		REGULAR(9f, new int[]{7, 8, 9}, "ui_7", "ui_8", "ui"),
+		SEMIBOLD(9f, new int[]{7, 8, 9}, "ui_bold_7", "ui_bold_8", "ui_bold"),
+		DISPLAY(11f, new int[]{11}, "display");
 
-		private final FontDescription description;
+		private final float baseSize;
+		private final int[] sizes;
+		private final FontDescription[] descriptions;
 
-		Weight(String path) {
-			this.description = new FontDescription.Resource(Identifier.fromNamespaceAndPath("ooga", path));
+		Weight(float baseSize, int[] sizes, String... paths) {
+			this.baseSize = baseSize;
+			this.sizes = sizes;
+			this.descriptions = new FontDescription[paths.length];
+			for (int i = 0; i < paths.length; i++) {
+				descriptions[i] = new FontDescription.Resource(Identifier.fromNamespaceAndPath("ooga", paths[i]));
+			}
+		}
+
+		/** Index of the real size closest to {@code baseSize * scale}. */
+		private int pick(float scale) {
+			float target = baseSize * scale;
+			int best = sizes.length - 1;
+			for (int i = 0; i < sizes.length; i++) {
+				if (Math.abs(sizes[i] - target) < Math.abs(sizes[best] - target)) best = i;
+			}
+			return best;
 		}
 	}
 
@@ -34,20 +53,28 @@ public final class OogaFonts {
 		return Minecraft.getInstance().font;
 	}
 
-	public static Component text(String text, Weight weight) {
+	private static Component text(String text, Weight weight, int sizeIndex) {
 		MutableComponent component = Component.literal(text);
 		if (ClientSettings.customFont()) {
-			return component.withStyle(style -> style.withFont(weight.description));
+			FontDescription description = weight.descriptions[sizeIndex];
+			return component.withStyle(style -> style.withFont(description));
 		}
 		return weight == Weight.REGULAR ? component : component.withStyle(style -> style.withBold(weight == Weight.DISPLAY));
 	}
 
+	/** Remaining scale to apply after choosing a real size. */
+	private static float residual(Weight weight, int sizeIndex, float scale) {
+		if (!ClientSettings.customFont()) return scale;
+		return weight.baseSize * scale / weight.sizes[sizeIndex];
+	}
+
 	public static float width(String text, Weight weight) {
-		return font().width(text(text, weight));
+		return width(text, weight, 1f);
 	}
 
 	public static float width(String text, Weight weight, float scale) {
-		return width(text, weight) * scale;
+		int index = weight.pick(scale);
+		return font().width(text(text, weight, index)) * residual(weight, index, scale);
 	}
 
 	public static float height(float scale) {
@@ -61,10 +88,16 @@ public final class OogaFonts {
 	public static void draw(GuiGraphics g, String text, float x, float y, int color, Weight weight, float scale) {
 		int c = Render2D.apply(color);
 		if ((c >>> 24) < 4) return;
+		int index = weight.pick(scale);
+		float rest = residual(weight, index, scale);
+		// Snap to the physical pixel grid: text between pixels is resampled and looks smeared.
+		int gs = Render2D.guiScale();
+		float sx = Math.round(x * gs) / (float) gs;
+		float sy = Math.round(y * gs) / (float) gs;
 		g.pose().pushMatrix();
-		g.pose().translate(x, y);
-		if (scale != 1f) g.pose().scale(scale, scale);
-		g.drawString(font(), text(text, weight), 0, 0, c, false);
+		g.pose().translate(sx, sy);
+		if (Math.abs(rest - 1f) > 0.01f) g.pose().scale(rest, rest);
+		g.drawString(font(), text(text, weight, index), 0, 0, c, false);
 		g.pose().popMatrix();
 	}
 

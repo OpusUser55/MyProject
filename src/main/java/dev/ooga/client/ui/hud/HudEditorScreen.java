@@ -56,8 +56,8 @@ public class HudEditorScreen extends Screen {
 		HudManager.get().renderElements(g, delta);
 
 		if (dragging != null) {
-			if (snappedX) Render2D.rect(g, width / 2f - 0.5f, 0, 1f, height, 0x88F2C14E);
-			if (snappedY) Render2D.rect(g, 0, height / 2f - 0.5f, width, 1f, 0x88F2C14E);
+			if (snappedX) Render2D.rect(g, width / 2f - 0.5f, 0, 1f, height, OogaTheme.accent(0x88));
+			if (snappedY) Render2D.rect(g, 0, height / 2f - 0.5f, width, 1f, OogaTheme.accent(0x88));
 		}
 
 		Render2D.pushAlpha(t);
