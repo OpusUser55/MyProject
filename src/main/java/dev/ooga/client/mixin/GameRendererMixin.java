@@ -1,5 +1,6 @@
 package dev.ooga.client.mixin;
 
+import dev.ooga.client.camera.CameraController;
 import dev.ooga.client.camera.FirstPersonRenderer;
 import dev.ooga.client.module.ModuleManager;
 import dev.ooga.client.module.impl.render.ZoomModule;
@@ -20,6 +21,12 @@ public abstract class GameRendererMixin {
 		if (!useFovSetting) return;
 		float zoom = ModuleManager.get().get(ZoomModule.class).currentZoom();
 		if (zoom != 1f) cir.setReturnValue(cir.getReturnValue() / zoom);
+	}
+
+	/** A detached camera that can't interact shouldn't highlight the block the body is facing. */
+	@Inject(method = "shouldRenderBlockOutline", at = @At("HEAD"), cancellable = true)
+	private void ooga$hideOutline(CallbackInfoReturnable<Boolean> cir) {
+		if (CameraController.get().blocksInteraction()) cir.setReturnValue(false);
 	}
 
 	@Inject(method = "renderItemInHand", at = @At("HEAD"), cancellable = true)

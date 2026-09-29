@@ -73,13 +73,19 @@ public class HudEditorScreen extends Screen {
 			if (hv > 0.01f) GlowRenderer.glow(g, x, y, w, h, OogaTheme.RADIUS_CONTROL, OogaTheme.GOLD, 0.5f * hv);
 			Render2D.outline(g, x, y, w, h, OogaTheme.RADIUS_CONTROL, ColorUtil.lerp(0x40FFFFFF, OogaTheme.GOLD, hv));
 
-			String label = element.getDisplayName();
-			NumberSetting scale = element.scaleSetting();
-			if (scale != null && hv > 0.5f) label += "  " + scale.format();
-			float lw = OogaFonts.width(label, Weight.SEMIBOLD, 0.7f) + 8f;
-			float ly = y > 12f ? y - 11f : y + h + 2f;
-			Render2D.roundRect(g, x, ly, lw, 9f, 2f, ColorUtil.lerp(0xE0141519, OogaTheme.GOLD, hv));
-			OogaFonts.draw(g, label, x + 4f, ly + 1.6f, ColorUtil.lerp(OogaTheme.TEXT_SECONDARY, OogaTheme.ON_GOLD, hv), Weight.SEMIBOLD, 0.7f);
+			// Name chip only for the element under the cursor, so neighbours' labels never collide.
+			if (hv > 0.01f) {
+				String label = element.getDisplayName();
+				NumberSetting scale = element.scaleSetting();
+				if (scale != null) label += "  " + scale.format();
+				float lw = OogaFonts.width(label, Weight.SEMIBOLD, 0.7f) + 8f;
+				float ly = y > 12f ? y - 11f : y + h + 2f;
+				float lx = Math.min(x, width - lw - 2f);
+				Render2D.pushAlpha(hv);
+				Render2D.roundRect(g, lx, ly, lw, 9f, 2f, OogaTheme.GOLD);
+				OogaFonts.draw(g, label, lx + 4f, ly + 1.6f, OogaTheme.ON_GOLD, Weight.SEMIBOLD, 0.7f);
+				Render2D.popAlpha();
+			}
 		}
 
 		String hint = "Drag to move  ·  Scroll to resize  ·  Esc to finish";

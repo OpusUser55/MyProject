@@ -63,6 +63,9 @@ public class ClickGuiScreen extends Screen {
 	private final Anim categoryIndicator = new Anim(-1f, 18f);
 	private final Anim scroll = new Anim(0f, 20f);
 	private final Anim searchFocus = new Anim(0f, 16f);
+	/** Fades the module list in whenever its contents change (category or query). */
+	private final Anim contentIn = new Anim(1f, 12f);
+	private String contentKey = "";
 	private final Map<Module, CardState> cards = new IdentityHashMap<>();
 	/** Keyed by settings, categories and stable string ids, hence equals-based. */
 	private final Map<Object, Anim> hovers = new HashMap<>();
@@ -412,7 +415,16 @@ public class ClickGuiScreen extends Screen {
 		float offset = scroll.update(scrollTarget);
 
 		g.enableScissor(Math.round(cx), Math.round(listTop - 2), Math.round(w - 1), Math.round(listBottom));
-		float y = listTop - offset;
+		String key = searching ? "?" + search : category.name();
+		if (!key.equals(contentKey)) {
+			// Typing refines results in place; only a category switch gets the full slide.
+			boolean refine = searching && contentKey.startsWith("?");
+			contentKey = key;
+			contentIn.snap(refine ? 0.6f : 0f);
+		}
+		float appear = Anim.ease(contentIn.update(1f));
+		Render2D.pushAlpha(appear);
+		float y = listTop - offset + (1f - appear) * 8f;
 		boolean mouseInList = localMouseX >= cx && localMouseX < w && localMouseY >= listTop && localMouseY < listBottom;
 		for (Module m : modules) {
 			float ch = cardHeight(m);
@@ -430,6 +442,7 @@ public class ClickGuiScreen extends Screen {
 			OogaFonts.drawCentered(g, headline, cx + cw / 2f, ey + 19f, OogaTheme.TEXT_SECONDARY, Weight.SEMIBOLD, 1f);
 			OogaFonts.drawCentered(g, detail, cx + cw / 2f, ey + 31f, OogaTheme.TEXT_MUTED, Weight.REGULAR, 0.78f);
 		}
+		Render2D.popAlpha();
 		g.disableScissor();
 
 		// Soft fades at the list edges hint that there's more to scroll.
@@ -641,7 +654,12 @@ public class ClickGuiScreen extends Screen {
 			boolean active = draggingSlider == number;
 			Anim a = hovers.computeIfAbsent(setting, k -> new Anim(0f, 18f));
 			float activeT = a.update(active ? 1f : rowHover ? 0.4f : 0f);
-			Widgets.slider(g, trackX, trackY, trackW, (float) number.getProgress(), activeT);
+			// Follows the mouse tightly while dragging, glides for resets and scroll changes.
+			Anim shown = hovers.computeIfAbsent(setting.getName() + "#" + System.identityHashCode(setting),
+					k -> new Anim((float) number.getProgress(), 28f));
+			float progress = active ? (float) number.getProgress() : shown.update((float) number.getProgress());
+			if (active) shown.snap(progress);
+			Widgets.slider(g, trackX, trackY, trackW, progress, activeT);
 			hits.add(new Hit(trackX - 4, y, trackW + 8, h, (button, mx, my) -> {
 				if (button != 0) return false;
 				draggingSlider = number;
