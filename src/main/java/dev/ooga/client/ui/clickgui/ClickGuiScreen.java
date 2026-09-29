@@ -350,7 +350,7 @@ public class ClickGuiScreen extends Screen {
 
 		// Footer: live summary.
 		int enabled = 0;
-		for (Module m : ModuleManager.get().getModules()) if (m.isEnabled() && !m.isSettingsOnly() && !m.isHiddenFromList()) enabled++;
+		for (Module m : ModuleManager.get().getModules()) if (m.isEnabled() && !m.isSettingsOnly()) enabled++;
 		float fy = h - PAD - 8f;
 		Render2D.circle(g, PAD + 2.5f, fy + 3f, 2f, enabled > 0 ? OogaTheme.GOLD : OogaTheme.TEXT_MUTED);
 		OogaFonts.draw(g, enabled + " active", PAD + 8f, fy, OogaTheme.TEXT_MUTED, Weight.REGULAR, 0.75f);
@@ -392,8 +392,8 @@ public class ClickGuiScreen extends Screen {
 		int enabledCount = 0;
 		for (Module m : modules) if (m.isEnabled() && !m.isSettingsOnly()) enabledCount++;
 		String subtitle = searching
-				? modules.size() + (modules.size() == 1 ? " result" : " results")
-				: modules.size() + " modules  ·  " + enabledCount + " enabled";
+				? plural(modules.size(), "result")
+				: plural(modules.size(), "module") + "  ·  " + enabledCount + " enabled";
 		float hy = HEADER + PAD;
 		OogaFonts.draw(g, title, cx + PAD, hy, OogaTheme.TEXT, Weight.DISPLAY);
 		float titleW = OogaFonts.width(title, Weight.DISPLAY);
@@ -457,7 +457,7 @@ public class ClickGuiScreen extends Screen {
 	}
 
 	private float settingHeight(Setting<?> setting) {
-		return setting instanceof NumberSetting ? 25f : 18f;
+		return 18f;
 	}
 
 	private float settingsHeight(Module m) {
@@ -613,7 +613,9 @@ public class ClickGuiScreen extends Screen {
 		int labelColor = rowHover ? OogaTheme.TEXT : OogaTheme.TEXT_SECONDARY;
 		float labelScale = 0.85f;
 		float labelY = y + 5f;
-		OogaFonts.draw(g, setting.getName(), x, labelY, labelColor, Weight.REGULAR, labelScale);
+		// Labels are trimmed to their column so they can never run under a control.
+		float labelMax = setting instanceof NumberSetting ? w * 0.36f - 6f : w * 0.6f;
+		OogaFonts.draw(g, OogaFonts.trim(setting.getName(), Weight.REGULAR, labelScale, labelMax), x, labelY, labelColor, Weight.REGULAR, labelScale);
 
 		if (setting instanceof BooleanSetting bool) {
 			Anim a = hovers.computeIfAbsent(setting, k -> new Anim(bool.get() ? 1f : 0f, 16f));
@@ -628,23 +630,27 @@ public class ClickGuiScreen extends Screen {
 				return true;
 			}));
 		} else if (setting instanceof NumberSetting number) {
+			// One row: label · track · value. The value column is fixed so tracks line up.
 			String value = number.format();
+			float valueCol = 30f;
 			float vw = OogaFonts.width(value, Weight.SEMIBOLD, 0.8f);
 			OogaFonts.draw(g, value, x + w - vw, labelY + 0.6f, OogaTheme.GOLD_TEXT, Weight.SEMIBOLD, 0.8f);
-			float trackY = y + 17.5f;
+			float trackX = x + w * 0.36f;
+			float trackW = w - valueCol - 8f - (trackX - x);
+			float trackY = y + h / 2f;
 			boolean active = draggingSlider == number;
 			Anim a = hovers.computeIfAbsent(setting, k -> new Anim(0f, 18f));
 			float activeT = a.update(active ? 1f : rowHover ? 0.4f : 0f);
-			Widgets.slider(g, x, trackY, w, (float) number.getProgress(), activeT);
-			hits.add(new Hit(x - 3, y + 10f, w + 6, h - 10f, (button, mx, my) -> {
+			Widgets.slider(g, trackX, trackY, trackW, (float) number.getProgress(), activeT);
+			hits.add(new Hit(trackX - 4, y, trackW + 8, h, (button, mx, my) -> {
 				if (button != 0) return false;
 				draggingSlider = number;
-				sliderX = x;
-				sliderW = w;
-				number.setProgress((mx - x) / w);
+				sliderX = trackX;
+				sliderW = trackW;
+				number.setProgress((mx - trackX) / trackW);
 				return true;
 			}));
-			hits.add(new Hit(x, y, w, 10f, (button, mx, my) -> {
+			hits.add(new Hit(x, y, trackX - x - 4, h, (button, mx, my) -> {
 				if (button == 1) {
 					number.reset();
 					return true;
@@ -665,6 +671,10 @@ public class ClickGuiScreen extends Screen {
 	}
 
 	// ------------------------------------------------------------------ helpers
+
+	private static String plural(int count, String noun) {
+		return count + " " + noun + (count == 1 ? "" : "s");
+	}
 
 	private static boolean inside(float mx, float my, float x, float y, float w, float h) {
 		return mx >= x && mx < x + w && my >= y && my < y + h;

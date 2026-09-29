@@ -16,7 +16,7 @@ public class NotificationsModule extends Module {
 	public final BooleanSetting toggles = add(new BooleanSetting("Module Toggles", "Notify when modules are enabled or disabled.", true));
 
 	public NotificationsModule() {
-		super("Notifications", "Toasts for module toggles and client events.", Category.CLIENT);
+		super("Notifications", "Toasts for module toggles and client events.", Category.HUD);
 		hideFromList();
 		instance = this;
 		enableByDefault();

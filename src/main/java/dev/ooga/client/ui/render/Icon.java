@@ -71,6 +71,16 @@ public enum Icon {
 			}
 		}
 	},
+	HUD {
+		@Override
+		void paint(GuiGraphics g, float x, float y, float s, float t, int c) {
+			// A screen frame with a small widget in its top-left corner.
+			int px = Math.max(1, Math.round(t * Render2D.guiScale()));
+			Render2D.outline(g, x + s * 0.04f, y + s * 0.12f, s * 0.92f, s * 0.76f, s * 0.12f, px, c);
+			Render2D.roundRect(g, x + s * 0.2f, y + s * 0.28f, s * 0.3f, s * 0.18f, s * 0.05f, c);
+			Render2D.roundRect(g, x + s * 0.2f, y + s * 0.54f, s * 0.18f, s * 0.12f, s * 0.04f, ColorUtil.fade(c, 0.6f));
+		}
+	},
 	CLIENT {
 		@Override
 		void paint(GuiGraphics g, float x, float y, float s, float t, int c) {

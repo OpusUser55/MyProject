@@ -22,7 +22,7 @@ public class InfoHudModule extends Module {
 	private double blocksPerSecond;
 
 	public InfoHudModule() {
-		super("Info HUD", "FPS, coordinates, facing, speed and ping.", Category.CLIENT);
+		super("Info HUD", "FPS, coordinates, facing, speed and ping.", Category.HUD);
 		hideFromList();
 		enableByDefault();
 		HudManager.get().register(new InfoHud(this));

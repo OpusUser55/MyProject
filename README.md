@@ -3,6 +3,14 @@
 A Fabric utility client for **Minecraft 1.21.11** with its own visual identity: a dark
 charcoal UI with a restrained, sophisticated gold accent and a soft golden glow.
 
+## Preview
+
+![ClickGUI](docs/previews/clickgui_freecam.png)
+![HUD](docs/previews/hud.png)
+
+These are rendered offline from the real UI code by a stand-in renderer (Inter via Java2D),
+so text anti-aliasing differs slightly from in-game.
+
 ## Building
 
 Requires Java 21.
@@ -42,7 +50,7 @@ src/main/java/dev/ooga/client
 │   ├── OogaTheme.java       colour, radius and spacing tokens
 │   ├── render/              Render2D (pixel-exact shapes), GlowRenderer, OogaFonts, Icon
 │   ├── clickgui/            the menu and its widgets
-│   ├── hud/                 HUD elements, watermark, module list, HUD editor
+│   ├── hud/                 watermark, module list, info, keystrokes, HUD editor
 │   └── notify/              toast notifications
 └── mixin/                   the only code that touches Minecraft internals
 ```

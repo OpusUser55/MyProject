@@ -16,7 +16,7 @@ public class WatermarkModule extends Module {
 	public final BooleanSetting fps = add(new BooleanSetting("Show FPS", "Append the current frame rate.", true));
 
 	public WatermarkModule() {
-		super("Watermark", "The Ooga mark in the corner of your screen.", Category.CLIENT);
+		super("Watermark", "The Ooga mark in the corner of your screen.", Category.HUD);
 		hideFromList();
 		enableByDefault();
 		HudManager.get().register(new WatermarkHud(this));

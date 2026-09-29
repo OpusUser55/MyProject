@@ -8,6 +8,7 @@ public enum Category {
 	RENDER("Render", Icon.RENDER),
 	WORLD("World", Icon.WORLD),
 	MISC("Misc", Icon.MISC),
+	HUD("HUD", Icon.HUD),
 	CLIENT("Client", Icon.CLIENT);
 
 	private final String displayName;

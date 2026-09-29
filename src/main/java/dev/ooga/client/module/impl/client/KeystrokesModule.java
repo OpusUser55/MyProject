@@ -13,7 +13,7 @@ public class KeystrokesModule extends Module {
 	public final NumberSetting scale = add(new NumberSetting("Scale", "Keystrokes size.", 1.0, 0.5, 2.0, 0.05, "x"));
 
 	public KeystrokesModule() {
-		super("Keystrokes", "Shows movement keys and clicks as you press them.", Category.CLIENT);
+		super("Keystrokes", "Shows movement keys and clicks as you press them.", Category.HUD);
 		hideFromList();
 		HudManager.get().register(new KeystrokesHud(this));
 	}

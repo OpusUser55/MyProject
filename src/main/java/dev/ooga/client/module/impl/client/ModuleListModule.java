@@ -16,7 +16,7 @@ public class ModuleListModule extends Module {
 	public final BooleanSetting suffixes = add(new BooleanSetting("Suffixes", "Show module modes next to names.", true));
 
 	public ModuleListModule() {
-		super("Module List", "Lists your enabled modules on screen.", Category.CLIENT);
+		super("Module List", "Lists your enabled modules on screen.", Category.HUD);
 		hideFromList();
 		enableByDefault();
 		HudManager.get().register(new ModuleListHud(this));
