@@ -38,6 +38,14 @@ public interface CameraMode {
 	/** Whether the player may attack, mine and use items while the camera is detached. */
 	boolean allowInteraction();
 
+	/**
+	 * Whether the player's own movement input is cut off while active. Freecam flies the camera
+	 * with the movement keys, so it locks the body; Free Look leaves you walking normally.
+	 */
+	default boolean lockPlayer() {
+		return true;
+	}
+
 	/** Whether to hide the HUD while active. The HUD stays unless the user opts in. */
 	default boolean hideHud() {
 		return false;

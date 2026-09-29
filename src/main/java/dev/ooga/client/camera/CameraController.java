@@ -64,7 +64,7 @@ public final class CameraController {
 		mc.options.setCameraType(CameraType.FIRST_PERSON);
 		// Occlusion culling assumes the eye is in open air; a free camera may be inside blocks.
 		mc.smartCull = false;
-		controlLock.lock();
+		if (newMode.lockPlayer()) controlLock.lock();
 		if (newMode.hideHud()) {
 			savedHideGui = mc.options.hideGui;
 			mc.options.hideGui = true;

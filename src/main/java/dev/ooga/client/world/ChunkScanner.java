@@ -12,8 +12,11 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -38,12 +41,22 @@ public final class ChunkScanner {
 		void forgetChunk(ChunkPos pos);
 
 		void clear();
+
+		/** Lets a listener skip whole 16-block sections, e.g. everything above a height limit. */
+		default boolean wantsSection(int minY) {
+			return true;
+		}
 	}
 
 	private static final int CHUNKS_PER_TICK = 3;
+	/** Quiet period after a block change before its chunk is rescanned, so mining doesn't rescan every tick. */
+	private static final int RESCAN_DELAY_TICKS = 20;
 	private static final List<Listener> LISTENERS = new ArrayList<>();
 	private static final Deque<ChunkPos> QUEUE = new ArrayDeque<>();
 	private static final Set<ChunkPos> QUEUED = new HashSet<>();
+	/** Chunks with recent block changes, and the tick at which each may be rescanned. */
+	private static final Map<Long, Integer> DIRTY = new HashMap<>();
+	private static int ticks;
 
 	private ChunkScanner() {
 	}
@@ -79,22 +92,39 @@ public final class ChunkScanner {
 		}
 	}
 
+	/** Schedules a rescan once the chunk has stopped changing for a moment. */
+	public static void markDirty(ChunkPos pos) {
+		DIRTY.put(pos.toLong(), ticks + RESCAN_DELAY_TICKS);
+	}
+
 	public static void clear() {
 		QUEUE.clear();
 		QUEUED.clear();
+		DIRTY.clear();
 		for (Listener listener : LISTENERS) listener.clear();
 	}
 
 	public static void tick() {
 		Minecraft mc = Minecraft.getInstance();
 		if (mc.level == null) return;
+		ticks++;
 		List<Listener> active = new ArrayList<>();
 		for (Listener listener : LISTENERS) if (listener.active()) active.add(listener);
 		if (active.isEmpty()) {
 			// Nothing wants results; drop the backlog rather than scanning for nobody.
 			QUEUE.clear();
 			QUEUED.clear();
+			DIRTY.clear();
 			return;
+		}
+		if (!DIRTY.isEmpty()) {
+			Iterator<Map.Entry<Long, Integer>> it = DIRTY.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry<Long, Integer> entry = it.next();
+				if (entry.getValue() > ticks) continue;
+				it.remove();
+				enqueue(new ChunkPos(entry.getKey()));
+			}
 		}
 		for (int i = 0; i < CHUNKS_PER_TICK && !QUEUE.isEmpty(); i++) {
 			ChunkPos pos = QUEUE.pollFirst();

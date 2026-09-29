@@ -7,9 +7,14 @@ import dev.ooga.client.module.setting.ModeSetting;
 import dev.ooga.client.module.setting.NumberSetting;
 import dev.ooga.client.render.TracerOrigin;
 import dev.ooga.client.render.WorldOverlay;
+import dev.ooga.client.ui.notify.Notification;
+import dev.ooga.client.ui.notify.NotificationManager;
+import dev.ooga.client.util.ChatUtil;
 import dev.ooga.client.util.ColorUtil;
 import dev.ooga.client.world.BlockEntityTracker;
+import dev.ooga.client.world.Finds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BarrelBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -22,6 +27,11 @@ import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /** Highlights containers and utility blocks through walls, each kind in its own colour. */
 public class StorageEspModule extends Module {
@@ -50,12 +60,53 @@ public class StorageEspModule extends Module {
 			.visibleWhen(() -> !style.is("Outline")));
 	public final BooleanSetting tracers = add(new BooleanSetting("Tracers", "Lines from your view to each block.", false));
 	public final NumberSetting range = add(new NumberSetting("Range", "Maximum distance.", 128, 16, 512, 8, "m"));
+	public final NumberSetting stashAlert = add(new NumberSetting("Stash Alert", "Announce a chunk holding at least this many chests, barrels and shulkers. 0 turns it off.", 12, 0, 64, 1));
 
+	private final Set<Long> announcedStashes = new HashSet<>();
 	private int shown;
+	/** The level our state belongs to; a new one (dimension change, new server) resets it. */
+	private Object lastLevel;
 
 	public StorageEspModule() {
 		super("Storage ESP", "Chests, shulkers, barrels and more, visible through walls.", Category.BASEFINDING);
 		WorldOverlay.register(this::draw);
+	}
+
+	@Override
+	protected void onEnable() {
+		announcedStashes.clear();
+	}
+
+	/** Stash alerts: chests, barrels and shulkers counted per chunk, whatever is shown. */
+	@Override
+	public void onTick() {
+		if (mc.level != lastLevel) {
+			lastLevel = mc.level;
+			announcedStashes.clear();
+		}
+		int threshold = stashAlert.getInt();
+		if (threshold <= 0 || mc.player == null || mc.player.tickCount % 20 != 0) return;
+		Map<Long, Integer> perChunk = new HashMap<>();
+		Map<Long, int[]> shulkersPerChunk = new HashMap<>();
+		for (BlockEntity be : BlockEntityTracker.all()) {
+			boolean shulker = be instanceof ShulkerBoxBlockEntity;
+			if (!shulker && !(be instanceof ChestBlockEntity) && !(be instanceof BarrelBlockEntity)) continue;
+			if (be.isRemoved()) continue;
+			long chunk = ChunkPos.asLong(be.getBlockPos());
+			perChunk.merge(chunk, 1, Integer::sum);
+			if (shulker) shulkersPerChunk.computeIfAbsent(chunk, k -> new int[1])[0]++;
+		}
+		for (Map.Entry<Long, Integer> entry : perChunk.entrySet()) {
+			if (entry.getValue() < threshold || !announcedStashes.add(entry.getKey())) continue;
+			ChunkPos chunk = new ChunkPos(entry.getKey());
+			int shulkers = shulkersPerChunk.getOrDefault(entry.getKey(), new int[1])[0];
+			String detail = entry.getValue() + " containers" + (shulkers > 0 ? ", " + shulkers + " shulkers" : "");
+			BlockPos pos = new BlockPos(chunk.getMiddleBlockX(), mc.player.getBlockY(), chunk.getMiddleBlockZ());
+			if (!Finds.report("Stash", detail, pos)) continue;
+			String where = pos.getX() + ", " + pos.getZ();
+			ChatUtil.info("Stash at " + where + ": " + detail);
+			NotificationManager.get().push("Stash found", where, Notification.Kind.INFO);
+		}
 	}
 
 	private Kind kindOf(BlockEntity be) {

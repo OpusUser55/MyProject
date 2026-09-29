@@ -4,8 +4,10 @@ import dev.ooga.client.camera.CameraController;
 import dev.ooga.client.config.ConfigManager;
 import dev.ooga.client.module.Module;
 import dev.ooga.client.module.ModuleManager;
+import dev.ooga.client.module.impl.basefinding.NewChunksModule;
 import dev.ooga.client.module.impl.client.MusicModule;
 import dev.ooga.client.module.impl.client.NotificationsModule;
+import dev.ooga.client.module.impl.render.FreeLookModule;
 import dev.ooga.client.module.impl.render.FreecamModule;
 import dev.ooga.client.module.impl.render.FullbrightModule;
 import dev.ooga.client.render.WorldOverlay;
@@ -14,6 +16,7 @@ import dev.ooga.client.ui.notify.Notification;
 import dev.ooga.client.ui.notify.NotificationManager;
 import dev.ooga.client.world.BlockEntityTracker;
 import dev.ooga.client.world.ChunkScanner;
+import dev.ooga.client.world.Finds;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -26,7 +29,7 @@ import net.minecraft.resources.Identifier;
 
 public class OogaClient implements ClientModInitializer {
 	public static final String MOD_ID = "ooga";
-	public static final String VERSION = "0.1.0";
+	public static final String VERSION = "0.2.0";
 
 	@Override
 	public void onInitializeClient() {
@@ -66,13 +69,17 @@ public class OogaClient implements ClientModInitializer {
 
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			modules.get(FreecamModule.class).setEnabled(false, false);
+			modules.get(FreeLookModule.class).setEnabled(false, false);
 			CameraController.get().exit();
 			BlockEntityTracker.clear();
 			ChunkScanner.clear();
+			modules.get(NewChunksModule.class).clearWorld();
+			Finds.clear();
 		});
 
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
 			modules.get(FreecamModule.class).setEnabled(false, false);
+			modules.get(FreeLookModule.class).setEnabled(false, false);
 			modules.get(FullbrightModule.class).restoreGamma();
 			ConfigManager.get().save();
 		});

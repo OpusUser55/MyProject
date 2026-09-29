@@ -5,10 +5,15 @@
 	"client": [
 		"CameraAccessor",
 		"CameraMixin",
+		"ClientPacketListenerMixin",
 		"EntityGlowMixin",
 		"EntityMixin",
 		"GameRendererMixin",
 		"KeyboardHandlerMixin",
+		"LevelRendererMixin",
+		"LivingEntityAccessor",
+		"LivingEntityMixin",
+		"LivingEntityRendererMixin",
 		"MinecraftMixin",
 		"MouseHandlerMixin",
 		"OptionInstanceAccessor"

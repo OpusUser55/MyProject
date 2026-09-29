@@ -12,6 +12,8 @@ import dev.ooga.client.ui.notify.NotificationManager;
 import dev.ooga.client.util.ChatUtil;
 import dev.ooga.client.util.ColorUtil;
 import dev.ooga.client.world.ChunkScanner;
+import dev.ooga.client.world.Finds;
+import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
@@ -161,6 +163,8 @@ public class SusChunkFinderModule extends Module implements ChunkScanner.Listene
 	private void announce(ChunkPos pos, String evidence) {
 		int x = pos.getMiddleBlockX();
 		int z = pos.getMiddleBlockZ();
+		int y = mc.player == null ? 64 : mc.player.getBlockY();
+		if (!Finds.report("Sus Chunk", evidence, new BlockPos(x, y, z))) return;
 		if (chat.get()) ChatUtil.info("Sus chunk at " + x + ", " + z + ": " + evidence);
 		if (toast.get()) NotificationManager.get().push("Sus chunk", x + ", " + z, Notification.Kind.INFO);
 	}

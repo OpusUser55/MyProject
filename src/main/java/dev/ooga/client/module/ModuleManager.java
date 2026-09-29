@@ -1,11 +1,16 @@
 package dev.ooga.client.module;
 
+import dev.ooga.client.module.impl.basefinding.FinderAlertsModule;
+import dev.ooga.client.module.impl.basefinding.HoleEspModule;
 import dev.ooga.client.module.impl.basefinding.LightFinderModule;
+import dev.ooga.client.module.impl.basefinding.NewChunksModule;
 import dev.ooga.client.module.impl.basefinding.SpawnerFinderModule;
 import dev.ooga.client.module.impl.basefinding.StorageEspModule;
 import dev.ooga.client.module.impl.basefinding.SusChunkFinderModule;
+import dev.ooga.client.module.impl.basefinding.TunnelFinderModule;
 import dev.ooga.client.module.impl.client.ClickGuiModule;
 import dev.ooga.client.module.impl.client.ClientSettings;
+import dev.ooga.client.module.impl.client.FindsHudModule;
 import dev.ooga.client.module.impl.client.InfoHudModule;
 import dev.ooga.client.module.impl.client.KeystrokesModule;
 import dev.ooga.client.module.impl.client.ModuleListModule;
@@ -13,11 +18,16 @@ import dev.ooga.client.module.impl.client.MusicModule;
 import dev.ooga.client.module.impl.client.NotificationsModule;
 import dev.ooga.client.module.impl.client.WatermarkModule;
 import dev.ooga.client.module.impl.movement.SprintModule;
+import dev.ooga.client.module.impl.render.BlockEspModule;
 import dev.ooga.client.module.impl.render.EspModule;
+import dev.ooga.client.module.impl.render.FreeLookModule;
 import dev.ooga.client.module.impl.render.FreecamModule;
 import dev.ooga.client.module.impl.render.FullbrightModule;
+import dev.ooga.client.module.impl.render.NametagsModule;
+import dev.ooga.client.module.impl.render.SlowMineModule;
 import dev.ooga.client.module.impl.render.TracersModule;
 import dev.ooga.client.module.impl.render.ZoomModule;
+import dev.ooga.client.module.impl.world.AutoToolModule;
 import dev.ooga.client.module.setting.SettingEvents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,17 +65,28 @@ public final class ModuleManager {
 		register(new InfoHudModule());
 		register(new KeystrokesModule());
 		register(new MusicModule());
+		register(new FindsHudModule());
 
 		register(new FreecamModule());
 		register(new FullbrightModule());
 		register(new ZoomModule());
 		register(new EspModule());
 		register(new TracersModule());
+		register(new NametagsModule());
+		register(new BlockEspModule());
+		register(new FreeLookModule());
+		register(new SlowMineModule());
 
 		register(new StorageEspModule());
 		register(new SpawnerFinderModule());
 		register(new SusChunkFinderModule());
 		register(new LightFinderModule());
+		register(new TunnelFinderModule());
+		register(new HoleEspModule());
+		register(new NewChunksModule());
+		register(new FinderAlertsModule());
+
+		register(new AutoToolModule());
 
 		register(new SprintModule());
 
