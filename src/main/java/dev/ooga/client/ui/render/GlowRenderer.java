@@ -13,8 +13,10 @@ import net.minecraft.client.gui.GuiGraphics;
  * Only the rings are drawn — never the interior — so translucent panels don't get tinted.
  */
 public final class GlowRenderer {
+	/** Furthest the glow may reach, in screen pixels. */
+	private static final int MAX_SPREAD_PX = 28;
 	/** Upper bound on rings per element, so a large radius at high GUI scale stays cheap. */
-	private static final int MAX_LAYERS = 18;
+	private static final int MAX_RINGS = 9;
 
 	private GlowRenderer() {
 	}
@@ -38,7 +40,9 @@ public final class GlowRenderer {
 		if (intensity <= 0.01f) return;
 
 		int scale = Render2D.guiScale();
-		int layers = Math.min(MAX_LAYERS, Math.max(1, Math.round(radius * scale)));
+		int spread = Math.min(MAX_SPREAD_PX, Math.max(1, Math.round(radius * scale)));
+		// Wide glows use thicker rings so the number of draw calls stays bounded.
+		int step = Math.max(1, (int) Math.ceil(spread / (float) MAX_RINGS));
 		// Peak opacity of the innermost ring. Kept low: glow should be felt more than seen.
 		float peak = 0.34f * intensity * Render2D.alpha();
 
@@ -50,12 +54,12 @@ public final class GlowRenderer {
 
 		g.pose().pushMatrix();
 		g.pose().scale(1f / scale, 1f / scale);
-		for (int k = 1; k <= layers; k++) {
-			float falloff = 1f - (k - 0.5f) / layers;
+		for (int k = step; k <= spread; k += step) {
+			float falloff = 1f - (k - step / 2f) / spread;
 			int alpha = Math.round(255 * peak * falloff * falloff);
 			if (alpha <= 0) continue;
 			int ringColor = ColorUtil.withAlpha(color, alpha);
-			Render2D.ringPx(g, x1 - k, y1 - k, x2 + k, y2 + k, r + k, 1, ringColor);
+			Render2D.ringPx(g, x1 - k, y1 - k, x2 + k, y2 + k, r + k, step, ringColor);
 		}
 		g.pose().popMatrix();
 	}

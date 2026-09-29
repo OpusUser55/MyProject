@@ -46,12 +46,17 @@ public final class CameraController {
 		if (mode != null) exit();
 
 		// Seed from what the user currently sees, so enabling never causes a jump.
-		Camera camera = mc.gameRenderer.getMainCamera();
-		Vec3 start = camera.isInitialized() ? camera.getPosition() : mc.player.getEyePosition();
-		float yaw = camera.isInitialized() ? camera.getYRot() : mc.player.getYRot();
-		float pitch = camera.isInitialized() ? camera.getXRot() : mc.player.getXRot();
-
 		savedPerspective = mc.options.getCameraType();
+		Camera camera = mc.gameRenderer.getMainCamera();
+		Vec3 start = camera.position();
+		float yaw = mc.player.getYRot();
+		float pitch = mc.player.getXRot();
+		if (savedPerspective == CameraType.THIRD_PERSON_FRONT) {
+			// The front-facing view looks back at the player.
+			yaw += 180f;
+			pitch = -pitch;
+		}
+
 		savedSmartCull = mc.smartCull;
 		// First person keeps vanilla submitting the hand and the crosshair.
 		mc.options.setCameraType(CameraType.FIRST_PERSON);

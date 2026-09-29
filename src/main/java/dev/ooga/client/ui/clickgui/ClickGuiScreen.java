@@ -55,7 +55,8 @@ public class ClickGuiScreen extends Screen {
 	private static final float SEARCH_W = 136f;
 	private static final float SEARCH_H = 17f;
 
-	private static Category lastCategory = Category.COMBAT;
+	/** Remembered across openings; null until the menu is first opened. */
+	private static Category lastCategory;
 
 	private final ClickGuiModule config = ModuleManager.get().get(ClickGuiModule.class);
 	private final Anim open = new Anim(0f, 14f);
@@ -67,7 +68,7 @@ public class ClickGuiScreen extends Screen {
 	private final Map<Object, Anim> hovers = new HashMap<>();
 	private final List<Hit> hits = new ArrayList<>();
 
-	private Category category = lastCategory;
+	private Category category = lastCategory != null ? lastCategory : firstPopulatedCategory();
 	private final StringBuilder search = new StringBuilder();
 	private boolean searchFocused;
 	private boolean closing;
@@ -114,6 +115,13 @@ public class ClickGuiScreen extends Screen {
 
 	public ClickGuiScreen() {
 		super(Component.literal("Ooga"));
+	}
+
+	private static Category firstPopulatedCategory() {
+		for (Category c : Category.values()) {
+			if (!ModuleManager.get().getModules(c).isEmpty()) return c;
+		}
+		return Category.values()[0];
 	}
 
 	// ================================================================== geometry
@@ -414,7 +422,13 @@ public class ClickGuiScreen extends Screen {
 			y += ch + CARD_GAP;
 		}
 		if (modules.isEmpty()) {
-			OogaFonts.drawCentered(g, "Nothing matches \"" + search + "\"", cx + cw / 2f, listTop + 30f, OogaTheme.TEXT_MUTED, Weight.REGULAR, 0.9f);
+			float ey = listTop + (listBottom - listTop) / 2f - 16f;
+			Icon icon = searching ? Icon.SEARCH : category.getIcon();
+			icon.draw(g, cx + cw / 2f - 6f, ey, 12f, OogaTheme.TEXT_MUTED);
+			String headline = searching ? "No matches" : "Nothing here yet";
+			String detail = searching ? "Try a different word, or press Esc to clear." : "Modules in this category will appear here.";
+			OogaFonts.drawCentered(g, headline, cx + cw / 2f, ey + 19f, OogaTheme.TEXT_SECONDARY, Weight.SEMIBOLD, 1f);
+			OogaFonts.drawCentered(g, detail, cx + cw / 2f, ey + 31f, OogaTheme.TEXT_MUTED, Weight.REGULAR, 0.78f);
 		}
 		g.disableScissor();
 

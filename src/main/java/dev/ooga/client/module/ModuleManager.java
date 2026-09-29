@@ -2,12 +2,16 @@ package dev.ooga.client.module;
 
 import dev.ooga.client.module.impl.client.ClickGuiModule;
 import dev.ooga.client.module.impl.client.ClientSettings;
+import dev.ooga.client.module.impl.client.InfoHudModule;
+import dev.ooga.client.module.impl.client.KeystrokesModule;
 import dev.ooga.client.module.impl.client.ModuleListModule;
 import dev.ooga.client.module.impl.client.NotificationsModule;
 import dev.ooga.client.module.impl.client.WatermarkModule;
 import dev.ooga.client.module.impl.movement.SprintModule;
+import dev.ooga.client.module.impl.render.EspModule;
 import dev.ooga.client.module.impl.render.FreecamModule;
 import dev.ooga.client.module.impl.render.FullbrightModule;
+import dev.ooga.client.module.impl.render.ZoomModule;
 import dev.ooga.client.module.setting.SettingEvents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +46,13 @@ public final class ModuleManager {
 		register(new WatermarkModule());
 		register(new ModuleListModule());
 		register(new NotificationsModule());
+		register(new InfoHudModule());
+		register(new KeystrokesModule());
 
 		register(new FreecamModule());
 		register(new FullbrightModule());
+		register(new ZoomModule());
+		register(new EspModule());
 
 		register(new SprintModule());
 
