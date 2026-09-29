@@ -772,6 +772,11 @@ public class ClickGuiScreen extends Screen {
 	@Override
 	public boolean keyPressed(KeyEvent event) {
 		int key = event.key();
+		if (closing) {
+			// Pressing the menu key mid-close changes your mind: animate back open.
+			if (key == config.getKey()) closing = false;
+			return true;
+		}
 		if (binding != null) {
 			if (key == GLFW.GLFW_KEY_ESCAPE || key == GLFW.GLFW_KEY_BACKSPACE || key == GLFW.GLFW_KEY_DELETE) binding.setKey(-1);
 			else binding.setKey(key);

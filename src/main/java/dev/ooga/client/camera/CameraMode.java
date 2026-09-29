@@ -37,4 +37,9 @@ public interface CameraMode {
 
 	/** Whether the player may attack, mine and use items while the camera is detached. */
 	boolean allowInteraction();
+
+	/** Whether to hide the HUD while active. The HUD stays unless the user opts in. */
+	default boolean hideHud() {
+		return false;
+	}
 }

@@ -143,10 +143,8 @@ public final class FreeCamera implements CameraMode {
 		return settings.allowInteraction.get();
 	}
 
-	/** Moves the camera back to the player's eyes without leaving Freecam. */
-	public void recenter() {
-		Minecraft mc = Minecraft.getInstance();
-		if (mc.player == null) return;
-		begin(mc.player.getEyePosition(), mc.player.getYRot(), mc.player.getXRot());
+	@Override
+	public boolean hideHud() {
+		return settings.hideHud.get();
 	}
 }

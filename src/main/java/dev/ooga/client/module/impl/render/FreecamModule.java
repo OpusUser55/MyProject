@@ -24,6 +24,7 @@ public class FreecamModule extends Module {
 	public final BooleanSetting cameraLighting = add(new BooleanSetting("Camera Lighting", "Light the hand from where the camera is.", true)
 			.visibleWhen(showHand::get));
 	public final BooleanSetting showPlayer = add(new BooleanSetting("Show Player", "Draw your body where you left it.", true));
+	public final BooleanSetting hideHud = add(new BooleanSetting("Hide HUD", "Hide the HUD while flying, for clean shots.", false));
 	public final BooleanSetting allowInteraction = add(new BooleanSetting("Allow Interaction", "Let clicks mine, attack and use items from your body.", false));
 
 	private final FreeCamera camera = new FreeCamera(this);

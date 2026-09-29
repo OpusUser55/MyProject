@@ -22,6 +22,8 @@ public final class CameraController {
 	private CameraMode mode;
 	private CameraType savedPerspective;
 	private boolean savedSmartCull;
+	/** Null unless we hid the HUD ourselves; then the value to restore. */
+	private Boolean savedHideGui;
 	private Vec3 lastAppliedPosition;
 
 	private CameraController() {
@@ -63,6 +65,10 @@ public final class CameraController {
 		// Occlusion culling assumes the eye is in open air; a free camera may be inside blocks.
 		mc.smartCull = false;
 		controlLock.lock();
+		if (newMode.hideHud()) {
+			savedHideGui = mc.options.hideGui;
+			mc.options.hideGui = true;
+		}
 
 		mode = newMode;
 		newMode.begin(start, yaw, pitch);
@@ -78,6 +84,9 @@ public final class CameraController {
 		controlLock.unlock();
 		if (savedPerspective != null) mc.options.setCameraType(savedPerspective);
 		mc.smartCull = savedSmartCull;
+		// Only undo our own change; an F1 press during Freecam is the user's choice to keep.
+		if (savedHideGui != null) mc.options.hideGui = savedHideGui;
+		savedHideGui = null;
 		savedPerspective = null;
 	}
 
