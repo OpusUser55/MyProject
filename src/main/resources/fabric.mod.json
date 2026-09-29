@@ -1,0 +1,20 @@
+{
+	"schemaVersion": 1,
+	"id": "ooga",
+	"version": "${version}",
+	"name": "Ooga-Client",
+	"description": "A premium dark utility client with a subtle golden glow.",
+	"authors": ["Ooga"],
+	"license": "All-Rights-Reserved",
+	"environment": "client",
+	"entrypoints": {
+		"client": ["dev.ooga.client.OogaClient"]
+	},
+	"mixins": ["ooga.mixins.json"],
+	"depends": {
+		"fabricloader": ">=0.17.0",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}

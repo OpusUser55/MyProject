@@ -1,0 +1,21 @@
+{
+	"required": true,
+	"package": "dev.ooga.client.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"CameraAccessor",
+		"CameraMixin",
+		"EntityMixin",
+		"GameRendererMixin",
+		"KeyboardHandlerMixin",
+		"MinecraftMixin",
+		"MouseHandlerMixin",
+		"OptionInstanceAccessor"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}
