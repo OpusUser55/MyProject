@@ -5,7 +5,7 @@ charcoal UI with a restrained, sophisticated gold accent and a soft golden glow.
 
 ## Preview
 
-![ClickGUI](docs/previews/clickgui_freecam.png)
+![ClickGUI panels](docs/previews/panels_expanded.png)
 ![HUD](docs/previews/hud.png)
 
 These are rendered offline from the real UI code by a stand-in renderer (Inter via Java2D),
@@ -27,9 +27,11 @@ The mod jar lands in `build/libs/`. Drop it, together with
 | Action | Default |
 | --- | --- |
 | Open the menu | `Right Shift` |
-| Toggle a module | Left-click its card |
-| Show a module's settings | Right-click the card, or click the chevron |
-| Bind a key | Middle-click the card, or click the key chip; `Esc`/`Backspace` unbinds |
+| Toggle a module | Left-click its row |
+| Show a module's settings | Right-click the row |
+| Bind a key | Middle-click the row, then press a key; `Esc`/`Backspace` unbinds |
+| Move / collapse a panel | Drag its header / click the chevron (or right-click the header) |
+| Switch layout | ClickGUI settings → Layout: Panels (default) or Window |
 | Search | Just start typing (or `Ctrl+F`); `Enter` toggles the top result |
 | Reset a slider | Right-click its label |
 | Move HUD elements | **Edit HUD** in the menu header; scroll over an element to resize |

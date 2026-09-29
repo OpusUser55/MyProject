@@ -8,6 +8,7 @@ import com.google.gson.JsonParser;
 import dev.ooga.client.module.Module;
 import dev.ooga.client.module.ModuleManager;
 import dev.ooga.client.module.setting.Setting;
+import dev.ooga.client.ui.clickgui.PanelLayout;
 import dev.ooga.client.ui.hud.HudManager;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -70,6 +71,7 @@ public final class ConfigManager {
 				}
 			}
 			if (root.has("hud")) HudManager.get().fromJson(root.getAsJsonObject("hud"));
+			if (root.has("clickgui")) PanelLayout.fromJson(root.getAsJsonObject("clickgui"));
 		} catch (IOException | RuntimeException e) {
 			ModuleManager.LOGGER.error("Failed to load Ooga config; using defaults", e);
 		} finally {
@@ -94,6 +96,7 @@ public final class ConfigManager {
 		}
 		root.add("modules", modules);
 		root.add("hud", HudManager.get().toJson());
+		root.add("clickgui", PanelLayout.toJson());
 
 		try {
 			Files.createDirectories(file.getParent());
