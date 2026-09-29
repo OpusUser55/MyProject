@@ -51,6 +51,7 @@ Settings are saved automatically to `config/ooga/config.json`.
 | Light Finder | Torches and lanterns below a set height, where caves generate none |
 | Finder Alerts | Shared settings: a ping sound for every find, and a log of all finds (time, server, dimension, coordinates) in `config/ooga/finds.log` |
 | Finds (HUD) | The last few finds in this dimension, with coordinates, distance and an arrow pointing to each |
+| Radar (HUD) | A rotating minimap: players, optionally hostiles, and every find as a coloured marker |
 
 Finders scan chunks in the background a few per tick, so enabling them never stalls the game.
 When blocks change (mined, placed, liquids flowing) the chunk is rescanned once it settles, so
@@ -97,7 +98,7 @@ src/main/java/dev/ooga/client
 │   ├── OogaTheme.java       colour, radius and spacing tokens
 │   ├── render/              Render2D (pixel-exact shapes), GlowRenderer, OogaFonts, Icon
 │   ├── clickgui/            the menu and its widgets
-│   ├── hud/                 watermark, module list, info, keystrokes, finds, HUD editor
+│   ├── hud/                 watermark, module list, info, keystrokes, finds, radar, HUD editor
 │   └── notify/              toast notifications
 └── mixin/                   the only code that touches Minecraft internals
 ```
