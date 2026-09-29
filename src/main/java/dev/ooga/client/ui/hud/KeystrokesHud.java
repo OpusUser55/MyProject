@@ -26,7 +26,7 @@ public class KeystrokesHud extends HudElement {
 	private final Map<String, Anim> press = new HashMap<>();
 
 	public KeystrokesHud(KeystrokesModule module) {
-		super("keystrokes", "Keystrokes", 0.006f, 0.72f);
+		super("keystrokes", "Keystrokes", Anchor.START, 0f, Anchor.END, 0.985f);
 		this.module = module;
 	}
 

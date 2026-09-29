@@ -36,6 +36,17 @@ The mod jar lands in `build/libs/`. Drop it, together with
 
 Settings are saved automatically to `config/ooga/config.json`.
 
+### Music widget
+
+The **Music** HUD module shows what's playing in any system media player: Spotify,
+browsers, Apple Music and so on. Open chat to click its previous, play/pause and next buttons.
+
+| OS | Source |
+| --- | --- |
+| Windows 10/11 | System media session (the one the volume flyout shows), via PowerShell |
+| macOS | Spotify, then Apple Music, via AppleScript |
+| Linux | Any MPRIS player via `playerctl` (install it from your package manager) |
+
 ## Layout
 
 ```

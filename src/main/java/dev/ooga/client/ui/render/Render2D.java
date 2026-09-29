@@ -142,6 +142,39 @@ public final class Render2D {
 		end(g);
 	}
 
+	/** A filled triangle, scanline-rasterised with anti-aliased horizontal edges. */
+	public static void triangle(GuiGraphics g, float ax, float ay, float bx, float by, float cx, float cy, int color) {
+		int c = apply(color);
+		if (ColorUtil.alpha(c) == 0) return;
+		int s = guiScale();
+		begin(g, s);
+		float[] xs = {ax * s, bx * s, cx * s};
+		float[] ys = {ay * s, by * s, cy * s};
+		int top = (int) Math.floor(Math.min(ys[0], Math.min(ys[1], ys[2])));
+		int bottom = (int) Math.ceil(Math.max(ys[0], Math.max(ys[1], ys[2])));
+		for (int row = top; row < bottom; row++) {
+			float sy = row + 0.5f;
+			float left = Float.MAX_VALUE, right = -Float.MAX_VALUE;
+			for (int i = 0; i < 3; i++) {
+				int j = (i + 1) % 3;
+				float y0 = ys[i], y1 = ys[j];
+				if ((sy < Math.min(y0, y1)) || (sy > Math.max(y0, y1)) || y0 == y1) continue;
+				float x = xs[i] + (sy - y0) / (y1 - y0) * (xs[j] - xs[i]);
+				left = Math.min(left, x);
+				right = Math.max(right, x);
+			}
+			if (right <= left) continue;
+			int l = (int) Math.ceil(left);
+			int r = (int) Math.floor(right);
+			if (r > l) g.fill(l, row, r, row + 1, c);
+			float lc = l - left;
+			float rc = right - r;
+			if (lc > 0.03f) g.fill(l - 1, row, l, row + 1, ColorUtil.fade(c, lc));
+			if (rc > 0.03f) g.fill(r, row, r + 1, row + 1, ColorUtil.fade(c, rc));
+		}
+		end(g);
+	}
+
 	/** A straight line of the given thickness (GUI units), rasterised with square stamps. */
 	public static void line(GuiGraphics g, float x1, float y1, float x2, float y2, float thickness, int color) {
 		int c = apply(color);

@@ -4,6 +4,7 @@ import dev.ooga.client.camera.CameraController;
 import dev.ooga.client.config.ConfigManager;
 import dev.ooga.client.module.Module;
 import dev.ooga.client.module.ModuleManager;
+import dev.ooga.client.module.impl.client.MusicModule;
 import dev.ooga.client.module.impl.client.NotificationsModule;
 import dev.ooga.client.module.impl.render.FreecamModule;
 import dev.ooga.client.module.impl.render.FullbrightModule;
@@ -15,6 +16,9 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
+import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.resources.Identifier;
 
 public class OogaClient implements ClientModInitializer {
@@ -38,6 +42,13 @@ public class OogaClient implements ClientModInitializer {
 		// Options and the window exist by the time the client has started, so restoring saved
 		// module state (e.g. Fullbright touching gamma) is safe from here on.
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> ConfigManager.get().load());
+
+		// Music controls are clickable while chat is open, the same way chat links are.
+		ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
+			if (!(screen instanceof ChatScreen)) return;
+			MusicModule music = modules.get(MusicModule.class);
+			ScreenMouseEvents.allowMouseClick(screen).register((s, event) -> !music.hud().handleClick(event.x(), event.y(), event.button()));
+		});
 
 		ClientTickEvents.START_CLIENT_TICK.register(client -> CameraController.get().tick());
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {

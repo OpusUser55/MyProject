@@ -28,7 +28,7 @@ public class InfoHud extends HudElement {
 	private final InfoHudModule module;
 
 	public InfoHud(InfoHudModule module) {
-		super("info", "Info HUD", 0.006f, 0.1f);
+		super("info", "Info HUD", Anchor.START, 0f, Anchor.START, 0.1f);
 		this.module = module;
 	}
 

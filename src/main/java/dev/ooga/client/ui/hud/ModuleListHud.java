@@ -31,7 +31,7 @@ public class ModuleListHud extends HudElement {
 	private final Map<Module, Anim> rows = new IdentityHashMap<>();
 
 	public ModuleListHud(ModuleListModule module) {
-		super("module_list", "Module List", 1f, 0.01f);
+		super("module_list", "Module List", Anchor.END, 1f, Anchor.START, 0f);
 		this.module = module;
 	}
 

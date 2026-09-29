@@ -21,7 +21,7 @@ public class WatermarkHud extends HudElement {
 	private final WatermarkModule module;
 
 	public WatermarkHud(WatermarkModule module) {
-		super("watermark", "Watermark", 0.006f, 0.01f);
+		super("watermark", "Watermark", Anchor.START, 0f, Anchor.START, 0f);
 		this.module = module;
 	}
 

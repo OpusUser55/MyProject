@@ -11,18 +11,40 @@ import net.minecraft.client.gui.GuiGraphics;
  * HUD editor can hit-test and drag them.
  */
 public abstract class HudElement {
+	/** Gap kept between elements and the screen edge. */
+	protected static final float EDGE_MARGIN = 3f;
+
+	/**
+	 * Which point of the element is pinned. Elements in the outer thirds of the screen pin
+	 * their near edge, so they hug that edge at any resolution; centred elements stay centred.
+	 */
+	public enum Anchor {
+		START, CENTER, END;
+
+		static Anchor of(float center, float size) {
+			if (center < size / 3f) return START;
+			if (center > size * 2f / 3f) return END;
+			return CENTER;
+		}
+	}
+
 	private final String id;
 	private final String displayName;
+	private Anchor anchorX;
+	private Anchor anchorY;
+	/** Relative (0..1) position of the anchored point. */
 	private float relX;
 	private float relY;
 	protected float width;
 	protected float height;
 
-	protected HudElement(String id, String displayName, float defaultRelX, float defaultRelY) {
+	protected HudElement(String id, String displayName, Anchor anchorX, float relX, Anchor anchorY, float relY) {
 		this.id = id;
 		this.displayName = displayName;
-		this.relX = defaultRelX;
-		this.relY = defaultRelY;
+		this.anchorX = anchorX;
+		this.relX = relX;
+		this.anchorY = anchorY;
+		this.relY = relY;
 	}
 
 	public abstract boolean isVisible();
@@ -34,26 +56,50 @@ public abstract class HudElement {
 		render(g, getX(), getY(), delta);
 	}
 
+	private static float resolve(Anchor anchor, float rel, float screen, float size) {
+		float point = rel * screen;
+		float start = switch (anchor) {
+			case START -> point;
+			case CENTER -> point - size / 2f;
+			case END -> point - size;
+		};
+		return Math.max(EDGE_MARGIN, Math.min(screen - size - EDGE_MARGIN, start));
+	}
+
 	public float getX() {
-		int sw = Minecraft.getInstance().getWindow().getGuiScaledWidth();
-		return Math.max(0, Math.min(sw - width, relX * sw));
+		return resolve(anchorX, relX, Minecraft.getInstance().getWindow().getGuiScaledWidth(), width);
 	}
 
 	public float getY() {
-		int sh = Minecraft.getInstance().getWindow().getGuiScaledHeight();
-		return Math.max(0, Math.min(sh - height, relY * sh));
+		return resolve(anchorY, relY, Minecraft.getInstance().getWindow().getGuiScaledHeight(), height);
 	}
 
+	/** Moves the element so its top-left corner is at (x, y), re-deriving its anchors. */
 	public void setPosition(float x, float y) {
 		var window = Minecraft.getInstance().getWindow();
-		relX = Math.max(0, Math.min(1, x / window.getGuiScaledWidth()));
-		relY = Math.max(0, Math.min(1, y / window.getGuiScaledHeight()));
+		float sw = window.getGuiScaledWidth();
+		float sh = window.getGuiScaledHeight();
+		anchorX = Anchor.of(x + width / 2f, sw);
+		anchorY = Anchor.of(y + height / 2f, sh);
+		relX = clamp01(pointFor(anchorX, x, width) / sw);
+		relY = clamp01(pointFor(anchorY, y, height) / sh);
+	}
+
+	private static float pointFor(Anchor anchor, float start, float size) {
+		return switch (anchor) {
+			case START -> start;
+			case CENTER -> start + size / 2f;
+			case END -> start + size;
+		};
+	}
+
+	private static float clamp01(float v) {
+		return Math.max(0, Math.min(1, v));
 	}
 
 	/** True when the element sits on the right half, so it should grow leftward. */
 	protected boolean anchoredRight() {
-		int sw = Minecraft.getInstance().getWindow().getGuiScaledWidth();
-		return getX() + width / 2f > sw / 2f;
+		return anchorX == Anchor.END;
 	}
 
 	public boolean contains(double mouseX, double mouseY) {
@@ -91,11 +137,19 @@ public abstract class HudElement {
 		JsonObject json = new JsonObject();
 		json.addProperty("x", relX);
 		json.addProperty("y", relY);
+		json.addProperty("anchorX", anchorX.name());
+		json.addProperty("anchorY", anchorY.name());
 		return json;
 	}
 
 	public void fromJson(JsonObject json) {
 		if (json.has("x")) relX = json.get("x").getAsFloat();
 		if (json.has("y")) relY = json.get("y").getAsFloat();
+		try {
+			if (json.has("anchorX")) anchorX = Anchor.valueOf(json.get("anchorX").getAsString());
+			if (json.has("anchorY")) anchorY = Anchor.valueOf(json.get("anchorY").getAsString());
+		} catch (IllegalArgumentException ignored) {
+			// Keep defaults for unknown values.
+		}
 	}
 }

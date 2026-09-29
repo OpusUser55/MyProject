@@ -111,6 +111,33 @@ public enum Icon {
 			Render2D.line(g, x + s * 0.65f, y + s * 0.5f, x + s * 0.35f, y + s * 0.8f, t, c);
 		}
 	},
+	PLAY {
+		@Override
+		void paint(GuiGraphics g, float x, float y, float s, float t, int c) {
+			Render2D.triangle(g, x + s * 0.22f, y + s * 0.1f, x + s * 0.22f, y + s * 0.9f, x + s * 0.9f, y + s * 0.5f, c);
+		}
+	},
+	PAUSE {
+		@Override
+		void paint(GuiGraphics g, float x, float y, float s, float t, int c) {
+			Render2D.roundRect(g, x + s * 0.18f, y + s * 0.12f, s * 0.22f, s * 0.76f, s * 0.06f, c);
+			Render2D.roundRect(g, x + s * 0.6f, y + s * 0.12f, s * 0.22f, s * 0.76f, s * 0.06f, c);
+		}
+	},
+	NEXT {
+		@Override
+		void paint(GuiGraphics g, float x, float y, float s, float t, int c) {
+			Render2D.triangle(g, x + s * 0.1f, y + s * 0.15f, x + s * 0.1f, y + s * 0.85f, x + s * 0.68f, y + s * 0.5f, c);
+			Render2D.roundRect(g, x + s * 0.72f, y + s * 0.15f, s * 0.16f, s * 0.7f, s * 0.05f, c);
+		}
+	},
+	PREVIOUS {
+		@Override
+		void paint(GuiGraphics g, float x, float y, float s, float t, int c) {
+			Render2D.triangle(g, x + s * 0.9f, y + s * 0.15f, x + s * 0.9f, y + s * 0.85f, x + s * 0.32f, y + s * 0.5f, c);
+			Render2D.roundRect(g, x + s * 0.12f, y + s * 0.15f, s * 0.16f, s * 0.7f, s * 0.05f, c);
+		}
+	},
 	MOVE {
 		@Override
 		void paint(GuiGraphics g, float x, float y, float s, float t, int c) {

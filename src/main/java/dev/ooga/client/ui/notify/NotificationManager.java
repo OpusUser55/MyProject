@@ -31,7 +31,7 @@ public final class NotificationManager extends HudElement {
 	private final List<Notification> active = new ArrayList<>();
 
 	private NotificationManager() {
-		super("notifications", "Notifications", 1f, 1f);
+		super("notifications", "Notifications", Anchor.END, 1f, Anchor.END, 1f);
 	}
 
 	public static NotificationManager get() {
