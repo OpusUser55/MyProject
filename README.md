@@ -61,6 +61,8 @@ Finders scan chunks in the background a few per tick, so enabling them never sta
 | Freelook | Hold `Left Alt` to orbit the camera around you while you keep walking the way you face (third or first person) |
 | Zoom | Hold `Z` to zoom; scroll to adjust |
 | Waypoints | Saved places per server, drawn as a box + beam with a floating name/distance label, optional tracers and a nearest-first HUD list. Overworld waypoints show in the Nether at /8 (purple) and vice versa |
+| Block ESP | Highlights any blocks you list by ID (`diamond_ore, spawner, beacon`…), from chunk data and live block updates, with optional tracers |
+| Trajectories | Predicts where ender pearls, snowballs, eggs, potions, XP bottles, tridents and drawn bows / charged crossbows will land |
 
 ### Misc
 

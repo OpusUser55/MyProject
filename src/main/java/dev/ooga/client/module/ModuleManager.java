@@ -34,11 +34,13 @@ import dev.ooga.client.module.impl.movement.ElytraSwapModule;
 import dev.ooga.client.module.impl.movement.ParkourModule;
 import dev.ooga.client.module.impl.movement.SafeWalkModule;
 import dev.ooga.client.module.impl.movement.SprintModule;
+import dev.ooga.client.module.impl.render.BlockEspModule;
 import dev.ooga.client.module.impl.render.EspModule;
 import dev.ooga.client.module.impl.render.FreecamModule;
 import dev.ooga.client.module.impl.render.FreelookModule;
 import dev.ooga.client.module.impl.render.FullbrightModule;
 import dev.ooga.client.module.impl.render.TracersModule;
+import dev.ooga.client.module.impl.render.TrajectoriesModule;
 import dev.ooga.client.module.impl.render.WaypointsModule;
 import dev.ooga.client.module.impl.render.ZoomModule;
 import dev.ooga.client.module.impl.world.AutoEatModule;
@@ -92,6 +94,8 @@ public final class ModuleManager {
 		register(new ZoomModule());
 		register(new EspModule());
 		register(new TracersModule());
+		register(new BlockEspModule());
+		register(new TrajectoriesModule());
 		register(new WaypointsModule());
 
 		register(new StorageEspModule());

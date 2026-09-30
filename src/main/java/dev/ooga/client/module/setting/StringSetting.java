@@ -5,7 +5,7 @@ import com.google.gson.JsonPrimitive;
 
 /** Free text, edited in place in the ClickGUI. */
 public class StringSetting extends Setting<String> {
-	public static final int MAX_LENGTH = 48;
+	public static final int MAX_LENGTH = 256;
 
 	public StringSetting(String name, String description, String defaultValue) {
 		super(name, description, defaultValue);
