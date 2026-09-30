@@ -44,6 +44,8 @@ public class PanelClickGuiScreen extends Screen {
 	private static final float HEADER_H = 19f;
 	private static final float GAP = 8f;
 	private static final float MARGIN = 8f;
+	/** Panels start below the tab bar. */
+	private static final float TOP = 32f;
 	private static final String SEARCH_ID = "search";
 
 	private final ClickGuiModule config = ModuleManager.get().get(ClickGuiModule.class);
@@ -54,6 +56,29 @@ public class PanelClickGuiScreen extends Screen {
 	private final Map<Module, Boolean> expanded = new HashMap<>();
 	private final List<Hit> hits = new ArrayList<>();
 	private final MenuBackdrop backdrop = new MenuBackdrop();
+
+	private enum Tab {
+		MAIN("Main"), CONFIGS("Configs"), FINDS("Finds"), THEME("Theme");
+
+		final String label;
+
+		Tab(String label) {
+			this.label = label;
+		}
+	}
+
+	/** The last tab used, remembered while the game runs. */
+	private static Tab lastTab = Tab.MAIN;
+	private Tab tab = lastTab;
+	private final Anim tabX = new Anim(-1f, 16f);
+	private final Anim tabW = new Anim(0f, 16f);
+	private final Anim pageScroll = new Anim(0f, 16f);
+	private float pageScrollTarget;
+	private final StringBuilder configName = new StringBuilder();
+	private String confirmDelete;
+	private long confirmUntil;
+	private String status;
+	private long statusUntil;
 
 	private final StringBuilder search = new StringBuilder();
 	private boolean closing;
@@ -150,8 +175,8 @@ public class PanelClickGuiScreen extends Screen {
 		heights.add(HEADER_H + 46f);
 
 		List<float[]> columns = new ArrayList<>(); // {x, bottom}
-		for (float x = MARGIN; x + panelW() <= screenW() - MARGIN; x += panelW() + GAP) columns.add(new float[]{x, MARGIN - GAP});
-		if (columns.isEmpty()) columns.add(new float[]{MARGIN, MARGIN - GAP});
+		for (float x = MARGIN; x + panelW() <= screenW() - MARGIN; x += panelW() + GAP) columns.add(new float[]{x, TOP - GAP});
+		if (columns.isEmpty()) columns.add(new float[]{MARGIN, TOP - GAP});
 
 		// Account for panels the user has already placed, so new ones don't land on top of them.
 		for (int i = 0; i < ids.size(); i++) {
@@ -163,6 +188,7 @@ public class PanelClickGuiScreen extends Screen {
 		}
 		for (int i = 0; i < ids.size(); i++) {
 			PanelLayout.Entry e = PanelLayout.get(ids.get(i));
+			if (e.placed() && e.y < TOP) e.y = TOP;
 			if (e.placed()) continue;
 			float[] target = columns.get(0);
 			for (float[] col : columns) if (col[1] < target[1]) target = col;
@@ -221,17 +247,22 @@ public class PanelClickGuiScreen extends Screen {
 
 		List<Category> categories = categories();
 		long elapsed = System.currentTimeMillis() - openedAt;
-		// The panel being dragged draws last so it floats above the others (and wins clicks).
-		for (int pass = 0; pass < 2; pass++) {
-			for (int i = 0; i <= categories.size(); i++) {
-				String id = i < categories.size() ? categories.get(i).name() : SEARCH_ID;
-				if (id.equals(draggingPanel) != (pass == 1)) continue;
-				float appear = stagger(i, elapsed, t);
-				if (i < categories.size()) drawCategoryPanel(g, categories.get(i), appear, offset);
-				else drawSearchPanel(g, appear, offset);
+		if (tab == Tab.MAIN) {
+			// The panel being dragged draws last so it floats above the others (and wins clicks).
+			for (int pass = 0; pass < 2; pass++) {
+				for (int i = 0; i <= categories.size(); i++) {
+					String id = i < categories.size() ? categories.get(i).name() : SEARCH_ID;
+					if (id.equals(draggingPanel) != (pass == 1)) continue;
+					float appear = stagger(i, elapsed, t);
+					if (i < categories.size()) drawCategoryPanel(g, categories.get(i), appear, offset);
+					else drawSearchPanel(g, appear, offset);
+				}
 			}
+		} else {
+			drawPage(g, Anim.ease(t));
 		}
 
+		drawTabs(g, Anim.ease(t));
 		drawBrand(g, Anim.ease(t));
 		g.pose().popMatrix();
 
@@ -621,6 +652,385 @@ public class PanelClickGuiScreen extends Screen {
 		Render2D.popAlpha();
 	}
 
+	// ================================================================== tabs
+
+	private float pageMaxScroll;
+
+	/** A glowing pill of tabs across the top; the active tab's highlight slides between them. */
+	private void drawTabs(GuiGraphics g, float appear) {
+		if (appear <= 0.01f) return;
+		Render2D.pushAlpha(appear);
+		float pad = 12f, h = 17f, gap = 2f;
+		float total = 4f;
+		float[] widths = new float[Tab.values().length];
+		for (Tab t : Tab.values()) {
+			widths[t.ordinal()] = OogaFonts.width(t.label, Weight.SEMIBOLD, S8) + pad * 2;
+			total += widths[t.ordinal()] + gap;
+		}
+		total -= gap;
+		float x = (screenW() - total) / 2f;
+		float y = 7f - (1f - appear) * 8f;
+		GlowRenderer.glow(g, x, y, total, h + 4f, (h + 4f) / 2f, OogaTheme.GOLD, 0.5f, 3f);
+		Render2D.roundRect(g, x, y, total, h + 4f, (h + 4f) / 2f, ClientSettings.surface(0xF00E0F12));
+		Render2D.outline(g, x, y, total, h + 4f, (h + 4f) / 2f, OogaTheme.accent(0x70));
+
+		float tx = x + 2f;
+		for (Tab t : Tab.values()) {
+			float w = widths[t.ordinal()];
+			if (t == tab) {
+				float targetX = tx;
+				if (tabX.get() < 0) {
+					tabX.snap(targetX);
+					tabW.snap(w);
+				}
+				float ix = tabX.update(targetX), iw = tabW.update(w);
+				GlowRenderer.glow(g, ix, y + 2f, iw, h, h / 2f, OogaTheme.GOLD, 0.9f, 4f);
+				Render2D.roundRect(g, ix, y + 2f, iw, h, h / 2f, OogaTheme.GOLD);
+				Render2D.horizontalGradient(g, ix + h / 2f, y + 2f, iw - h, h, 0, OogaTheme.ACCENT_2);
+			}
+			tx += w + gap;
+		}
+		tx = x + 2f;
+		for (Tab t : Tab.values()) {
+			float w = widths[t.ordinal()];
+			float hv = hover("tab#" + t, tx, y + 2f, w, h);
+			boolean active = t == tab;
+			int color = active ? OogaTheme.ON_GOLD : ColorUtil.lerp(OogaTheme.TEXT_SECONDARY, OogaTheme.TEXT, hv);
+			OogaFonts.drawCentered(g, t.label, tx + w / 2f, textY(y + 2f, h, 8), color, Weight.SEMIBOLD, S8);
+			final Tab target = t;
+			hits.add(new Hit(tx, y + 2f, w, h, (button, mx, my) -> {
+				if (button != 0) return false;
+				switchTab(target);
+				return true;
+			}));
+			tx += w + gap;
+		}
+		Render2D.popAlpha();
+	}
+
+	private void switchTab(Tab target) {
+		if (tab == target) return;
+		tab = target;
+		lastTab = target;
+		pageScrollTarget = 0;
+		pageScroll.snap(0);
+		draggingPanel = null;
+		draggingSlider = null;
+	}
+
+	/** Shared frame for the non-panel tabs: a centred glowing card that scrolls. */
+	private void drawPage(GuiGraphics g, float appear) {
+		if (appear <= 0.01f) return;
+		float w = Math.min(300f, screenW() - 24f);
+		float x = (screenW() - w) / 2f;
+		float top = TOP + 2f, bottom = screenH() - 44f;
+		float h = bottom - top;
+		Render2D.pushAlpha(appear);
+		GlowRenderer.glow(g, x, top, w, h, radius() + 1, OogaTheme.GOLD, 0.6f * config.panelGlow.getFloat() + 0.1f, 3f);
+		Render2D.roundRect(g, x, top, w, h, radius() + 1, ClientSettings.surface(0xF00E0F12));
+		Render2D.outline(g, x, top, w, h, radius() + 1, OogaTheme.accent(0x80));
+
+		float scrollY = pageScroll.update(pageScrollTarget);
+		g.enableScissor(Math.round(x), Math.round(top + 1), Math.round(x + w), Math.round(bottom - 1));
+		float cx = x + 10f, cw = w - 20f;
+		float y = top + 10f - scrollY;
+		int firstHit = hits.size();
+		float end = switch (tab) {
+			case CONFIGS -> drawConfigsPage(g, cx, y, cw);
+			case FINDS -> drawFindsPage(g, cx, y, cw);
+			case THEME -> drawThemePage(g, cx, y, cw);
+			default -> y;
+		};
+		g.disableScissor();
+		// Anything scrolled out of the card can't be clicked; partly visible things only where shown.
+		for (int i = hits.size() - 1; i >= firstHit; i--) {
+			Hit hit = hits.get(i);
+			float y0 = Math.max(hit.y(), top), y1 = Math.min(hit.y() + hit.h(), bottom);
+			if (y1 <= y0) hits.remove(i);
+			else hits.set(i, new Hit(hit.x(), y0, hit.w(), y1 - y0, hit.action()));
+		}
+		pageMaxScroll = Math.max(0f, end + scrollY - bottom + 10f);
+		if (pageScrollTarget > pageMaxScroll) pageScrollTarget = pageMaxScroll;
+
+		if (status != null && System.currentTimeMillis() < statusUntil) {
+			float sw = OogaFonts.width(status, Weight.SEMIBOLD, S7) + 12f;
+			float sy = bottom - 16f;
+			Render2D.roundRect(g, x + (w - sw) / 2f, sy, sw, 12f, 6f, OogaTheme.accent(0xD0));
+			OogaFonts.drawCentered(g, status, x + w / 2f, sy + 2.5f, OogaTheme.ON_GOLD, Weight.SEMIBOLD, S7);
+		}
+		Render2D.popAlpha();
+	}
+
+	private void flash(String message) {
+		status = message;
+		statusUntil = System.currentTimeMillis() + 2200;
+	}
+
+	private float heading(GuiGraphics g, String title, String subtitle, float x, float y, float w) {
+		GlowRenderer.glow(g, x, y + 1f, OogaFonts.width(title, Weight.SEMIBOLD, 1f), 8f, 2f, OogaTheme.GOLD, 0.35f, 4f);
+		OogaFonts.draw(g, title, x, y, OogaTheme.gradient(0.3f), Weight.SEMIBOLD, 1f);
+		if (subtitle != null) OogaFonts.draw(g, subtitle, x, y + 11f, OogaTheme.TEXT_MUTED, Weight.REGULAR, S7);
+		return y + (subtitle != null ? 22f : 13f);
+	}
+
+	/** A pill button; {@code primary} ones are filled with the accent and glow. Returns its width. */
+	private float button(GuiGraphics g, String label, float x, float y, float w, boolean primary, Runnable action) {
+		float h = 13f;
+		if (w <= 0) w = OogaFonts.width(label, Weight.SEMIBOLD, S7) + 12f;
+		float hv = hover("btn#" + label + "#" + Math.round(x) + "#" + Math.round(y), x, y, w, h);
+		if (primary) {
+			GlowRenderer.glow(g, x, y, w, h, h / 2f, OogaTheme.GOLD, 0.5f + 0.4f * hv, 3f);
+			Render2D.roundRect(g, x, y, w, h, h / 2f, ColorUtil.lerp(OogaTheme.GOLD, OogaTheme.GOLD_BRIGHT, hv));
+		} else {
+			Render2D.roundRect(g, x, y, w, h, h / 2f, ColorUtil.lerp(OogaTheme.SURFACE_CONTROL, OogaTheme.accent(0x40), hv));
+			Render2D.outline(g, x, y, w, h, h / 2f, ColorUtil.lerp(OogaTheme.BORDER, OogaTheme.accent(0x90), hv));
+		}
+		OogaFonts.drawCentered(g, label, x + w / 2f, textY(y, h, 7), primary ? OogaTheme.ON_GOLD : OogaTheme.TEXT, Weight.SEMIBOLD, S7);
+		hits.add(new Hit(x, y, w, h, (b, mx, my) -> {
+			if (b != 0) return false;
+			action.run();
+			return true;
+		}));
+		return w;
+	}
+
+	private float card(GuiGraphics g, float x, float y, float w, float h, float hover) {
+		Render2D.roundRect(g, x, y, w, h, OogaTheme.corner(4f), ColorUtil.lerp(0x0DFFFFFF, OogaTheme.accent(0x18), hover));
+		Render2D.outline(g, x, y, w, h, OogaTheme.corner(4f), ColorUtil.lerp(OogaTheme.BORDER, OogaTheme.accent(0x60), hover));
+		return h;
+	}
+
+	private static String ago(long millis) {
+		if (millis <= 0) return "";
+		long s = (System.currentTimeMillis() - millis) / 1000;
+		if (s < 60) return "just now";
+		if (s < 3600) return s / 60 + "m ago";
+		if (s < 86400) return s / 3600 + "h ago";
+		return s / 86400 + "d ago";
+	}
+
+	// ------------------------------------------------------------------ configs
+
+	private void saveConfig(String name) {
+		String clean = dev.ooga.client.config.Profiles.clean(name);
+		if (clean.isEmpty()) {
+			flash("Type a name first");
+			return;
+		}
+		if (dev.ooga.client.config.Profiles.save(clean)) {
+			flash("Saved " + clean);
+			configName.setLength(0);
+		} else {
+			flash("Couldn't save " + clean);
+		}
+	}
+
+	private float drawConfigsPage(GuiGraphics g, float x, float y, float w) {
+		y = heading(g, "Configs", "Save and load your modules, keybinds and settings.", x, y, w);
+
+		// Name field and save button.
+		float fh = 14f, bw = 44f;
+		float fw = w - bw - 5f;
+		boolean typing = !configName.isEmpty();
+		GlowRenderer.glow(g, x, y, fw, fh, OogaTheme.corner(3f), OogaTheme.GOLD, 0.35f, 3f);
+		Render2D.roundRect(g, x, y, fw, fh, OogaTheme.corner(3f), OogaTheme.SURFACE_INSET);
+		Render2D.outline(g, x, y, fw, fh, OogaTheme.corner(3f), OogaTheme.accent(0x90));
+		String shown = typing ? configName.toString() : "Type a name, then Save";
+		OogaFonts.draw(g, shown, x + 5f, y + 3.6f, typing ? OogaTheme.TEXT : OogaTheme.TEXT_MUTED, Weight.REGULAR, S8);
+		if ((System.currentTimeMillis() / 530) % 2 == 0) {
+			float cx = x + 5.5f + (typing ? OogaFonts.width(shown, Weight.REGULAR, S8) : 0f);
+			Render2D.rect(g, cx, y + 3f, 0.75f, 8f, OogaTheme.GOLD);
+		}
+		button(g, "Save", x + fw + 5f, y + 0.5f, bw, true, () -> saveConfig(configName.toString()));
+		y += fh + 12f;
+
+		// Presets.
+		OogaFonts.draw(g, "PRESETS", x, y, OogaTheme.TEXT_MUTED, Weight.SEMIBOLD, S7);
+		y += 10f;
+		float px = x;
+		for (dev.ooga.client.config.Presets.Preset preset : dev.ooga.client.config.Presets.ALL) {
+			float pw = OogaFonts.width(preset.name(), Weight.SEMIBOLD, S7) + 12f;
+			if (px + pw > x + w) {
+				px = x;
+				y += 16f;
+			}
+			float bx = px;
+			hoveredTipIf("preset#" + preset.name(), preset.description(), bx, y, pw, 13f);
+			button(g, preset.name(), bx, y, pw, false, () -> {
+				dev.ooga.client.config.Presets.apply(preset);
+				flash(preset.name() + " applied");
+			});
+			px += pw + 5f;
+		}
+		y += 22f;
+
+		// Saved configs.
+		List<dev.ooga.client.config.Profiles.Entry> saved = dev.ooga.client.config.Profiles.list();
+		OogaFonts.draw(g, "SAVED  " + saved.size(), x, y, OogaTheme.TEXT_MUTED, Weight.SEMIBOLD, S7);
+		float folderW = OogaFonts.width("Open Folder", Weight.SEMIBOLD, S7) + 12f;
+		button(g, "Open Folder", x + w - folderW, y - 3f, folderW, false, () -> {
+			try {
+				java.nio.file.Files.createDirectories(dev.ooga.client.config.Profiles.DIR);
+			} catch (java.io.IOException ignored) {
+				// Opening will just fail quietly.
+			}
+			net.minecraft.util.Util.getPlatform().openPath(dev.ooga.client.config.Profiles.DIR);
+		});
+		y += 14f;
+		if (saved.isEmpty()) {
+			OogaFonts.draw(g, "No saved configs yet.", x, y + 2f, OogaTheme.TEXT_SECONDARY, Weight.REGULAR, S8);
+			y += 14f;
+		}
+		for (dev.ooga.client.config.Profiles.Entry entry : saved) {
+			float rh = 22f;
+			float hv = hover("cfg#" + entry.name(), x, y, w, rh);
+			card(g, x, y, w, rh, hv);
+			OogaFonts.draw(g, entry.name(), x + 7f, y + 3.5f, OogaTheme.TEXT, Weight.SEMIBOLD, S8);
+			OogaFonts.draw(g, ago(entry.modified()), x + 7f, y + 12.5f, OogaTheme.TEXT_MUTED, Weight.REGULAR, S7);
+			boolean confirming = entry.name().equals(confirmDelete) && System.currentTimeMillis() < confirmUntil;
+			String del = confirming ? "Sure?" : "Delete";
+			float dw = OogaFonts.width(del, Weight.SEMIBOLD, S7) + 12f;
+			float lw = OogaFonts.width("Load", Weight.SEMIBOLD, S7) + 14f;
+			float sw = OogaFonts.width("Overwrite", Weight.SEMIBOLD, S7) + 12f;
+			float bx = x + w - 5f - dw;
+			button(g, del, bx, y + 4.5f, dw, false, () -> {
+				if (entry.name().equals(confirmDelete) && System.currentTimeMillis() < confirmUntil) {
+					dev.ooga.client.config.Profiles.delete(entry.name());
+					confirmDelete = null;
+					flash("Deleted " + entry.name());
+				} else {
+					confirmDelete = entry.name();
+					confirmUntil = System.currentTimeMillis() + 3000;
+				}
+			});
+			bx -= sw + 4f;
+			button(g, "Overwrite", bx, y + 4.5f, sw, false, () -> saveConfig(entry.name()));
+			bx -= lw + 4f;
+			button(g, "Load", bx, y + 4.5f, lw, true, () -> flash(dev.ooga.client.config.Profiles.load(entry.name()) ? "Loaded " + entry.name() : "Couldn't load " + entry.name()));
+			y += rh + 4f;
+		}
+		return y;
+	}
+
+	// ------------------------------------------------------------------ finds & waypoints
+
+	private float drawFindsPage(GuiGraphics g, float x, float y, float w) {
+		y = heading(g, "Finds", "Everything the base finders turned up this session.", x, y, w);
+		List<dev.ooga.client.world.Finds.Find> finds = dev.ooga.client.world.Finds.recent();
+		var player = minecraft == null ? null : minecraft.player;
+		if (finds.isEmpty()) {
+			OogaFonts.draw(g, "Nothing yet. Turn on Spawner Finder, Storage ESP or the other finders.", x, y + 2f, OogaTheme.TEXT_SECONDARY, Weight.REGULAR, S7);
+			y += 14f;
+		}
+		for (dev.ooga.client.world.Finds.Find find : finds) {
+			float rh = 22f;
+			float hv = hover("find#" + find.type() + find.pos().asLong(), x, y, w, rh);
+			card(g, x, y, w, rh, hv);
+			int dot = switch (find.type()) {
+				case "Spawner" -> 0xFFE8594A;
+				case "Tunnel" -> 0xFF5FB3F0;
+				case "Stash" -> 0xFFD9A441;
+				default -> OogaTheme.GOLD;
+			};
+			GlowRenderer.glowCircle(g, x + 8f, y + 11f, 2.2f, dot, 0.8f);
+			Render2D.circle(g, x + 8f, y + 11f, 2.2f, dot);
+			String what = find.detail() == null || find.detail().isEmpty() ? find.type() : find.type() + " · " + find.detail();
+			OogaFonts.draw(g, OogaFonts.trim(what, Weight.SEMIBOLD, S8, w - 110f), x + 15f, y + 3.5f, OogaTheme.TEXT, Weight.SEMIBOLD, S8);
+			String where = find.pos().getX() + ", " + find.pos().getY() + ", " + find.pos().getZ();
+			if (player != null) where += "   " + Math.round(Math.sqrt(find.pos().distToCenterSqr(player.position()))) + "m";
+			OogaFonts.draw(g, where, x + 15f, y + 12.5f, OogaTheme.TEXT_MUTED, Weight.REGULAR, S7);
+			float cw = OogaFonts.width("Copy", Weight.SEMIBOLD, S7) + 12f;
+			float ww = OogaFonts.width("Waypoint", Weight.SEMIBOLD, S7) + 12f;
+			String coords = find.pos().getX() + " " + find.pos().getY() + " " + find.pos().getZ();
+			button(g, "Copy", x + w - 5f - cw, y + 4.5f, cw, false, () -> {
+				minecraft.keyboardHandler.setClipboard(coords);
+				flash("Copied " + coords);
+			});
+			button(g, "Waypoint", x + w - 9f - cw - ww, y + 4.5f, ww, true, () -> {
+				dev.ooga.client.world.Waypoints.add(find.type() + " " + find.pos().getX() + "," + find.pos().getZ(), find.pos());
+				flash("Waypoint added");
+			});
+			y += rh + 4f;
+		}
+
+		y += 8f;
+		y = heading(g, "Waypoints", "Here, on this server and dimension. Beams show in the world.", x, y, w);
+		float aw = OogaFonts.width("Add Here", Weight.SEMIBOLD, S7) + 12f;
+		button(g, "Add Here", x + w - aw, y - 20f, aw, true, () -> {
+			if (minecraft.player == null) return;
+			var wp = dev.ooga.client.world.Waypoints.add(dev.ooga.client.world.Waypoints.nextName("Waypoint"), minecraft.player.blockPosition());
+			flash("Added " + wp.name);
+		});
+		var waypoints = dev.ooga.client.world.Waypoints.here();
+		if (waypoints.isEmpty()) {
+			OogaFonts.draw(g, "No waypoints here yet.", x, y + 2f, OogaTheme.TEXT_SECONDARY, Weight.REGULAR, S7);
+			y += 14f;
+		}
+		for (var wp : waypoints) {
+			float rh = 20f;
+			float hv = hover("wp#" + wp.name, x, y, w, rh);
+			card(g, x, y, w, rh, hv);
+			GlowRenderer.glowCircle(g, x + 8f, y + 10f, 2.2f, wp.color, 0.8f);
+			Render2D.circle(g, x + 8f, y + 10f, 2.2f, wp.color);
+			OogaFonts.draw(g, wp.name, x + 15f, y + 3f, OogaTheme.TEXT, Weight.SEMIBOLD, S8);
+			String where = wp.x + ", " + wp.y + ", " + wp.z;
+			if (player != null) where += "   " + Math.round(Math.sqrt(wp.pos().distToCenterSqr(player.position()))) + "m";
+			OogaFonts.draw(g, where, x + 15f, y + 11.5f, OogaTheme.TEXT_MUTED, Weight.REGULAR, S7);
+			float dw = OogaFonts.width("Delete", Weight.SEMIBOLD, S7) + 12f;
+			String name = wp.name;
+			button(g, "Delete", x + w - 5f - dw, y + 3.5f, dw, false, () -> {
+				dev.ooga.client.world.Waypoints.remove(name);
+				flash("Removed " + name);
+			});
+			y += rh + 4f;
+		}
+		return y;
+	}
+
+	// ------------------------------------------------------------------ theme
+
+	private float drawThemePage(GuiGraphics g, float x, float y, float w) {
+		y = heading(g, "Theme", "Accent colour, glow and menu effects.", x, y, w);
+		ClientSettings settings = ModuleManager.get().get(ClientSettings.class);
+		OogaTheme.Accent[] accents = OogaTheme.Accent.values();
+		float cell = w / 6f;
+		for (int i = 0; i < accents.length; i++) {
+			OogaTheme.Accent accent = accents[i];
+			float cx = x + (i % 6) * cell + cell / 2f;
+			float cy = y + (i / 6) * 30f + 9f;
+			boolean active = settings.accent.is(accent.label);
+			float hv = hover("accent#" + accent.label, cx - cell / 2f, cy - 9f, cell, 28f);
+			int color = accent == OogaTheme.Accent.CHROMA ? OogaTheme.hsv((System.currentTimeMillis() % 4000) / 4000f, 0.55f, 0.97f) : 0xFF000000 | accent.base();
+			GlowRenderer.glowCircle(g, cx, cy, 6f, color, active ? 1f : 0.3f + 0.5f * hv);
+			if (active) Render2D.circle(g, cx, cy, 8f, 0xFFFFFFFF);
+			Render2D.circle(g, cx, cy, active ? 6.5f : 6f + hv, color);
+			OogaFonts.drawCentered(g, accent.label, cx, cy + 9.5f, active ? OogaTheme.TEXT : OogaTheme.TEXT_MUTED, Weight.REGULAR, 0.62f);
+			hits.add(new Hit(cx - cell / 2f, cy - 9f, cell, 28f, (b, mx, my) -> {
+				if (b != 0) return false;
+				settings.accent.set(accent.label);
+				return true;
+			}));
+		}
+		y += ((accents.length + 5) / 6) * 30f + 6f;
+
+		y = settingsBlock(g, "GLOW & COLOUR", settings, x, y, w);
+		y = settingsBlock(g, "MENU", config, x, y + 6f, w);
+		return y;
+	}
+
+	private float settingsBlock(GuiGraphics g, String title, Module module, float x, float y, float w) {
+		OogaFonts.draw(g, title, x, y, OogaTheme.TEXT_MUTED, Weight.SEMIBOLD, S7);
+		y += 10f;
+		float h = settingsHeight(module);
+		card(g, x, y, w, h, 0f);
+		float sy = y + 2f;
+		for (Setting<?> setting : module.getSettings()) {
+			if (!setting.isVisible()) continue;
+			sy = drawSetting(g, setting, x + 7f, sy, w - 14f);
+		}
+		return y + h + 4f;
+	}
+
 	private static String keyName(int key) {
 		String name = InputConstants.Type.KEYSYM.getOrCreate(key).getDisplayName().getString();
 		return name.length() > 6 ? name.substring(0, 6) : name;
@@ -651,7 +1061,7 @@ public class PanelClickGuiScreen extends Screen {
 		if (draggingPanel != null) {
 			PanelLayout.Entry e = PanelLayout.get(draggingPanel);
 			e.x = Math.max(0, Math.min(screenW() - panelW(), mx - dragDX));
-			e.y = Math.max(0, Math.min(screenH() - HEADER_H, my - dragDY));
+			e.y = Math.max(TOP, Math.min(screenH() - HEADER_H, my - dragDY));
 			return true;
 		}
 		if (draggingSlider != null) {
@@ -671,6 +1081,10 @@ public class PanelClickGuiScreen extends Screen {
 
 	@Override
 	public boolean mouseScrolled(double mx, double my, double scrollX, double scrollY) {
+		if (tab != Tab.MAIN) {
+			pageScrollTarget = Math.max(0f, Math.min(pageMaxScroll, pageScrollTarget - (float) scrollY * 20f));
+			return true;
+		}
 		scrollTarget = Math.max(-40f, Math.min(600f, scrollTarget - (float) scrollY * 20f));
 		return true;
 	}
@@ -686,6 +1100,21 @@ public class PanelClickGuiScreen extends Screen {
 			if (key == GLFW.GLFW_KEY_ESCAPE || key == GLFW.GLFW_KEY_BACKSPACE || key == GLFW.GLFW_KEY_DELETE) binding.setKey(-1);
 			else binding.setKey(key);
 			binding = null;
+			return true;
+		}
+		if (tab == Tab.CONFIGS && key != GLFW.GLFW_KEY_ESCAPE) {
+			if (key == GLFW.GLFW_KEY_BACKSPACE && !configName.isEmpty()) {
+				if ((event.modifiers() & GLFW.GLFW_MOD_CONTROL) != 0) configName.setLength(0);
+				else configName.setLength(configName.length() - 1);
+				return true;
+			}
+			if (key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_KP_ENTER) {
+				saveConfig(configName.toString());
+				return true;
+			}
+		}
+		if (tab != Tab.MAIN && key == config.getKey()) {
+			onClose();
 			return true;
 		}
 		if (key == GLFW.GLFW_KEY_ESCAPE) {
@@ -719,6 +1148,13 @@ public class PanelClickGuiScreen extends Screen {
 	public boolean charTyped(CharacterEvent event) {
 		int codepoint = event.codepoint();
 		if (binding != null || Character.isISOControl(codepoint)) return false;
+		if (tab == Tab.CONFIGS) {
+			if (configName.length() < 24 && (Character.isLetterOrDigit(codepoint) || codepoint == ' ' || codepoint == '_' || codepoint == '-')) {
+				configName.appendCodePoint(codepoint);
+			}
+			return true;
+		}
+		if (tab != Tab.MAIN) return false;
 		if (search.isEmpty() && Character.isWhitespace(codepoint)) return false;
 		if (search.length() < 32) search.appendCodePoint(codepoint);
 		return true;

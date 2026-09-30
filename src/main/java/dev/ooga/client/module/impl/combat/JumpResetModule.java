@@ -2,6 +2,7 @@ package dev.ooga.client.module.impl.combat;
 
 import dev.ooga.client.module.Category;
 import dev.ooga.client.module.Module;
+import dev.ooga.client.module.impl.client.SafetyModule;
 import dev.ooga.client.module.setting.NumberSetting;
 import dev.ooga.client.util.Delay;
 
@@ -28,5 +29,10 @@ public class JumpResetModule extends Module {
 		if (justHit && mc.player.onGround() && !mc.player.isInWater() && Delay.chance(chance.get())) {
 			mc.player.jumpFromGround();
 		}
+	}
+
+	@Override
+	public boolean isBlatant() {
+		return true;
 	}
 }

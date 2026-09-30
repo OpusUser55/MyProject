@@ -2,6 +2,7 @@ package dev.ooga.client.module.impl.combat;
 
 import dev.ooga.client.module.Category;
 import dev.ooga.client.module.Module;
+import dev.ooga.client.module.impl.client.SafetyModule;
 import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.NumberSetting;
 import dev.ooga.client.module.impl.client.FriendsModule;
@@ -25,13 +26,18 @@ public class HitboxModule extends Module {
 	/** Extra pick radius for {@code entity}; 0 when the module doesn't apply. */
 	public static float extra(Entity entity) {
 		HitboxModule self = instance;
-		if (self == null || !self.isEnabled() || entity == mc.player || FriendsModule.protects(entity)) return 0f;
+		if (self == null || !self.isEnabled() || SafetyModule.paused() || entity == mc.player || FriendsModule.protects(entity)) return 0f;
 		boolean wanted = entity instanceof Player ? self.players.get() : entity instanceof Enemy && self.hostiles.get();
-		return wanted ? self.expand.getFloat() : 0f;
+		return wanted ? (float) SafetyModule.atMost(self.expand.get(), 0.1) : 0f;
 	}
 
 	@Override
 	public String getSuffix() {
 		return expand.format();
+	}
+
+	@Override
+	public boolean isBlatant() {
+		return true;
 	}
 }

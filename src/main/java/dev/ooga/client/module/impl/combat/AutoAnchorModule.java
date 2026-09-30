@@ -2,6 +2,7 @@ package dev.ooga.client.module.impl.combat;
 
 import dev.ooga.client.module.Category;
 import dev.ooga.client.module.Module;
+import dev.ooga.client.module.impl.client.SafetyModule;
 import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.NumberSetting;
 import dev.ooga.client.util.Delay;
@@ -157,5 +158,10 @@ public class AutoAnchorModule extends Module {
 	@Override
 	public String getSuffix() {
 		return step == Step.READY ? null : step.name().charAt(0) + step.name().substring(1).toLowerCase();
+	}
+
+	@Override
+	public boolean isBlatant() {
+		return true;
 	}
 }

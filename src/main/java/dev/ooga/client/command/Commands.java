@@ -128,6 +128,21 @@ public final class Commands {
 				}
 			}
 		});
+		register("config", "save|load|delete <name> | list", "Save and load named configs.", args -> {
+			String sub = args.length == 0 ? "list" : args[0].toLowerCase(Locale.ROOT);
+			String name = args.length > 1 ? String.join(" ", Arrays.copyOfRange(args, 1, args.length)) : "";
+			switch (sub) {
+				case "save" -> ChatUtil.info(dev.ooga.client.config.Profiles.save(name) ? "Saved config " + name : "Give the config a name");
+				case "load" -> ChatUtil.info(dev.ooga.client.config.Profiles.load(name) ? "Loaded config " + name : "No config called " + name);
+				case "delete" -> ChatUtil.info(dev.ooga.client.config.Profiles.delete(name) ? "Deleted config " + name : "No config called " + name);
+				default -> {
+					var saved = dev.ooga.client.config.Profiles.list();
+					List<String> names = new ArrayList<>();
+					for (var e : saved) names.add(e.name());
+					ChatUtil.info(saved.isEmpty() ? "No saved configs. .config save <name>" : "Configs: " + String.join(", ", names));
+				}
+			}
+		});
 		register("finds", "[clear]", "List recent finds, or forget them.", args -> {
 			if (args.length > 0 && args[0].equalsIgnoreCase("clear")) {
 				Finds.clear();

@@ -2,6 +2,7 @@ package dev.ooga.client.module.impl.misc;
 
 import dev.ooga.client.module.Category;
 import dev.ooga.client.module.Module;
+import dev.ooga.client.module.impl.client.SafetyModule;
 import dev.ooga.client.module.impl.client.FriendsModule;
 import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.NumberSetting;
@@ -37,7 +38,13 @@ public class AutoClickerModule extends Module {
 			mc.gameMode.attack(mc.player, target);
 		}
 		mc.player.swing(InteractionHand.MAIN_HAND);
-		int lo = (int) Math.min(minCps.get(), maxCps.get()), hi = (int) Math.max(minCps.get(), maxCps.get());
+		int hi = (int) SafetyModule.atMost(Math.max(minCps.get(), maxCps.get()), 13);
+		int lo = (int) Math.min(Math.min(minCps.get(), maxCps.get()), hi);
 		delay.start(Math.max(1, Math.round(20f / hi)), Math.max(1, Math.round(20f / lo)));
+	}
+
+	@Override
+	public boolean isBlatant() {
+		return true;
 	}
 }

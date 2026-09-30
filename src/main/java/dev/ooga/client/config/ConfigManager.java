@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dev.ooga.client.module.Module;
 import dev.ooga.client.module.ModuleManager;
+import dev.ooga.client.module.impl.client.ClientSettings;
 import dev.ooga.client.module.setting.Setting;
 import dev.ooga.client.ui.clickgui.PanelLayout;
 import dev.ooga.client.ui.hud.HudManager;
@@ -54,24 +55,12 @@ public final class ConfigManager {
 		loading = true;
 		try {
 			JsonObject root = JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
-			JsonObject modules = root.has("modules") ? root.getAsJsonObject("modules") : new JsonObject();
-			for (Module module : ModuleManager.get().getModules()) {
-				if (!modules.has(module.getName())) continue;
-				JsonObject data = modules.getAsJsonObject(module.getName());
-				if (data.has("key")) module.setKey(data.get("key").getAsInt());
-				if (data.has("settings")) {
-					JsonObject settings = data.getAsJsonObject("settings");
-					for (Setting<?> setting : module.getSettings()) {
-						JsonElement value = settings.get(setting.getName());
-						if (value != null) setting.fromJson(value);
-					}
-				}
-				if (module.persistsEnabledState() && data.has("enabled")) {
-					module.setEnabled(data.get("enabled").getAsBoolean(), false);
-				}
+			apply(root, true);
+			// Version 1 configs stored the old gold default; move them to the new blue default.
+			if (!root.has("version") || root.get("version").getAsInt() < 2) {
+				ClientSettings settings = ModuleManager.get().get(ClientSettings.class);
+				if (settings.accent.is("Gold")) settings.accent.set("Ocean");
 			}
-			if (root.has("hud")) HudManager.get().fromJson(root.getAsJsonObject("hud"));
-			if (root.has("clickgui")) PanelLayout.fromJson(root.getAsJsonObject("clickgui"));
 		} catch (IOException | RuntimeException e) {
 			ModuleManager.LOGGER.error("Failed to load Ooga config; using defaults", e);
 		} finally {
@@ -80,10 +69,35 @@ public final class ConfigManager {
 		}
 	}
 
-	public void save() {
-		dirtySince = -1;
+	/**
+	 * Applies a saved state. With {@code layout}, HUD positions and menu panels are restored too
+	 * (the main config); named configs leave the layout where it is.
+	 */
+	public void apply(JsonObject root, boolean layout) {
+		JsonObject modules = root.has("modules") ? root.getAsJsonObject("modules") : new JsonObject();
+		for (Module module : ModuleManager.get().getModules()) {
+			if (!modules.has(module.getName())) continue;
+			JsonObject data = modules.getAsJsonObject(module.getName());
+			if (data.has("key")) module.setKey(data.get("key").getAsInt());
+			if (data.has("settings")) {
+				JsonObject settings = data.getAsJsonObject("settings");
+				for (Setting<?> setting : module.getSettings()) {
+					JsonElement value = settings.get(setting.getName());
+					if (value != null) setting.fromJson(value);
+				}
+			}
+			if (module.persistsEnabledState() && data.has("enabled")) {
+				module.setEnabled(data.get("enabled").getAsBoolean(), false);
+			}
+		}
+		if (layout && root.has("hud")) HudManager.get().fromJson(root.getAsJsonObject("hud"));
+		if (layout && root.has("clickgui")) PanelLayout.fromJson(root.getAsJsonObject("clickgui"));
+	}
+
+	/** The whole current state as JSON: modules, keys, settings, HUD and menu layout. */
+	public JsonObject snapshot() {
 		JsonObject root = new JsonObject();
-		root.addProperty("version", 1);
+		root.addProperty("version", 2);
 		JsonObject modules = new JsonObject();
 		for (Module module : ModuleManager.get().getModules()) {
 			JsonObject data = new JsonObject();
@@ -97,6 +111,12 @@ public final class ConfigManager {
 		root.add("modules", modules);
 		root.add("hud", HudManager.get().toJson());
 		root.add("clickgui", PanelLayout.toJson());
+		return root;
+	}
+
+	public void save() {
+		dirtySince = -1;
+		JsonObject root = snapshot();
 
 		try {
 			Files.createDirectories(file.getParent());

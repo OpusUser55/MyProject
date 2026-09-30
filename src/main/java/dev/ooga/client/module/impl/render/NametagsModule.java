@@ -8,6 +8,7 @@ import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.NumberSetting;
 import dev.ooga.client.render.Projector;
 import dev.ooga.client.ui.OogaTheme;
+import dev.ooga.client.ui.render.GlowRenderer;
 import dev.ooga.client.ui.render.OogaFonts;
 import dev.ooga.client.ui.render.OogaFonts.Weight;
 import dev.ooga.client.ui.render.Render2D;
@@ -38,6 +39,8 @@ public class NametagsModule extends Module {
 	public final BooleanSetting hostiles = add(new BooleanSetting("Hostiles", "Tags over hostile mobs.", false));
 	public final BooleanSetting health = add(new BooleanSetting("Health", "Show health (including absorption).", true));
 	public final BooleanSetting distance = add(new BooleanSetting("Distance", "Show distance in blocks.", true));
+	public final BooleanSetting ping = add(new BooleanSetting("Ping", "Show each player's latency.", false));
+	public final NumberSetting background = add(new NumberSetting("Background", "Opacity of the tag's backing.", 0.78, 0.0, 1.0, 0.05));
 	public final BooleanSetting items = add(new BooleanSetting("Items", "Show held item and armour above the tag.", true));
 	public final BooleanSetting hideVanilla = add(new BooleanSetting("Hide Vanilla", "Hide Minecraft's own name tags for entities that get one of ours.", true));
 	public final NumberSetting scale = add(new NumberSetting("Scale", "Tag size.", 1.0, 0.5, 2.0, 0.05, "x"));
@@ -95,6 +98,10 @@ public class NametagsModule extends Module {
 			hpColor = living.getAbsorptionAmount() > 0 ? 0xFFF2C94C : ColorUtil.lerp(0xFFE5484D, 0xFF46C37B, ratio);
 		}
 		String dist = distance.get() ? Math.round(tag.distance()) + "m" : null;
+		if (ping.get() && entity instanceof Player && mc.getConnection() != null) {
+			var info = mc.getConnection().getPlayerInfo(entity.getUUID());
+			if (info != null) dist = (dist == null ? "" : dist + " ") + info.getLatency() + "ms";
+		}
 
 		float gap = 4f, pad = 4f;
 		float w = OogaFonts.width(name, Weight.SEMIBOLD);
@@ -108,7 +115,8 @@ public class NametagsModule extends Module {
 		g.pose().translate(tag.x(), tag.y());
 		g.pose().scale(s, s);
 		float x = -w / 2f, y = -h;
-		Render2D.roundRect(g, x, y, w, h, OogaTheme.RADIUS_CONTROL, 0xC80E0F12);
+		GlowRenderer.glow(g, x, y, w, h, OogaTheme.RADIUS_CONTROL, FriendsModule.highlights(entity) ? FriendsModule.COLOR : OogaTheme.GOLD, 0.35f, 3f);
+		Render2D.roundRect(g, x, y, w, h, OogaTheme.RADIUS_CONTROL, ColorUtil.withAlpha(0x0E0F12, Math.round(255 * background.getFloat())));
 		Render2D.outline(g, x, y, w, h, OogaTheme.RADIUS_CONTROL, FriendsModule.highlights(entity) ? FriendsModule.COLOR : entity instanceof Player ? OogaTheme.accent(0x80) : OogaTheme.BORDER);
 		float tx = x + pad, ty = y + 2.5f;
 		OogaFonts.draw(g, name, tx, ty, OogaTheme.TEXT, Weight.SEMIBOLD);

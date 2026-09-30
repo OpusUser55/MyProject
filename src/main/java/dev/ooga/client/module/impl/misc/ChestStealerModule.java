@@ -2,6 +2,7 @@ package dev.ooga.client.module.impl.misc;
 
 import dev.ooga.client.module.Category;
 import dev.ooga.client.module.Module;
+import dev.ooga.client.module.impl.client.SafetyModule;
 import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.NumberSetting;
 import dev.ooga.client.util.Delay;
@@ -35,11 +36,17 @@ public class ChestStealerModule extends Module {
 		for (int i = 0; i < containerSlots; i++) {
 			if (!menu.slots.get(i).hasItem()) continue;
 			mc.gameMode.handleInventoryMouseClick(menu.containerId, i, 0, ClickType.QUICK_MOVE, mc.player);
-			delay.start(minDelay.getInt(), Math.max(minDelay.getInt(), maxDelay.getInt()));
+			int lo = (int) SafetyModule.atLeast(minDelay.getInt(), 2);
+			delay.start(lo, Math.max(lo, maxDelay.getInt()));
 			// Still there: our inventory is full.
 			if (menu.slots.get(i).hasItem() && autoClose.get()) mc.player.closeContainer();
 			return;
 		}
 		if (autoClose.get()) mc.player.closeContainer();
+	}
+
+	@Override
+	public boolean isBlatant() {
+		return true;
 	}
 }

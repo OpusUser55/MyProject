@@ -2,6 +2,7 @@ package dev.ooga.client.module.impl.render;
 
 import dev.ooga.client.module.Category;
 import dev.ooga.client.module.Module;
+import dev.ooga.client.module.impl.client.FriendsModule;
 import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.ModeSetting;
 import dev.ooga.client.module.setting.NumberSetting;
@@ -41,6 +42,7 @@ public class TracersModule extends Module {
 			int rgb = color.is("Distance")
 					? ColorUtil.lerp(0xFFE5484D, 0xFF46C37B, (float) Math.min(1, distance / 64.0)) & 0xFFFFFF
 					: OogaTheme.GOLD & 0xFFFFFF;
+			if (FriendsModule.highlights(entity)) rgb = FriendsModule.COLOR & 0xFFFFFF;
 			float fade = (float) (1 - 0.6 * distance / max);
 			drawer.line(origin, pos, ColorUtil.withAlpha(rgb, Math.round(255 * opacity.getFloat() * fade)));
 		}

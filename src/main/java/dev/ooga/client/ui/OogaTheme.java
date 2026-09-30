@@ -56,9 +56,13 @@ public final class OogaTheme {
 			this.second = second;
 		}
 
+		public int base() {
+			return base;
+		}
+
 		public static Accent byLabel(String label) {
 			for (Accent a : values()) if (a.label.equalsIgnoreCase(label)) return a;
-			return GOLD;
+			return OCEAN;
 		}
 	}
 
@@ -71,7 +75,7 @@ public final class OogaTheme {
 	public static final int ON_GOLD = 0xFF1A1407;
 	/** Second accent colour: the far end of accent gradients. */
 	public static int ACCENT_2;
-	private static Accent current = Accent.GOLD;
+	private static Accent current = Accent.OCEAN;
 	private static float chromaSpeed = 1f;
 
 	// Radii (GUI units). Three sizes only, all scaled together by the Corners setting.
@@ -84,7 +88,7 @@ public final class OogaTheme {
 	private static float cornerFactor = 1f;
 
 	static {
-		applyAccent(Accent.GOLD);
+		applyAccent(Accent.OCEAN);
 	}
 
 	public static void applyAccent(Accent accent) {

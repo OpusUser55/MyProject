@@ -2,6 +2,7 @@ package dev.ooga.client.module.impl.combat;
 
 import dev.ooga.client.module.Category;
 import dev.ooga.client.module.Module;
+import dev.ooga.client.module.impl.client.SafetyModule;
 import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.NumberSetting;
 import dev.ooga.client.util.Delay;
@@ -32,6 +33,7 @@ public class AutoCrystalModule extends Module {
 	public final BooleanSetting placeObsidian = add(new BooleanSetting("Place Obsidian", "Put obsidian down first when you aim at a block that isn't obsidian or bedrock.", false));
 	public final NumberSetting switchDelay = add(new NumberSetting("Switch Delay", "Ticks to wait after switching to obsidian before placing it.", 1, 0, 10, 1, "t")
 			.visibleWhen(placeObsidian::get));
+	public final NumberSetting breakChance = add(new NumberSetting("Break Chance", "Percent of chances to actually break, so timing isn't perfect.", 95, 50, 100, 5, "%"));
 	public final BooleanSetting stopOnKill = add(new BooleanSetting("Stop On Kill", "Pause after a player dies nearby, so their loot isn't blown up.", true));
 	public final NumberSetting stopTime = add(new NumberSetting("Stop Time", "Seconds to stay paused.", 3, 0.5, 10, 0.5, "s")
 			.visibleWhen(stopOnKill::get));
@@ -66,6 +68,8 @@ public class AutoCrystalModule extends Module {
 		// Break: a crystal under the crosshair.
 		if (hit instanceof EntityHitResult entityHit && entityHit.getEntity() instanceof EndCrystal crystal) {
 			if (attack.done()) {
+				startAttackDelay();
+				if (!Delay.chance(breakChance.get())) return;
 				mc.gameMode.attack(mc.player, crystal);
 				mc.player.swing(InteractionHand.MAIN_HAND);
 				startAttackDelay();
@@ -115,7 +119,8 @@ public class AutoCrystalModule extends Module {
 
 	private void startAttackDelay() {
 		int lo = (int) Math.round(Math.min(minCps.get(), maxCps.get()));
-		int hi = (int) Math.round(Math.max(minCps.get(), maxCps.get()));
+		int hi = (int) Math.round(SafetyModule.atMost(Math.max(minCps.get(), maxCps.get()), 12));
+		lo = Math.min(lo, hi);
 		// Clicks per second to ticks between clicks (20 ticks per second).
 		int slow = Math.max(1, Math.round(20f / lo));
 		int fast = Math.max(1, Math.round(20f / hi));
@@ -126,5 +131,10 @@ public class AutoCrystalModule extends Module {
 		Inventory inventory = mc.player.getInventory();
 		for (int i = 0; i < Inventory.getSelectionSize(); i++) if (inventory.getItem(i).is(item)) return i;
 		return -1;
+	}
+
+	@Override
+	public boolean isBlatant() {
+		return true;
 	}
 }

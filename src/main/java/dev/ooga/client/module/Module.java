@@ -109,6 +109,10 @@ public abstract class Module {
 	public void onTick() {
 	}
 
+	/** Called instead of {@link #onTick} while the module is paused around staff. */
+	public void onPausedTick() {
+	}
+
 	/** Called once per client tick while disabled, e.g. to finish a fade-out. */
 	public void onDisabledTick() {
 	}
@@ -165,6 +169,14 @@ public abstract class Module {
 	/** Short state shown next to the name in the module list, e.g. a mode. May be null. */
 	public String getSuffix() {
 		return null;
+	}
+
+	/**
+	 * Blatant modules (combat automation, movement and speed changes) are what anticheats look
+	 * for; they're suspended while staff are online if the Anticheat settings ask for it.
+	 */
+	public boolean isBlatant() {
+		return false;
 	}
 
 	protected boolean inWorld() {

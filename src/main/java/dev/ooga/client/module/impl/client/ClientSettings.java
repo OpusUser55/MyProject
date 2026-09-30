@@ -12,7 +12,7 @@ import dev.ooga.client.util.ColorUtil;
 public class ClientSettings extends Module {
 	private static ClientSettings instance;
 
-	public final ModeSetting accent = add(new ModeSetting("Accent", "Accent colour for the whole client. Chroma slowly cycles through every hue.", "Gold",
+	public final ModeSetting accent = add(new ModeSetting("Accent", "Accent colour for the whole client. Chroma slowly cycles through every hue.", "Ocean",
 			"Gold", "Amber", "Honey", "Champagne", "Lemon", "Ocean", "Violet", "Rose", "Mint", "Crimson", "Chroma")
 			.onChange(this::applyTheme));
 	public final NumberSetting chromaSpeed = add(new NumberSetting("Chroma Speed", "How fast Chroma cycles.", 1.0, 0.2, 4.0, 0.1, "x")

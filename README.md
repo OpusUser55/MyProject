@@ -8,8 +8,10 @@ charcoal UI with a restrained, sophisticated gold accent and a soft golden glow.
 ![ClickGUI panels](docs/previews/panels_expanded.png)
 ![HUD](docs/previews/hud.png)
 
-![Menu, Gold accent (mockup)](docs/previews/v08_neon_gold.png)
-![Menu, Ocean accent (mockup)](docs/previews/v08_neon_ocean.png)
+![Main tab (mockup)](docs/previews/v09_main.png)
+![Configs tab (mockup)](docs/previews/v09_configs.png)
+![Finds tab (mockup)](docs/previews/v09_finds.png)
+![Theme tab (mockup)](docs/previews/v09_theme.png)
 ![Combat settings (mockup)](docs/previews/v05_combat.png)
 ![Base finding HUD and ESP (mockup)](docs/previews/v02_basefinding.png)
 ![Slow Mine](docs/previews/v02_slowmine.png)
@@ -45,9 +47,34 @@ The mod jar lands in `build/libs/`. Drop it, together with
 
 Settings are saved automatically to `config/ooga/config.json`.
 
+### Menu tabs
+
+The menu has four tabs across the top:
+
+| Tab | What's there |
+| --- | --- |
+| Main | The module panels |
+| Configs | Type a name and **Save** your modules, keybinds and settings; **Load**, **Overwrite** or **Delete** saved configs (in `config/ooga/configs/`); one-click presets: **Legit**, **Base Hunting**, **PvP**, **Blatant** |
+| Finds | Everything the finders turned up this session, with **Waypoint** and **Copy** buttons; your waypoints here, with **Add Here** and **Delete** |
+| Theme | Accent swatches and every glow / menu setting |
+
+### Anticheat safety
+
+Client → **Anticheat** has two switches, both on by default:
+
+- **Safe Mode** keeps risky modules within human-looking limits: click speeds capped
+  (Auto Clicker 13, Auto Crystal 12 CPS), a random delay before every Trigger Bot hit,
+  partial knockback reduction (Velocity keeps at least 65%), Hitbox at most 0.1, Step at most
+  1 block, Aim Assist gentle, Fast Place / Fast Break with a 1-tick pause, Chest Stealer
+  at least 2 ticks per item, and No Fall sending one packet right before landing instead of
+  every tick.
+- **Pause On Staff** suspends every blatant module while Admin Detector sees staff online.
+
+No client can promise to be undetectable everywhere; this makes it a lot less likely.
+
 ### Look and feel
 
-Client Settings → **Accent** picks the colour of everything: Gold, Amber, Honey, Champagne,
+Client Settings → **Accent** (or the Theme tab) picks the colour of everything. The default is **Ocean** blue; also Gold, Amber, Honey, Champagne,
 Lemon, Ocean, Violet, Rose, Mint, Crimson, or **Chroma** (slowly cycles through every hue).
 Each accent has a second colour used for gradients.
 
@@ -70,6 +97,7 @@ Type these in chat; they never reach the server.
 | `.friend add/remove/list <name>` | Manage friends |
 | `.wp add [name]` / `del <name>` / `list` / `clear` | Waypoints here |
 | `.finds [clear]` | List or forget recent finds |
+| `.config save/load/delete <name>` / `list` | Named configs |
 | `.coords` | Copy your coordinates |
 | `.modules` | List modules that are on |
 

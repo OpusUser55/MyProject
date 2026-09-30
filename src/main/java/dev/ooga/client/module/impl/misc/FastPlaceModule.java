@@ -3,6 +3,7 @@ package dev.ooga.client.module.impl.misc;
 import dev.ooga.client.mixin.MinecraftAccessor;
 import dev.ooga.client.module.Category;
 import dev.ooga.client.module.Module;
+import dev.ooga.client.module.impl.client.SafetyModule;
 import dev.ooga.client.module.setting.NumberSetting;
 
 /** Shortens the 4-tick pause between block placements (and item uses) while holding right click. */
@@ -16,11 +17,17 @@ public class FastPlaceModule extends Module {
 	@Override
 	public void onTick() {
 		MinecraftAccessor accessor = (MinecraftAccessor) mc;
-		if (accessor.ooga$getRightClickDelay() > delay.getInt()) accessor.ooga$setRightClickDelay(delay.getInt());
+		int wanted = (int) SafetyModule.atLeast(delay.getInt(), 1);
+		if (accessor.ooga$getRightClickDelay() > wanted) accessor.ooga$setRightClickDelay(wanted);
 	}
 
 	@Override
 	public String getSuffix() {
 		return delay.getInt() + "t";
+	}
+
+	@Override
+	public boolean isBlatant() {
+		return true;
 	}
 }

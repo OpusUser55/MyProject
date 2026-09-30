@@ -2,6 +2,7 @@ package dev.ooga.client.module.impl.combat;
 
 import dev.ooga.client.module.Category;
 import dev.ooga.client.module.Module;
+import dev.ooga.client.module.impl.client.SafetyModule;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 
@@ -16,7 +17,12 @@ public class CrystalOptimizerModule extends Module {
 
 	/** Called right after an attack packet is sent. */
 	public void afterAttack(Entity target) {
-		if (!isEnabled() || mc.level == null || !(target instanceof EndCrystal)) return;
+		if (!isEnabled() || SafetyModule.paused() || mc.level == null || !(target instanceof EndCrystal)) return;
 		mc.level.removeEntity(target.getId(), Entity.RemovalReason.KILLED);
+	}
+
+	@Override
+	public boolean isBlatant() {
+		return true;
 	}
 }

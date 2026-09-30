@@ -2,6 +2,7 @@ package dev.ooga.client.module.impl.movement;
 
 import dev.ooga.client.module.Category;
 import dev.ooga.client.module.Module;
+import dev.ooga.client.module.impl.client.SafetyModule;
 import dev.ooga.client.module.setting.NumberSetting;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -19,7 +20,13 @@ public class StepModule extends Module {
 	@Override
 	public void onTick() {
 		AttributeInstance step = attribute();
-		if (step != null && step.getBaseValue() != height.get()) step.setBaseValue(height.get());
+		double wanted = SafetyModule.atMost(height.get(), 1.0);
+		if (step != null && step.getBaseValue() != wanted) step.setBaseValue(wanted);
+	}
+
+	@Override
+	public void onPausedTick() {
+		onDisable();
 	}
 
 	@Override
@@ -35,5 +42,10 @@ public class StepModule extends Module {
 	@Override
 	public String getSuffix() {
 		return height.format();
+	}
+
+	@Override
+	public boolean isBlatant() {
+		return true;
 	}
 }

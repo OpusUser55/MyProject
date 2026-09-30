@@ -2,6 +2,7 @@ package dev.ooga.client.module.impl.combat;
 
 import dev.ooga.client.module.Category;
 import dev.ooga.client.module.Module;
+import dev.ooga.client.module.impl.client.SafetyModule;
 import dev.ooga.client.module.impl.client.FriendsModule;
 import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.NumberSetting;
@@ -22,6 +23,8 @@ public class TriggerBotModule extends Module {
 	public final BooleanSetting passive = add(new BooleanSetting("Passive", "Attack animals and other mobs.", false));
 	public final NumberSetting charge = add(new NumberSetting("Charge", "How recharged the attack must be (1.0 = full damage).", 1.0, 0.5, 1.0, 0.05));
 	public final NumberSetting randomDelay = add(new NumberSetting("Random Delay", "Up to this many extra ticks before each hit, so timing isn't robotic.", 1, 0, 5, 1, "t"));
+	public final NumberSetting hitChance = add(new NumberSetting("Hit Chance", "Percent of chances to actually swing.", 95, 10, 100, 5, "%"));
+	public final BooleanSetting weaponOnly = add(new BooleanSetting("Weapon Only", "Only while holding a sword, axe, mace or trident.", true));
 	public final BooleanSetting onlyHoldingClick = add(new BooleanSetting("Only While Holding", "Only attack while you hold the attack button.", false));
 
 	private int wait;
@@ -39,13 +42,23 @@ public class TriggerBotModule extends Module {
 		Entity target = entityHit.getEntity();
 		if (!wanted(target)) return;
 		if (mc.player.getAttackStrengthScale(0.5f) < charge.getFloat()) return;
+		if (weaponOnly.get() && !holdingWeapon()) return;
 		if (wait > 0) {
 			wait--;
 			return;
 		}
+		int maxDelay = (int) SafetyModule.atLeast(randomDelay.getInt(), 2);
+		int minDelay = SafetyModule.safe() ? 1 : 0;
+		wait = maxDelay == 0 ? 0 : ThreadLocalRandom.current().nextInt(minDelay, maxDelay + 1);
+		if (!dev.ooga.client.util.Delay.chance(hitChance.get())) return;
 		mc.gameMode.attack(mc.player, target);
 		mc.player.swing(InteractionHand.MAIN_HAND);
-		wait = randomDelay.getInt() == 0 ? 0 : ThreadLocalRandom.current().nextInt(randomDelay.getInt() + 1);
+	}
+
+	private boolean holdingWeapon() {
+		var stack = mc.player.getMainHandItem();
+		return stack.is(net.minecraft.tags.ItemTags.SWORDS) || stack.is(net.minecraft.tags.ItemTags.AXES)
+				|| stack.is(net.minecraft.world.item.Items.MACE) || stack.is(net.minecraft.world.item.Items.TRIDENT);
 	}
 
 	private boolean wanted(Entity entity) {
@@ -53,5 +66,10 @@ public class TriggerBotModule extends Module {
 		if (entity instanceof Player) return players.get() && !FriendsModule.protects(entity);
 		if (entity instanceof Enemy) return hostiles.get();
 		return passive.get();
+	}
+
+	@Override
+	public boolean isBlatant() {
+		return true;
 	}
 }

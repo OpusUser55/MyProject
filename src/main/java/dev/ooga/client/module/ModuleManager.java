@@ -10,6 +10,7 @@ import dev.ooga.client.module.impl.basefinding.SusChunkFinderModule;
 import dev.ooga.client.module.impl.basefinding.TunnelFinderModule;
 import dev.ooga.client.module.impl.client.ClickGuiModule;
 import dev.ooga.client.module.impl.client.ClientSettings;
+import dev.ooga.client.module.impl.client.SafetyModule;
 import dev.ooga.client.module.impl.client.FindsHudModule;
 import dev.ooga.client.module.impl.client.InfoHudModule;
 import dev.ooga.client.module.impl.client.KeystrokesModule;
@@ -103,6 +104,7 @@ public final class ModuleManager {
 	public void init() {
 		register(new ClickGuiModule());
 		register(new ClientSettings());
+		register(new SafetyModule());
 		register(new WatermarkModule());
 		register(new ModuleListModule());
 		register(new NotificationsModule());
@@ -238,6 +240,10 @@ public final class ModuleManager {
 			try {
 				if (!module.isEnabled()) {
 					module.onDisabledTick();
+					continue;
+				}
+				if (module.isBlatant() && SafetyModule.paused()) {
+					module.onPausedTick();
 					continue;
 				}
 				module.onTick();
