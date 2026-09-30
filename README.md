@@ -11,6 +11,7 @@ charcoal UI with a restrained, sophisticated gold accent and a soft golden glow.
 ![New modules](docs/previews/v02_menu.png)
 ![Base finding HUD and ESP (mockup)](docs/previews/v02_basefinding.png)
 ![Slow Mine](docs/previews/v02_slowmine.png)
+![Admins, radar, region map and sus chunks (mockup)](docs/previews/v03_admins_radar_regions.png)
 
 These are rendered offline from the real UI code by a stand-in renderer (Inter via Java2D),
 so text anti-aliasing differs slightly from in-game.
@@ -51,11 +52,13 @@ Settings are saved automatically to `config/ooga/config.json`.
 | Tunnel Finder | Long, straight 1x2 corridors of plain air with solid walls, floor and ceiling: player-dug tunnels. Measured across chunk borders; long ones are announced |
 | Hole ESP | 1x1 vertical shafts (air or ladders, walled on all four sides) that players dig straight down to hidden bases |
 | New Chunks | Marks chunks the server just generated (flowing-liquid updates right after load), so old, explored land stands out |
-| Sus Chunk Finder | Scores chunks for player-placed blocks (hoppers, observers, pistons, shulkers, beacons…) and fully grown kelp, which only grows while a chunk stays loaded; flagged chunks are marked and announced |
+| Sus Chunk Finder | Scores chunks for player-placed blocks (hoppers, observers, pistons, shulkers, beacons…) and fully grown kelp, which only grows while a chunk stays loaded; flagged chunks are announced and drawn as a gridded square, a plain square, or a tall beam (yellow, pink or accent) |
 | Light Finder | Torches and lanterns below a set height, where caves generate none |
 | Finder Alerts | Shared settings: a ping sound for every find, and a log of all finds (time, server, dimension, coordinates) in `config/ooga/finds.log` |
 | Finds (HUD) | The last few finds in this dimension, with coordinates, distance and an arrow pointing to each |
-| Radar (HUD) | A rotating minimap: players, optionally hostiles, and every find as a coloured marker |
+| Radar (HUD) | A rotating minimap with N/E/S/W on the rim: players as dots with distance (or name) tags, optionally hostiles, and every find as a coloured marker |
+| Region Map (HUD) | A numbered grid of world regions (size, grid and centre are configurable) with your region highlighted, its number in the header, visited regions brighter and regions with finds marked |
+| Admin Detector (Misc) | An **Admins** panel listing staff online with face and ping, or "None online". Staff = a staff rank in their tab name or team prefix, spectator mode (vanished staff), or a name in `config/ooga/staff.txt`. Chat + notification + sound when staff join or leave |
 
 Finders scan chunks in the background a few per tick, so enabling them never stalls the game.
 When blocks change (mined, placed, liquids flowing) the chunk is rescanned once it settles, so

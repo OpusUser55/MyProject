@@ -77,6 +77,9 @@ public class SusChunkFinderModule extends Module implements ChunkScanner.Listene
 	public final NumberSetting threshold = add(new NumberSetting("Threshold", "Score a chunk needs to be flagged.", 5, 1, 30, 0.5));
 	public final BooleanSetting placedBlocks = add(new BooleanSetting("Placed Blocks", "Count blocks players place (hoppers, pistons, shulkers…).", true));
 	public final BooleanSetting kelp = add(new BooleanSetting("Grown Kelp", "Count fully grown kelp, a sign the chunk stayed loaded.", true));
+	public final ModeSetting style = add(new ModeSetting("Style", "Grid: a gridded square. Slab: a plain square. Beam: a tall column you can spot from far away.", "Grid", "Grid", "Slab", "Beam"));
+	public final ModeSetting color = add(new ModeSetting("Color", "Marker colour.", "Yellow", "Yellow", "Pink", "Accent"));
+	public final NumberSetting opacity = add(new NumberSetting("Opacity", "Marker fill opacity.", 0.22, 0.05, 0.8, 0.01));
 	public final ModeSetting height = add(new ModeSetting("Height", "Draw the marker at a fixed height or at your feet.", "Player", "Player", "Fixed"));
 	public final NumberSetting fixedY = add(new NumberSetting("Marker Y", "Height of the marker in Fixed mode.", 63, -64, 320, 1)
 			.visibleWhen(() -> height.is("Fixed")));
@@ -180,16 +183,38 @@ public class SusChunkFinderModule extends Module implements ChunkScanner.Listene
 		announced.clear();
 	}
 
+	private int rgb() {
+		if (color.is("Pink")) return 0xE040C8;
+		if (color.is("Accent")) return OogaTheme.GOLD & 0xFFFFFF;
+		return 0xF5D22E;
+	}
+
 	private void draw(WorldOverlay.Drawer drawer, float partialTick) {
 		if (!isEnabled() || mc.player == null || flagged.isEmpty()) return;
 		double y = height.is("Fixed") ? fixedY.get() : Math.floor(mc.player.getPosition(partialTick).y);
-		int fill = OogaTheme.accent(0x30);
-		int line = OogaTheme.accent(0xD0);
+		int rgb = rgb();
+		int fill = ColorUtil.withAlpha(rgb, Math.round(255 * opacity.getFloat()));
+		int line = ColorUtil.withAlpha(rgb, 220);
+		int grid = ColorUtil.withAlpha(rgb, 150);
 		for (long key : flagged.keySet()) {
 			ChunkPos pos = new ChunkPos(key);
-			// A flat slab over the whole chunk, easy to spot from a distance.
-			AABB slab = new AABB(pos.getMinBlockX(), y, pos.getMinBlockZ(), pos.getMaxBlockX() + 1, y + 0.05, pos.getMaxBlockZ() + 1);
+			double x0 = pos.getMinBlockX(), z0 = pos.getMinBlockZ(), x1 = pos.getMaxBlockX() + 1, z1 = pos.getMaxBlockZ() + 1;
+			if (style.is("Beam")) {
+				// A column from bedrock to build height, visible across the map.
+				AABB beam = new AABB(x0 + 4, mc.level.getMinY(), z0 + 4, x1 - 4, mc.level.getMaxY(), z1 - 4);
+				drawer.box(beam, ColorUtil.withAlpha(rgb, Math.round(160 * opacity.getFloat())), line);
+				continue;
+			}
+			// A flat square over the whole chunk, easy to spot from a distance.
+			AABB slab = new AABB(x0, y, z0, x1, y + 0.05, z1);
 			drawer.box(slab, fill, line);
+			if (style.is("Grid")) {
+				double gy = y + 0.06;
+				for (int i = 2; i < 16; i += 2) {
+					drawer.line(x0 + i, gy, z0, x0 + i, gy, z1, grid);
+					drawer.line(x0, gy, z0 + i, x1, gy, z0 + i, grid);
+				}
+			}
 		}
 	}
 

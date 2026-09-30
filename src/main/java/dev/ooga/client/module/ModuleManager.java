@@ -17,6 +17,8 @@ import dev.ooga.client.module.impl.client.ModuleListModule;
 import dev.ooga.client.module.impl.client.MusicModule;
 import dev.ooga.client.module.impl.client.NotificationsModule;
 import dev.ooga.client.module.impl.client.RadarModule;
+import dev.ooga.client.module.impl.client.RegionMapModule;
+import dev.ooga.client.module.impl.misc.AdminDetectorModule;
 import dev.ooga.client.module.impl.client.WatermarkModule;
 import dev.ooga.client.module.impl.movement.SprintModule;
 import dev.ooga.client.module.impl.render.BlockEspModule;
@@ -68,6 +70,8 @@ public final class ModuleManager {
 		register(new MusicModule());
 		register(new FindsHudModule());
 		register(new RadarModule());
+		register(new RegionMapModule());
+		register(new AdminDetectorModule());
 
 		register(new FreecamModule());
 		register(new FullbrightModule());

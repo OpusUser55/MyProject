@@ -68,9 +68,15 @@ public class RadarHud extends HudElement {
 		float rx = -Mth.cos(yaw), rz = -Mth.sin(yaw);
 		float perBlock = (RADIUS - 3f) / module.range.getFloat();
 
-		// North marker on the rim.
-		float nx = -rz * (RADIUS - 5f), ny = fz * (RADIUS - 5f);
-		OogaFonts.drawCentered(g, "N", c + nx, c + ny - 3f, OogaTheme.TEXT_SECONDARY, Weight.SEMIBOLD, 0.6f);
+		// Compass letters on the rim, turning with you.
+		String[] letters = {"N", "E", "S", "W"};
+		int[][] dirs = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
+		for (int i = 0; i < 4; i++) {
+			float lx = (dirs[i][0] * rx + dirs[i][1] * rz) * (RADIUS - 6f);
+			float ly = -(dirs[i][0] * fx + dirs[i][1] * fz) * (RADIUS - 6f);
+			int color = i == 0 ? OogaTheme.GOLD_TEXT : OogaTheme.TEXT_SECONDARY;
+			OogaFonts.drawCentered(g, letters[i], c + lx, c + ly - 3f, color, Weight.SEMIBOLD, 0.6f);
+		}
 
 		if (module.finds.get()) {
 			String dimension = mc.level.dimension().identifier().toString();
@@ -85,13 +91,37 @@ public class RadarHud extends HudElement {
 			if (entity == player) continue;
 			boolean isPlayer = entity instanceof Player;
 			if (isPlayer ? !module.players.get() : !(module.hostiles.get() && entity instanceof Enemy)) continue;
-			float[] p = project(entity.getX() - px, entity.getZ() - pz, fx, fz, rx, rz, perBlock);
+			double dx = entity.getX() - px, dz = entity.getZ() - pz;
+			float[] p = project(dx, dz, fx, fz, rx, rz, perBlock);
 			if (p == null) continue;
-			Render2D.circle(g, c + p[0], c + p[1], isPlayer ? 1.8f : 1.4f, isPlayer ? OogaTheme.GOLD : HOSTILE);
+			float dotX = c + p[0], dotY = c + p[1];
+			if (!isPlayer) {
+				Render2D.circle(g, dotX, dotY, 1.4f, HOSTILE);
+				continue;
+			}
+			int dot = dotColor();
+			Render2D.circle(g, dotX, dotY, 3.2f, dot & 0x40FFFFFF);
+			Render2D.circle(g, dotX, dotY, 2f, dot);
+			String label = module.names.get() ? entity.getName().getString()
+					: module.distances.get() ? Math.round(Math.sqrt(dx * dx + dz * dz)) + "M" : null;
+			if (label != null) {
+				float lw = OogaFonts.width(label, Weight.SEMIBOLD, 0.5f) + 4f;
+				Render2D.roundRect(g, dotX + 3f, dotY - 3f, lw, 6f, 2f, 0xE00E0F12);
+				OogaFonts.draw(g, label, dotX + 5f, dotY - 2.2f, OogaTheme.TEXT, Weight.SEMIBOLD, 0.5f);
+			}
 		}
 		// You: a small arrow pointing up.
 		Render2D.triangle(g, c, c - 3.5f, c + 2.6f, c + 2.5f, c - 2.6f, c + 2.5f, OogaTheme.TEXT);
 		g.pose().popMatrix();
+	}
+
+	private int dotColor() {
+		return switch (module.dotColor.get()) {
+			case "Accent" -> OogaTheme.GOLD;
+			case "Red" -> HOSTILE;
+			case "White" -> 0xFFEDEDF0;
+			default -> 0xFFF0508C;
+		};
 	}
 
 	/** Radar-space offset for a world offset, or null if it falls outside the rim. */
