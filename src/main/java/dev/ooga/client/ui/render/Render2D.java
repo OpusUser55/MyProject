@@ -84,6 +84,19 @@ public final class Render2D {
 		end(g);
 	}
 
+	/**
+	 * Left-to-right gradient: {@code left} fading out rightwards laid over {@code right} fading
+	 * out leftwards. Pass 0 for either side to get a one-colour fade. Square corners.
+	 */
+	public static void horizontalGradient(GuiGraphics g, float x, float y, float w, float h, int left, int right) {
+		if (w <= 0 || h <= 0) return;
+		if (left != 0 && !SoftGlow.fade(g, x, y, w, h, apply(left), true)) {
+			rect(g, x, y, w, h, ColorUtil.lerp(left, right, 0.5f));
+			return;
+		}
+		if (right != 0) SoftGlow.fade(g, x, y, w, h, apply(right), false);
+	}
+
 	public static void roundRect(GuiGraphics g, float x, float y, float w, float h, float radius, int color) {
 		if (w <= 0 || h <= 0) return;
 		int c = apply(color);

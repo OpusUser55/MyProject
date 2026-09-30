@@ -8,6 +8,7 @@ import dev.ooga.client.ui.render.OogaFonts;
 import dev.ooga.client.ui.render.OogaFonts.Weight;
 import dev.ooga.client.ui.render.Render2D;
 import net.minecraft.client.Minecraft;
+import dev.ooga.client.util.ColorUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ServerData;
 
@@ -68,12 +69,15 @@ public class WatermarkHud extends HudElement {
 		g.pose().scale(scale, scale);
 		Render2D.pushAlpha(module.opacity.getFloat());
 
+		float glowStrength = module.glow.getFloat();
+		if (glowStrength > 0) GlowRenderer.glow(g, 0, 0, w, h, h / 2f, OogaTheme.GOLD, 0.3f * glowStrength, 6f);
 		Render2D.roundRect(g, 0, 0, w, h, h / 2f, 0xE00E0F12);
-		Render2D.outline(g, 0, 0, w, h, h / 2f, OogaTheme.BORDER);
+		// Accent light pooling behind the mark, fading out across the pill.
+		Render2D.horizontalGradient(g, h / 2f, 1f, Math.min(w - h, 60f), h - 2f, OogaTheme.accent(0x26), 0);
+		Render2D.outline(g, 0, 0, w, h, h / 2f, ColorUtil.lerp(OogaTheme.BORDER, OogaTheme.accent(0x60), glowStrength * 0.5f));
 
 		float cx = pad + markSize / 2f;
 		float cy = h / 2f;
-		float glowStrength = module.glow.getFloat();
 		if (glowStrength > 0) GlowRenderer.glow(g, cx - 3.5f, cy - 3.5f, 7f, 7f, 3.5f, OogaTheme.GOLD, glowStrength);
 		Render2D.diamond(g, cx, cy, markSize / 2f, OogaTheme.accent(0x59));
 		Render2D.diamond(g, cx, cy, markSize / 4f, OogaTheme.GOLD_BRIGHT);

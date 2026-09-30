@@ -70,6 +70,7 @@ public class ClickGuiScreen extends Screen {
 	/** Keyed by settings, categories and stable string ids, hence equals-based. */
 	private final Map<Object, Anim> hovers = new HashMap<>();
 	private final List<Hit> hits = new ArrayList<>();
+	private final MenuBackdrop backdrop = new MenuBackdrop();
 
 	private Category category = lastCategory != null ? lastCategory : firstPopulatedCategory();
 	private final StringBuilder search = new StringBuilder();
@@ -160,8 +161,8 @@ public class ClickGuiScreen extends Screen {
 
 	@Override
 	public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float delta) {
-		float t = Anim.ease(open.get()) * config.dim.getFloat();
-		if (t > 0.01f) Render2D.rect(g, 0, 0, width, height, ColorUtil.fade(0xB0050507, t));
+		OogaTheme.frame();
+		backdrop.draw(g, config, width, height, Anim.ease(open.get()));
 	}
 
 	@Override

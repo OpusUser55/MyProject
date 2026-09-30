@@ -22,6 +22,8 @@ public final class Widgets {
 		int offTrack = ColorUtil.lerp(OogaTheme.SURFACE_CONTROL, 0xFF30343C, hover);
 		int track = ColorUtil.lerp(offTrack, OogaTheme.GOLD, on);
 		Render2D.roundRect(g, x, y, w, h, r, track);
+		// A hint of the second accent towards the knob end while on.
+		if (on > 0.01f) Render2D.horizontalGradient(g, x + r, y + 1f, w - r * 2, h - 2f, 0, ColorUtil.fade(OogaTheme.ACCENT_2, on * 0.55f));
 		if (on < 0.99f) Render2D.outline(g, x, y, w, h, r, ColorUtil.fade(OogaTheme.BORDER, 1f - on));
 
 		float knobR = r - 1.6f;
@@ -37,6 +39,8 @@ public final class Widgets {
 		Render2D.roundRect(g, x, cy - trackH / 2f, w, trackH, trackH / 2f, OogaTheme.SURFACE_CONTROL);
 		float fill = Math.max(trackH, w * progress);
 		Render2D.roundRect(g, x, cy - trackH / 2f, fill, trackH, trackH / 2f, OogaTheme.GOLD);
+		Render2D.horizontalGradient(g, x + trackH / 2f, cy - trackH / 2f, fill - trackH, trackH, 0, OogaTheme.ACCENT_2);
+		GlowRenderer.glow(g, x, cy - trackH / 2f, fill, trackH, trackH / 2f, OogaTheme.GOLD, 0.25f + 0.35f * active, 3f);
 		float kx = x + w * progress;
 		float kr = 3.4f + 0.8f * active;
 		GlowRenderer.glowCircle(g, kx, cy, kr, OogaTheme.GOLD, 0.35f + 0.5f * active);

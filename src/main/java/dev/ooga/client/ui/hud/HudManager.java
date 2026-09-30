@@ -2,6 +2,7 @@ package dev.ooga.client.ui.hud;
 
 import com.google.gson.JsonObject;
 import dev.ooga.client.config.ConfigManager;
+import dev.ooga.client.ui.OogaTheme;
 import dev.ooga.client.ui.render.Render2D;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -34,6 +35,7 @@ public final class HudManager {
 	public void render(GuiGraphics g, DeltaTracker tracker) {
 		Minecraft mc = Minecraft.getInstance();
 		if (mc.options.hideGui) return;
+		OogaTheme.frame();
 		// The HUD editor draws the elements itself, with handles.
 		if (mc.screen instanceof HudEditorScreen) return;
 		renderElements(g, tracker.getGameTimeDeltaPartialTick(false));

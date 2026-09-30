@@ -5,6 +5,7 @@ import dev.ooga.client.module.ModuleManager;
 import dev.ooga.client.module.impl.client.ModuleListModule;
 import dev.ooga.client.module.setting.NumberSetting;
 import dev.ooga.client.ui.OogaTheme;
+import dev.ooga.client.ui.render.GlowRenderer;
 import dev.ooga.client.ui.render.OogaFonts;
 import dev.ooga.client.ui.render.OogaFonts.Weight;
 import dev.ooga.client.ui.render.Render2D;
@@ -94,7 +95,15 @@ public class ModuleListHud extends HudElement {
 
 		float rowY = 0;
 		float bg = module.opacity.getFloat();
+		float glow = module.glow.getFloat();
+		int index = 0;
+		double time = System.currentTimeMillis() / 1000.0;
 		for (Module m : shown) {
+			// Position along the accent gradient: down the list, and drifting over time in Wave.
+			float along = shown.size() <= 1 ? 0f : index / (float) (shown.size() - 1);
+			if (module.textColor.is("Wave")) along = (float) (0.5 + 0.5 * Math.sin(time * 1.6 - index * 0.45));
+			int accent = OogaTheme.gradient(along);
+			index++;
 			float t = Anim.ease(rows.get(m).get());
 			float rowWidth = labelWidth(m) + PAD_X * 2 + 2f;
 			float slide = (1f - t) * (rowWidth + 6f);
@@ -103,13 +112,21 @@ public class ModuleListHud extends HudElement {
 
 			Render2D.pushAlpha(t);
 			if (bg > 0) Render2D.rect(g, rowX, rowY, rowWidth, h, ColorUtil.withAlpha(0x0E0F12, Math.round(235 * bg)));
+			if (glow > 0) {
+				// Accent light washing in from the bar side.
+				Render2D.horizontalGradient(g, rowX, rowY, rowWidth, h,
+						right ? 0 : ColorUtil.withAlpha(accent, Math.round(60 * glow)),
+						right ? ColorUtil.withAlpha(accent, Math.round(60 * glow)) : 0);
+			}
 			if (module.accentBar.get()) {
 				float barX = right ? rowX + rowWidth - 1.5f : rowX;
-				Render2D.rect(g, barX, rowY, 1.5f, h, OogaTheme.GOLD);
+				if (glow > 0) GlowRenderer.glow(g, barX, rowY, 1.5f, h, 0.5f, accent, glow, 4f);
+				Render2D.rect(g, barX, rowY, 1.5f, h, accent);
 			}
 			float textX = rowX + PAD_X + (right ? 0 : 2f);
 			float textY = rowY + (h - 8f) / 2f;
-			OogaFonts.draw(g, name(m), textX, textY, OogaTheme.TEXT, Weight.REGULAR);
+			int textColor = module.textColor.is("White") ? OogaTheme.TEXT : ColorUtil.lerp(accent, 0xFFFFFFFF, 0.25f);
+			OogaFonts.draw(g, name(m), textX, textY, textColor, Weight.REGULAR);
 			String suffix = module.suffixes.get() ? m.getSuffix() : null;
 			if (suffix != null) {
 				float sx = textX + OogaFonts.width(name(m), Weight.REGULAR) + 3f;

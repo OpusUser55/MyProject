@@ -16,6 +16,8 @@ public class ModuleListModule extends Module {
 	public final BooleanSetting suffixes = add(new BooleanSetting("Suffixes", "Show module modes next to names.", true));
 	public final ModeSetting suffixColor = add(new ModeSetting("Suffix Color", "Colour of the suffix text.", "Accent", "Accent", "Muted")
 			.visibleWhen(suffixes::get));
+	public final ModeSetting textColor = add(new ModeSetting("Text Color", "White names, or names coloured along the accent gradient (Wave animates it).", "Wave", "White", "Gradient", "Wave"));
+	public final NumberSetting glow = add(new NumberSetting("Glow", "Soft light behind the accent bar and text.", 0.6, 0.0, 1.0, 0.05));
 	public final ModeSetting textCase = add(new ModeSetting("Text Case", "How module names are written.", "Normal", "Normal", "lowercase", "UPPERCASE"));
 	public final NumberSetting spacing = add(new NumberSetting("Row Spacing", "Extra space between rows.", 0, 0, 4, 0.5, "px"));
 

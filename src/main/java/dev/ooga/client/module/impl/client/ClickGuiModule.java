@@ -22,7 +22,11 @@ public class ClickGuiModule extends Module {
 	public final BooleanSetting cascade = add(new BooleanSetting("Cascade Open", "Panels appear one after another when the menu opens.", true)
 			.visibleWhen(() -> layout.is("Panels")));
 	public final BooleanSetting descriptions = add(new BooleanSetting("Descriptions", "Window layout: show a one-line description under each module.", true));
-	public final NumberSetting dim = add(new NumberSetting("Dim World", "How much to darken the world behind the menu.", 0.6, 0.0, 1.0, 0.05));
+	public final BooleanSetting blur = add(new BooleanSetting("Blur", "Blur the world behind the menu.", true));
+	public final BooleanSetting aurora = add(new BooleanSetting("Aurora", "Slow drifting accent-coloured light behind the panels.", true));
+	public final BooleanSetting particles = add(new BooleanSetting("Particles", "Small glowing particles floating up behind the panels.", true));
+	public final NumberSetting panelGlow = add(new NumberSetting("Panel Glow", "Soft light around every panel.", 0.45, 0.0, 1.0, 0.05));
+	public final NumberSetting dim = add(new NumberSetting("Dim World", "How much to darken the world behind the menu.", 0.45, 0.0, 1.0, 0.05));
 
 	public ClickGuiModule() {
 		super("ClickGUI", "The Ooga menu. Bind it to any key.", Category.CLIENT);

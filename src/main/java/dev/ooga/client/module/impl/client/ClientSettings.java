@@ -12,16 +12,23 @@ import dev.ooga.client.util.ColorUtil;
 public class ClientSettings extends Module {
 	private static ClientSettings instance;
 
-	public final ModeSetting accent = add(new ModeSetting("Accent", "Shade of the signature yellow.", "Gold",
-			"Gold", "Amber", "Honey", "Champagne", "Lemon")
+	public final ModeSetting accent = add(new ModeSetting("Accent", "Accent colour for the whole client. Chroma slowly cycles through every hue.", "Gold",
+			"Gold", "Amber", "Honey", "Champagne", "Lemon", "Ocean", "Violet", "Rose", "Mint", "Crimson", "Chroma")
 			.onChange(this::applyTheme));
+	public final NumberSetting chromaSpeed = add(new NumberSetting("Chroma Speed", "How fast Chroma cycles.", 1.0, 0.2, 4.0, 0.1, "x")
+			.visibleWhen(() -> accent.is("Chroma"))
+			.onChange(this::applyChroma));
 	public final ModeSetting corners = add(new ModeSetting("Corners", "Roundness of panels and controls.", "Rounded", "Rounded", "Soft", "Sharp")
 			.onChange(this::applyTheme));
 	public final NumberSetting panelOpacity = add(new NumberSetting("Panel Opacity", "How solid menu and HUD panels are.", 0.93, 0.6, 1.0, 0.01));
 	public final BooleanSetting glow = add(new BooleanSetting("Glow", "Soft golden glow on active elements. Turn off on low-end hardware.", true));
+	public final ModeSetting glowStyle = add(new ModeSetting("Glow Style", "Soft: smooth blurred light. Classic: the older crisp ring glow.", "Soft", "Soft", "Classic")
+			.visibleWhen(glow::get));
+	public final BooleanSetting bloom = add(new BooleanSetting("Bloom", "Glow adds light instead of paint, so it looks lit from within.", true)
+			.visibleWhen(glow::get));
 	public final NumberSetting glowIntensity = add(new NumberSetting("Glow Intensity", "How strong the glow is.", 1.0, 0.1, 2.0, 0.05)
 			.visibleWhen(glow::get));
-	public final NumberSetting glowRadius = add(new NumberSetting("Glow Radius", "How far the glow spreads.", 4.0, 1.0, 8.0, 0.5, "px")
+	public final NumberSetting glowRadius = add(new NumberSetting("Glow Radius", "How far the glow spreads.", 6.0, 1.0, 16.0, 0.5, "px")
 			.visibleWhen(glow::get));
 	public final NumberSetting glowPulse = add(new NumberSetting("Glow Pulse", "Speed of the glow's slow breathing. 0 disables it.", 0.5, 0.0, 2.0, 0.05)
 			.visibleWhen(glow::get));
@@ -35,6 +42,10 @@ public class ClientSettings extends Module {
 		settingsOnly();
 		instance = this;
 		applyTheme();
+	}
+
+	private void applyChroma() {
+		OogaTheme.setChromaSpeed(chromaSpeed.getFloat());
 	}
 
 	private void applyTheme() {
@@ -61,6 +72,14 @@ public class ClientSettings extends Module {
 
 	public static float glowRadius() {
 		return instance == null ? 4f : instance.glowRadius.getFloat();
+	}
+
+	public static boolean softGlow() {
+		return instance == null || instance.glowStyle.is("Soft");
+	}
+
+	public static boolean bloom() {
+		return instance == null || instance.bloom.get();
 	}
 
 	public static float glowPulseSpeed() {

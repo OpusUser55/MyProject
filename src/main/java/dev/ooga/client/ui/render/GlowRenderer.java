@@ -39,6 +39,13 @@ public final class GlowRenderer {
 		float intensity = ClientSettings.glowIntensity() * strength * pulse();
 		if (intensity <= 0.01f) return;
 
+		if (ClientSettings.softGlow()) {
+			// Smooth sprite glow; reaches a little further than the ring glow for the same radius.
+			float peak = Math.min(1f, 0.62f * intensity) * Render2D.alpha();
+			int soft = ColorUtil.withAlpha(color, Math.round(255 * peak));
+			if (SoftGlow.rect(g, x, y, w, h, radius * 1.7f + 1f, soft, true, ClientSettings.bloom())) return;
+		}
+
 		int scale = Render2D.guiScale();
 		int spread = Math.min(MAX_SPREAD_PX, Math.max(1, Math.round(radius * scale)));
 		// Wide glows use thicker rings so the number of draw calls stays bounded.
@@ -62,6 +69,16 @@ public final class GlowRenderer {
 			Render2D.ringPx(g, x1 - k, y1 - k, x2 + k, y2 + k, r + k, step, ringColor);
 		}
 		g.pose().popMatrix();
+	}
+
+	/**
+	 * A free-standing blob of light (no shape inside), for backgrounds and accents. Does nothing
+	 * with glow off or in Classic style.
+	 */
+	public static void light(GuiGraphics g, float cx, float cy, float radius, int color, float strength) {
+		if (!enabled() || !ClientSettings.softGlow() || strength <= 0.01f) return;
+		float a = Math.min(1f, ClientSettings.glowIntensity() * strength) * Render2D.alpha();
+		SoftGlow.blob(g, cx, cy, radius, ColorUtil.withAlpha(color, Math.round(255 * a)), ClientSettings.bloom());
 	}
 
 	/** Glow for circular shapes such as toggle knobs. */

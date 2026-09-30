@@ -53,6 +53,7 @@ public class PanelClickGuiScreen extends Screen {
 	private final Map<Object, Anim> anims = new HashMap<>();
 	private final Map<Module, Boolean> expanded = new HashMap<>();
 	private final List<Hit> hits = new ArrayList<>();
+	private final MenuBackdrop backdrop = new MenuBackdrop();
 
 	private final StringBuilder search = new StringBuilder();
 	private boolean closing;
@@ -194,8 +195,8 @@ public class PanelClickGuiScreen extends Screen {
 
 	@Override
 	public void renderBackground(GuiGraphics g, int mx, int my, float delta) {
-		float t = Anim.ease(open.get()) * config.dim.getFloat();
-		if (t > 0.01f) Render2D.rect(g, 0, 0, width, height, ColorUtil.fade(0xB0050507, t));
+		OogaTheme.frame();
+		backdrop.draw(g, config, width, height, Anim.ease(open.get()));
 	}
 
 	@Override
@@ -231,6 +232,7 @@ public class PanelClickGuiScreen extends Screen {
 			}
 		}
 
+		drawBrand(g, Anim.ease(t));
 		g.pose().popMatrix();
 
 		if (hoveredTip != previousTip) hoverStart = System.currentTimeMillis();
@@ -240,6 +242,40 @@ public class PanelClickGuiScreen extends Screen {
 			Widgets.tooltip(g, rawX, rawY, hoveredTipText, width, height);
 			Render2D.popAlpha();
 		}
+	}
+
+	/** A glowing wordmark at the bottom centre with live stats. */
+	private void drawBrand(GuiGraphics g, float appear) {
+		if (appear <= 0.01f) return;
+		Render2D.pushAlpha(appear);
+		int total = 0, on = 0;
+		for (Module m : ModuleManager.get().getModules()) {
+			if (m.isSettingsOnly()) continue;
+			total++;
+			if (m.isEnabled()) on++;
+		}
+		String word = "OOGA";
+		String stats = "v" + dev.ooga.client.OogaClient.VERSION + "  ·  " + on + " / " + total + " modules on";
+		float wordScale = 1.5f;
+		float letter = 1.6f;
+		float wordW = 0;
+		for (char ch : word.toCharArray()) wordW += OogaFonts.width(String.valueOf(ch), Weight.DISPLAY, wordScale) + letter;
+		float statsW = OogaFonts.width(stats, Weight.REGULAR, S7);
+		float cx = screenW() / 2f;
+		float y = screenH() - 34f;
+		GlowRenderer.light(g, cx, y + 8f, 46f, OogaTheme.GOLD, 0.35f);
+		float x = cx - wordW / 2f;
+		int i = 0;
+		for (char ch : word.toCharArray()) {
+			String c = String.valueOf(ch);
+			// Each letter picks its colour further along the accent gradient, shimmering over time.
+			float wave = (float) (0.5 + 0.5 * Math.sin(System.currentTimeMillis() / 600.0 - i * 0.9));
+			OogaFonts.draw(g, c, x, y, OogaTheme.gradient(wave), Weight.DISPLAY, wordScale);
+			x += OogaFonts.width(c, Weight.DISPLAY, wordScale) + letter;
+			i++;
+		}
+		OogaFonts.draw(g, stats, cx - statsW / 2f, y + 19f, OogaTheme.TEXT_SECONDARY, Weight.REGULAR, S7);
+		Render2D.popAlpha();
 	}
 
 	/** Panels cascade in one after another when the menu opens, and leave together. */
@@ -264,8 +300,9 @@ public class PanelClickGuiScreen extends Screen {
 		boolean dragging = id.equals(draggingPanel);
 		float lift = anim("lift#" + id, 0f, 16f).update(dragging ? 1f : 0f);
 
-		// Panels only glow while being moved; at rest the gold is reserved for enabled state.
-		if (lift > 0.01f) GlowRenderer.glow(g, x, y, panelW(), h, radius(), OogaTheme.GOLD, 0.4f * lift, 6f);
+		// A soft ambient light around every panel; stronger (and lifted) while being dragged.
+		float ambient = config.panelGlow.getFloat() * appear;
+		if (ambient + lift > 0.01f) GlowRenderer.glow(g, x, y, panelW(), h, radius(), OogaTheme.GOLD, 0.35f * ambient + 0.5f * lift, 7f + 3f * lift);
 		Render2D.roundRect(g, x, y, panelW(), h, radius(), ClientSettings.surface(0xEE0E0F12));
 
 		// Header: slightly lifted surface, gold icon, tracked caps title.
@@ -293,8 +330,14 @@ public class PanelClickGuiScreen extends Screen {
 
 		// Header divider: a plain hairline, with a short accent segment under the icon.
 		if (h > HEADER_H + 1) {
+			// Accent line under the header: bright under the icon, sweeping into the second
+			// accent colour and fading out towards the right.
 			Render2D.rect(g, x, y + HEADER_H, panelW(), 1f, OogaTheme.DIVIDER);
-			Render2D.rect(g, x + 7f, y + HEADER_H, 8f, 1f, OogaTheme.GOLD);
+			Render2D.horizontalGradient(g, x + 1f, y + HEADER_H, panelW() * 0.75f, 1f, OogaTheme.GOLD, 0);
+			Render2D.horizontalGradient(g, x + 1f, y + HEADER_H, panelW() - 2f, 1f, 0, ColorUtil.withAlpha(OogaTheme.ACCENT_2, 0x70));
+			GlowRenderer.glow(g, x + 6f, y + HEADER_H, panelW() * 0.4f, 1f, 0.5f, OogaTheme.GOLD, 0.45f * appear, 3f);
+			// A faint accent wash at the top of the body, like light spilling from the header.
+			Render2D.verticalGradient(g, x + 1f, y + HEADER_H + 1f, panelW() - 2f, 10f, OogaTheme.accent(0x14), 0x00000000);
 		}
 		Render2D.outline(g, x, y, panelW(), h, radius(), dragging ? OogaTheme.accent(0x66) : OogaTheme.BORDER);
 
@@ -370,8 +413,11 @@ public class PanelClickGuiScreen extends Screen {
 			if (fillStyle) {
 				Render2D.roundRect(g, x + inset, y + 0.5f, panelW() - inset * 2, rowH() - 1f, rowR, ColorUtil.fade(OogaTheme.accent(0x24), on));
 			} else {
+				// Enabled: a wash of accent light fading out across the row, and a glowing bar.
+				Render2D.horizontalGradient(g, x + inset, y + 0.5f, (panelW() - inset * 2) * 0.85f, rowH() - 1f,
+						ColorUtil.fade(OogaTheme.accent(0x2E), on), 0);
 				float barH = rowH() - 7f;
-				GlowRenderer.glow(g, x + inset, y + 3.5f, 1.5f, barH, 0.75f, OogaTheme.GOLD, on * 0.7f, 2.5f);
+				GlowRenderer.glow(g, x + inset, y + 3.5f, 1.5f, barH, 0.75f, OogaTheme.GOLD, on, 4f);
 				Render2D.roundRect(g, x + inset, y + 3.5f, 1.5f, barH, 0.75f, ColorUtil.fade(OogaTheme.GOLD, on));
 			}
 		}
@@ -383,7 +429,9 @@ public class PanelClickGuiScreen extends Screen {
 		if (m.isSettingsOnly()) nameColor = ColorUtil.lerp(OogaTheme.TEXT_SECONDARY, OogaTheme.TEXT, hv);
 		float controlsW = 24f;
 		String name = OogaFonts.trim(m.getName(), Weight.REGULAR, S8, panelW() - 14f - controlsW);
-		OogaFonts.draw(g, name, x + 9f, textY(y, rowH(), 8), nameColor, Weight.REGULAR, S8);
+		// Rows lean in slightly toward the cursor.
+		float slide = 1.5f * hv + 1f * on;
+		OogaFonts.draw(g, name, x + 9f + slide, textY(y, rowH(), 8), nameColor, Weight.REGULAR, S8);
 
 		float cy = y + rowH() / 2f;
 		if (binding == m) {
