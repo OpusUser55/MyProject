@@ -47,7 +47,7 @@ Settings are saved automatically to `config/ooga/config.json`.
 | Spawner Finder | Announces each spawner once (chat + notification with coordinates) and highlights it |
 | Sus Chunk Finder | Scores chunks for player-placed blocks (hoppers, observers, pistons, shulkers, beacons…) and fully grown kelp, which only grows while a chunk stays loaded; flagged chunks are marked and announced |
 | Light Finder | Torches and lanterns below a set height, where caves generate none |
-| Debris Finder | Ancient debris in the Nether, highlighted through netherrack with tracers and one chat line per vein. Only sees what the server sends: servers with anti-xray hide it |
+| Debris Finder | Ancient debris in the Nether, one box per vein (nearest first) with tracers and one chat line per vein. Also catches debris the server reveals later via block updates (mining, TNT), which is what works on anti-xray servers; **Revealed Only** ignores fake ores in chunk data |
 | Tracers (Render) | Lines to nearby players, optionally hostile mobs |
 
 Finders scan chunks in the background a few per tick, so enabling them never stalls the game.
