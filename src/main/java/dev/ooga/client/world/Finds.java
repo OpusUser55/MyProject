@@ -35,6 +35,8 @@ public final class Finds {
 	}
 
 	private static final int HISTORY = 32;
+	/** Finds reported since the game started; lets RTP Base Finder notice new ones. */
+	private static int total;
 	private static final Deque<Find> RECENT = new ArrayDeque<>();
 	/** type + position, so the same thing is never reported twice in a session. */
 	private static final Set<String> SEEN = new HashSet<>();
@@ -61,6 +63,7 @@ public final class Finds {
 
 		Find find = new Find(type, detail, pos.immutable(), dimension, System.currentTimeMillis());
 		RECENT.addFirst(find);
+		total++;
 		while (RECENT.size() > HISTORY) RECENT.removeLast();
 
 		FinderAlertsModule alerts = FinderAlertsModule.instance();
@@ -69,6 +72,10 @@ public final class Finds {
 		}
 		if (alerts == null || alerts.logToFile.get()) write(find);
 		return true;
+	}
+
+	public static int total() {
+		return total;
 	}
 
 	public static List<Find> recent() {

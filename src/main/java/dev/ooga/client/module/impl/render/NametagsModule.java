@@ -98,6 +98,10 @@ public class NametagsModule extends Module {
 			hpColor = living.getAbsorptionAmount() > 0 ? 0xFFF2C94C : ColorUtil.lerp(0xFFE5484D, 0xFF46C37B, ratio);
 		}
 		String dist = distance.get() ? Math.round(tag.distance()) + "m" : null;
+		if (entity instanceof Player player) {
+			int pops = dev.ooga.client.module.impl.combat.TotemPopsModule.popsOf(player.getGameProfile().name());
+			if (pops > 0) dist = (dist == null ? "" : dist + " ") + "-" + pops + " totem" + (pops == 1 ? "" : "s");
+		}
 		if (ping.get() && entity instanceof Player && mc.getConnection() != null) {
 			var info = mc.getConnection().getPlayerInfo(entity.getUUID());
 			if (info != null) dist = (dist == null ? "" : dist + " ") + info.getLatency() + "ms";

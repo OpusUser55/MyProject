@@ -93,7 +93,8 @@ public class SpawnerFinderModule extends Module {
 		if (!fresh.isEmpty()) announce(fresh);
 	}
 
-	private String mobOf(BlockEntity be) {
+	/** "Skeleton", "Trial", "Empty"… for a spawner block entity. */
+	public static String mobOf(BlockEntity be) {
 		if (be instanceof TrialSpawnerBlockEntity) return "Trial";
 		try {
 			Entity display = ((SpawnerBlockEntity) be).getSpawner().getOrCreateDisplayEntity(mc.level, be.getBlockPos());

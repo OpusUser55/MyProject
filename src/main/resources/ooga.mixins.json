@@ -20,6 +20,7 @@
 		"MultiPlayerGameModeAccessor",
 		"MultiPlayerGameModeMixin",
 		"OptionInstanceAccessor",
+		"PlayerInfoMixin",
 		"StringDecomposerMixin"
 	],
 	"injectors": {

@@ -1,10 +1,12 @@
 package dev.ooga.client.mixin;
 
+import dev.ooga.client.module.impl.combat.TotemPopsModule;
 import dev.ooga.client.module.impl.combat.VelocityModule;
 import dev.ooga.client.world.BlockUpdates;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
+import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
 import net.minecraft.network.protocol.game.ClientboundExplodePacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket;
@@ -40,6 +42,15 @@ public abstract class ClientPacketListenerMixin {
 		Minecraft mc = Minecraft.getInstance();
 		if (mc.player == null || !VelocityModule.active()) return;
 		packet.playerKnockback().ifPresent(knock -> mc.player.addDeltaMovement(VelocityModule.scale(knock).subtract(knock)));
+	}
+
+	/** Totem Pops: event 35 is the totem-of-undying animation. */
+	@Inject(method = "handleEntityEvent", at = @At("TAIL"), require = 0)
+	private void ooga$totemPop(ClientboundEntityEventPacket packet, CallbackInfo ci) {
+		Minecraft mc = Minecraft.getInstance();
+		if (packet.getEventId() != 35 || mc.level == null) return;
+		net.minecraft.world.entity.Entity entity = packet.getEntity(mc.level);
+		if (entity != null) TotemPopsModule.onPop(entity);
 	}
 
 	@Inject(method = "handleChunkBlocksUpdate", at = @At("TAIL"), require = 0)

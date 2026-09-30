@@ -3,6 +3,7 @@ package dev.ooga.client.mixin;
 import dev.ooga.client.camera.CameraController;
 import dev.ooga.client.camera.FirstPersonRenderer;
 import dev.ooga.client.module.ModuleManager;
+import dev.ooga.client.module.impl.render.BlockOutlineModule;
 import dev.ooga.client.module.impl.render.ZoomModule;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.GameRenderer;
@@ -26,7 +27,7 @@ public abstract class GameRendererMixin {
 	/** A detached camera that can't interact shouldn't highlight the block the body is facing. */
 	@Inject(method = "shouldRenderBlockOutline", at = @At("HEAD"), cancellable = true)
 	private void ooga$hideOutline(CallbackInfoReturnable<Boolean> cir) {
-		if (CameraController.get().blocksInteraction()) cir.setReturnValue(false);
+		if (CameraController.get().blocksInteraction() || BlockOutlineModule.replacesVanilla()) cir.setReturnValue(false);
 	}
 
 	@Inject(method = "renderItemInHand", at = @At("HEAD"), cancellable = true)

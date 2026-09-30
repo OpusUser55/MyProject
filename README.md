@@ -112,6 +112,10 @@ Type these in chat; they never reach the server.
 | New Chunks | Marks chunks the server just generated (flowing-liquid updates right after load), so old, explored land stands out |
 | Sus Chunk Finder | Scores chunks for player-placed blocks (hoppers, observers, pistons, shulkers, beacons…) and fully grown kelp, which only grows while a chunk stays loaded; flagged chunks are announced and drawn as a gridded square, a plain square, or a tall beam (yellow, pink or accent) |
 | Light Finder | Torches and lanterns below a set height, where caves generate none |
+| Spawner Nametags | A floating tag over every spawner with its mob and distance |
+| Cluster ESP | One big box (and a count) around groups of containers and spawners: bases and stashes |
+| Netherite Finder | Ancient debris through walls, with a chat alert per chunk |
+| RTP Base Finder | Keeps using random teleport (`/rtp`, `/rtp overworld`… or `/wild`) and stops the moment any finder reports something |
 | Finder Alerts | Shared settings: a ping sound for every find, and a log of all finds (time, server, dimension, coordinates) in `config/ooga/finds.log` |
 | Finds (HUD) | The last few finds in this dimension, with coordinates, distance and an arrow pointing to each |
 | Radar (HUD) | A rotating minimap with N/E/S/W on the rim: players as dots with distance (or name) tags, optionally hostiles, and every find as a coloured marker |
@@ -144,6 +148,9 @@ results stay current.
 | Trigger Bot | Attacks the entity under your crosshair once your attack has recharged (charge threshold and a small random delay are configurable) |
 | Aim Assist | Smoothly pulls your aim toward the nearest target within a FOV cone, eased per frame |
 | Auto Totem | Refills your offhand with a totem after one pops. **Inventory** mode (default) opens your inventory, swaps the totem in and closes it again, each step after a random delay in the range you set; **Instant** swaps without opening anything. **Hover Refill** also refills while you have your inventory open yourself |
+| Totem Pops | Counts each player's totem pops (shown on nametags too) and tells you when they die |
+| Auto Armor | Equips your best armour, one piece at a time with random delays |
+| Auto Gap | Eats a golden apple when your health drops |
 | Velocity | Take less (or no) knockback from hits and explosions |
 | Crystal Optimizer | Crystals disappear the moment you hit them, so the next one goes down faster |
 | Auto Double Hand | Holds a totem in your main hand when you're low or explosives are close |
@@ -171,6 +178,11 @@ results stay current.
 | Auto Mine | Holds attack for you while you look at a block |
 | Cord Snapper | One key copies your coordinates to the clipboard |
 | Friends (Client) | Middle-click players to befriend them: combat modules leave them alone and ESP, nametags and radar show them green. Saved in `config/ooga/friends.txt` |
+| Custom Crosshair (Render) | Cross, dot or circle crosshair that spreads while your attack recharges and turns red on targets |
+| Block Outline (Render) | Accent-coloured outline and fill on the block you look at |
+| Hit Particles (Render) | Extra crit / sharpness particles on your hits |
+| Skin Protect | Shows default skins for you (or everyone) on your screen |
+| Weather Notifier | Notifies when rain or thunder starts and stops |
 | Real Hitbox (Render) | Shows true hitboxes, eye height and look direction (and the expanded Hitbox area) |
 | Waypoints (World) | Glowing beams and on-screen labels with distance. Its keybind drops a waypoint; your death point is saved automatically. Per server and dimension |
 | Auto Respawn | Skips the death screen |
