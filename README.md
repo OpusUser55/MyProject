@@ -110,6 +110,7 @@ These press the normal game keys for you and hand them back when they stop, so y
 | Auto Eat | Eats the most filling hotbar food when hunger drops to a threshold, then switches back; skips golden apples, bad food and chorus fruit unless allowed |
 | Auto Fish | Reels in when the bobber dips and recasts after a delay |
 | Chest Memory | Remembers what's in every chest, barrel and shulker you open (on by default). `.find <item>` lists where it is and highlights those containers |
+| Replenish | Tops up hotbar stacks from your inventory when they run low or out, for building without pausing |
 
 ESP and Tracers colour `.friend`s blue (Tracers can skip them entirely).
 
