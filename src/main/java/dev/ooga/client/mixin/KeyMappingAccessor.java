@@ -9,4 +9,10 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface KeyMappingAccessor {
 	@Accessor("key")
 	InputConstants.Key ooga$getKey();
+
+	@Accessor("clickCount")
+	int ooga$getClickCount();
+
+	@Accessor("clickCount")
+	void ooga$setClickCount(int count);
 }

@@ -1,9 +1,11 @@
 package dev.ooga.client.mixin;
 
 import dev.ooga.client.world.BlockUpdates;
+import dev.ooga.client.world.ServerStats;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket;
+import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,5 +25,11 @@ public abstract class ClientPacketListenerMixin {
 	@Inject(method = "handleChunkBlocksUpdate", at = @At("RETURN"))
 	private void ooga$sectionUpdate(ClientboundSectionBlocksUpdatePacket packet, CallbackInfo ci) {
 		packet.runUpdates(BlockUpdates::fire);
+	}
+
+	/** Optional: if this ever fails to apply, only the TPS readout goes missing. */
+	@Inject(method = "handleSetTime", at = @At("RETURN"), require = 0)
+	private void ooga$timeUpdate(ClientboundSetTimePacket packet, CallbackInfo ci) {
+		ServerStats.onTimeUpdate();
 	}
 }

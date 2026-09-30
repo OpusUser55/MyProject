@@ -102,6 +102,8 @@ These press the normal game keys for you and hand them back when they stop, so y
 | Module | What it does |
 | --- | --- |
 | Auto Tool | Switches to the fastest hotbar tool while you mine and back afterwards; skips tools about to break |
+| Auto Eat | Eats the most filling hotbar food when hunger drops to a threshold, then switches back; skips golden apples, bad food and chorus fruit unless allowed |
+| Auto Fish | Reels in when the bobber dips and recasts after a delay |
 
 ESP and Tracers colour `.friend`s blue (Tracers can skip them entirely).
 
@@ -117,6 +119,10 @@ Type these in chat; they're handled by the client and never sent. Start a messag
 | `.wp add <name> [x y z]` | Save a waypoint here (or at coordinates) |
 | `.wp remove <name>` / `.wp list` / `.wp clear` | Manage this server's waypoints |
 | `.friend <add\|remove\|list> [name]` | Manage friends (alias `.f`) |
+| `.settings <module>` | List a module's settings |
+| `.set <module> <setting> <value>` | Change a setting (`.set debris finder range 200`, `.set better chat timestamps off`) |
+| `.reset <module> [setting]` | Reset one setting or all of a module's settings |
+| `.profile <save\|load\|list\|delete> [name]` | Save whole setups (modules, binds, settings, HUD layout) and switch between them |
 | `.coords` | Copy your coordinates to the clipboard |
 | `.modules` | List modules and whether they're on |
 

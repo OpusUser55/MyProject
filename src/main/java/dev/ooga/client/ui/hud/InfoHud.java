@@ -6,6 +6,7 @@ import dev.ooga.client.ui.OogaTheme;
 import dev.ooga.client.ui.render.OogaFonts;
 import dev.ooga.client.ui.render.OogaFonts.Weight;
 import dev.ooga.client.ui.render.Render2D;
+import dev.ooga.client.world.ServerStats;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.LocalPlayer;
@@ -73,6 +74,14 @@ public class InfoHud extends HudElement {
 			PlayerInfo info = mc.getConnection().getPlayerInfo(player.getUUID());
 			if (info != null) lines.add(new Line("PING", info.getLatency() + " ms", null));
 		}
+		if (module.tps.get() && mc.getConnection() != null) {
+			double tps = ServerStats.tps();
+			double silent = ServerStats.secondsSinceUpdate();
+			// A server that has gone quiet for a few seconds is frozen, whatever the average says.
+			String extra = silent > 3 ? String.format("no response %.0fs", silent) : null;
+			if (tps >= 0) lines.add(new Line("TPS", String.format("%.1f", tps), extra));
+		}
+		if (module.server.get() && mc.getCurrentServer() != null) lines.add(new Line("IP", mc.getCurrentServer().ip, null));
 		return lines;
 	}
 

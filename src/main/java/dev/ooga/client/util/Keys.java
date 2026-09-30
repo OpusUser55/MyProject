@@ -25,6 +25,12 @@ public final class Keys {
 		mapping.setDown(true);
 	}
 
+	/** One press, as if the key was tapped: queues a click the game handles on its next tick. */
+	public static void click(KeyMapping mapping) {
+		KeyMappingAccessor accessor = (KeyMappingAccessor) mapping;
+		accessor.ooga$setClickCount(accessor.ooga$getClickCount() + 1);
+	}
+
 	/** Stops holding the key, unless the player is holding it themselves. */
 	public static void release(KeyMapping mapping) {
 		mapping.setDown(physicallyDown(mapping));

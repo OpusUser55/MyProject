@@ -16,6 +16,8 @@ public class InfoHudModule extends Module {
 	public final BooleanSetting facing = add(new BooleanSetting("Facing", "Compass direction you're looking.", true));
 	public final BooleanSetting speed = add(new BooleanSetting("Speed", "Horizontal speed in blocks per second.", false));
 	public final BooleanSetting ping = add(new BooleanSetting("Ping", "Latency to the server.", true));
+	public final BooleanSetting tps = add(new BooleanSetting("TPS", "Server ticks per second (20 is healthy), estimated from time updates.", true));
+	public final BooleanSetting server = add(new BooleanSetting("Server", "The address of the server you're on.", false));
 	public final NumberSetting decimals = add(new NumberSetting("Decimals", "Decimal places for coordinates.", 0, 0, 2, 1)
 			.visibleWhen(coords::get));
 	public final BooleanSetting labels = add(new BooleanSetting("Labels", "Show the small FPS / XYZ / DIR labels.", true));

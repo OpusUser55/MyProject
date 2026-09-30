@@ -1,8 +1,14 @@
 package dev.ooga.client.command;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import dev.ooga.client.config.ConfigManager;
 import dev.ooga.client.module.Module;
 import dev.ooga.client.module.ModuleManager;
+import dev.ooga.client.module.setting.BooleanSetting;
+import dev.ooga.client.module.setting.ModeSetting;
+import dev.ooga.client.module.setting.NumberSetting;
+import dev.ooga.client.module.setting.Setting;
+import dev.ooga.client.module.setting.StringSetting;
 import dev.ooga.client.social.FriendStore;
 import dev.ooga.client.util.ChatUtil;
 import dev.ooga.client.waypoint.Waypoint;
@@ -95,6 +101,58 @@ public final class CommandManager {
 				default -> ChatUtil.info("Usage: " + PREFIX + "friend <add|remove|list> [name]");
 			}
 		}));
+		COMMANDS.put("settings", new Command("settings <module>", "List a module's settings and their values.", args -> {
+			Module module = module(args, 0);
+			if (module == null) return;
+			if (module.getSettings().isEmpty()) {
+				ChatUtil.info(module.getName() + " has no settings.");
+				return;
+			}
+			for (Setting<?> setting : module.getSettings()) ChatUtil.info(setting.getName() + ": " + show(setting));
+		}));
+		COMMANDS.put("set", new Command("set <module> <setting> <value>", "Change a setting from chat, e.g. .set debris finder range 200.", args -> {
+			Match match = match(args);
+			if (match == null) return;
+			if (match.setting() == null || match.rest().isEmpty()) {
+				ChatUtil.info("Usage: " + PREFIX + "set <module> <setting> <value>. See " + PREFIX + "settings " + match.module().getName());
+				return;
+			}
+			String error = assign(match.setting(), match.rest());
+			if (error != null) ChatUtil.info(error);
+			else ChatUtil.info(match.module().getName() + " › " + match.setting().getName() + " = " + show(match.setting()));
+		}));
+		COMMANDS.put("reset", new Command("reset <module> [setting]", "Reset one setting, or all of a module's settings, to default.", args -> {
+			Match match = match(args);
+			if (match == null) return;
+			if (match.setting() != null) {
+				match.setting().reset();
+				ChatUtil.info(match.module().getName() + " › " + match.setting().getName() + " reset to " + show(match.setting()));
+			} else {
+				for (Setting<?> setting : match.module().getSettings()) setting.reset();
+				ChatUtil.info("Reset all of " + match.module().getName() + "'s settings");
+			}
+		}));
+		COMMANDS.put("profile", new Command("profile <save|load|list|delete> [name]", "Save and switch between whole setups.", args -> {
+			ConfigManager config = ConfigManager.get();
+			String sub = args.length == 0 ? "list" : args[0].toLowerCase(Locale.ROOT);
+			String name = args.length > 1 ? ConfigManager.cleanProfileName(args[1]) : "";
+			switch (sub) {
+				case "save" -> {
+					if (name.isEmpty()) ChatUtil.info("Usage: " + PREFIX + "profile save <name> (letters, digits, - and _)");
+					else ChatUtil.info(config.saveProfile(name) ? "Saved profile " + name : "Couldn't save " + name);
+				}
+				case "load" -> {
+					if (name.isEmpty()) ChatUtil.info("Usage: " + PREFIX + "profile load <name>");
+					else ChatUtil.info(config.loadProfile(name) ? "Loaded profile " + name : "No profile called " + name);
+				}
+				case "delete", "del" -> ChatUtil.info(config.deleteProfile(name) ? "Deleted profile " + name : "No profile called " + name);
+				case "list" -> {
+					List<String> names = config.profiles();
+					ChatUtil.info(names.isEmpty() ? "No profiles yet. " + PREFIX + "profile save <name>" : "Profiles: " + String.join(", ", names));
+				}
+				default -> ChatUtil.info("Usage: " + PREFIX + "profile <save|load|list|delete> [name]");
+			}
+		}));
 		COMMANDS.put("coords", new Command("coords", "Copy your coordinates to the clipboard.", args -> {
 			Minecraft mc = Minecraft.getInstance();
 			if (mc.player == null) return;
@@ -143,6 +201,75 @@ public final class CommandManager {
 	/** A ".." message: strip one dot and send the rest as normal chat. */
 	public static String unescape(String message) {
 		return message.startsWith(PREFIX + PREFIX) ? message.substring(PREFIX.length()) : message;
+	}
+
+	private record Match(Module module, Setting<?> setting, String rest) {
+	}
+
+	/**
+	 * Splits "debris finder max veins 20" into module, setting and value by matching the
+	 * longest leading words against module names, then setting names.
+	 */
+	private static Match match(String[] args) {
+		for (int end = args.length; end >= 1; end--) {
+			String wanted = normalize(String.join(" ", Arrays.copyOfRange(args, 0, end)));
+			for (Module m : ModuleManager.get().getModules()) {
+				if (!normalize(m.getName()).equals(wanted)) continue;
+				String[] rest = Arrays.copyOfRange(args, end, args.length);
+				for (int send = rest.length; send >= 1; send--) {
+					String settingName = normalize(String.join(" ", Arrays.copyOfRange(rest, 0, send)));
+					for (Setting<?> setting : m.getSettings()) {
+						if (normalize(setting.getName()).equals(settingName)) {
+							return new Match(m, setting, String.join(" ", Arrays.copyOfRange(rest, send, rest.length)));
+						}
+					}
+				}
+				return new Match(m, null, String.join(" ", rest));
+			}
+		}
+		ChatUtil.info(args.length == 0 ? "Which module?" : "No module matches that. Type " + PREFIX + "modules");
+		return null;
+	}
+
+	/** @return an error message, or null when the value was applied. */
+	private static String assign(Setting<?> setting, String value) {
+		String v = value.trim();
+		if (setting instanceof BooleanSetting bool) {
+			switch (v.toLowerCase(Locale.ROOT)) {
+				case "on", "true", "yes", "1" -> bool.set(true);
+				case "off", "false", "no", "0" -> bool.set(false);
+				case "toggle" -> bool.toggle();
+				default -> {
+					return "Use on, off or toggle.";
+				}
+			}
+		} else if (setting instanceof NumberSetting number) {
+			try {
+				number.set(Double.parseDouble(v.replace("%", "").replace("m", "").replace("x", "").replace("s", "")));
+			} catch (NumberFormatException e) {
+				return "Not a number: " + v + " (range " + number.getMin() + " to " + number.getMax() + ")";
+			}
+		} else if (setting instanceof ModeSetting mode) {
+			for (String option : mode.getModes()) {
+				if (normalize(option).equals(normalize(v))) {
+					mode.set(option);
+					return null;
+				}
+			}
+			return "Options: " + String.join(", ", mode.getModes());
+		} else if (setting instanceof StringSetting text) {
+			text.set(v);
+		} else {
+			return "That setting can't be changed from chat.";
+		}
+		return null;
+	}
+
+	private static String show(Setting<?> setting) {
+		if (setting instanceof BooleanSetting bool) return bool.get() ? "on" : "off";
+		if (setting instanceof NumberSetting number) return number.format();
+		if (setting instanceof StringSetting text) return "\"" + text.get() + "\"";
+		return String.valueOf(setting.get());
 	}
 
 	private static Module module(String[] args, int from) {

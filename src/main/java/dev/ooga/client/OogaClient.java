@@ -20,6 +20,7 @@ import dev.ooga.client.ui.notify.Notification;
 import dev.ooga.client.ui.notify.NotificationManager;
 import dev.ooga.client.world.BlockEntityTracker;
 import dev.ooga.client.world.ChunkScanner;
+import dev.ooga.client.world.ServerStats;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -93,6 +94,7 @@ public class OogaClient implements ClientModInitializer {
 			modules.get(FakeScoreboardModule.class).onWorldJoin();
 			modules.get(FakePayModule.class).resetSpent();
 			modules.get(AutoReconnectModule.class).onJoin();
+			ServerStats.reset();
 		});
 
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
