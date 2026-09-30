@@ -9,11 +9,13 @@ import dev.ooga.client.module.impl.client.ArmorHudModule;
 import dev.ooga.client.module.impl.client.ClickGuiModule;
 import dev.ooga.client.module.impl.client.ClientSettings;
 import dev.ooga.client.module.impl.client.InfoHudModule;
+import dev.ooga.client.module.impl.client.InventoryHudModule;
 import dev.ooga.client.module.impl.client.ItemCountHudModule;
 import dev.ooga.client.module.impl.client.KeystrokesModule;
 import dev.ooga.client.module.impl.client.ModuleListModule;
 import dev.ooga.client.module.impl.client.MusicModule;
 import dev.ooga.client.module.impl.client.NotificationsModule;
+import dev.ooga.client.module.impl.client.RegionMapModule;
 import dev.ooga.client.module.impl.client.WatermarkModule;
 import dev.ooga.client.module.impl.misc.AutoReconnectModule;
 import dev.ooga.client.module.impl.misc.AutoRespawnModule;
@@ -23,6 +25,11 @@ import dev.ooga.client.module.impl.misc.FakePayModule;
 import dev.ooga.client.module.impl.misc.FakeScoreboardModule;
 import dev.ooga.client.module.impl.misc.NameProtectModule;
 import dev.ooga.client.module.impl.misc.VisualRangeModule;
+import dev.ooga.client.module.impl.movement.AutoJumpModule;
+import dev.ooga.client.module.impl.movement.AutoSwimModule;
+import dev.ooga.client.module.impl.movement.AutoWalkModule;
+import dev.ooga.client.module.impl.movement.ParkourModule;
+import dev.ooga.client.module.impl.movement.SafeWalkModule;
 import dev.ooga.client.module.impl.movement.SprintModule;
 import dev.ooga.client.module.impl.render.EspModule;
 import dev.ooga.client.module.impl.render.FreecamModule;
@@ -69,6 +76,8 @@ public final class ModuleManager {
 		register(new KeystrokesModule());
 		register(new ArmorHudModule());
 		register(new ItemCountHudModule());
+		register(new InventoryHudModule());
+		register(new RegionMapModule());
 		register(new MusicModule());
 
 		register(new FreecamModule());
@@ -86,6 +95,11 @@ public final class ModuleManager {
 		register(new DebrisFinderModule());
 
 		register(new SprintModule());
+		register(new AutoWalkModule());
+		register(new SafeWalkModule());
+		register(new ParkourModule());
+		register(new AutoJumpModule());
+		register(new AutoSwimModule());
 
 		register(new FakePayModule());
 		register(new FakeScoreboardModule());

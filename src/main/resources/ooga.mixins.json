@@ -10,6 +10,7 @@
 		"EntityMixin",
 		"GameRendererMixin",
 		"KeyboardHandlerMixin",
+		"KeyMappingAccessor",
 		"MinecraftMixin",
 		"MouseHandlerMixin",
 		"OptionInstanceAccessor",

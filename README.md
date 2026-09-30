@@ -76,8 +76,23 @@ Finders scan chunks in the background a few per tick, so enabling them never sta
 | Durability Alert | Warns once when your armor or held tool drops below a threshold (on by default) |
 | Armor HUD (HUD) | Armor and held items with colour-coded durability percentages |
 | Item Count HUD (HUD) | Totems, crystals, XP bottles, golden apples, pearls, obsidian and food you're carrying |
+| Inventory HUD (HUD) | Your 27 inventory slots (optionally the hotbar too) in a panel |
+| Region Map (HUD) | DonutSMP's 9×9 numbered region grid with your region in gold, a dot at your exact spot, and your coordinates + region number. Region size (default 50,000) and centre are adjustable |
 
 All of these are client-side only: nothing extra is sent to the server.
+
+### Movement
+
+| Module | What it does |
+| --- | --- |
+| Sprint | Sprints whenever you move forward |
+| Auto Walk | Holds forward for you; pressing back turns it off |
+| Safe Walk | Sneaks for you near the edge of a drop so you don't fall off (set the minimum drop) |
+| Parkour | Jumps at the last moment before you run off an edge |
+| Auto Jump | Sprint-jumps continuously while you move |
+| Auto Swim | Holds jump in water and lava so you float; hold sneak to dive |
+
+These press the normal game keys for you and hand them back when they stop, so your own key presses always win.
 
 ### Chat commands
 
