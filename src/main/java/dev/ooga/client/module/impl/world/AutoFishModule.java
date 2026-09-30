@@ -4,7 +4,6 @@ import dev.ooga.client.module.Category;
 import dev.ooga.client.module.Module;
 import dev.ooga.client.module.setting.NumberSetting;
 import dev.ooga.client.util.Keys;
-import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.Items;
 
 /**
@@ -32,7 +31,8 @@ public class AutoFishModule extends Module {
 			if (--waitTicks == 0 && mc.player.fishing == null) click();
 			return;
 		}
-		FishingHook hook = mc.player.fishing;
+		// var: FishingHook's package has moved between versions; the field type is all we need.
+		var hook = mc.player.fishing;
 		if (hook == null) {
 			settledTicks = 0;
 			return;
