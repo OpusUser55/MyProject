@@ -18,7 +18,7 @@ public final class Widgets {
 	 */
 	public static void toggle(GuiGraphics g, float x, float y, float w, float h, float on, float hover) {
 		float r = h / 2f;
-		if (on > 0.01f) GlowRenderer.glow(g, x, y, w, h, r, OogaTheme.GOLD, on * 0.7f);
+		if (on > 0.01f) GlowRenderer.glow(g, x, y, w, h, r, OogaTheme.GOLD, on, 3.5f);
 		int offTrack = ColorUtil.lerp(OogaTheme.SURFACE_CONTROL, 0xFF30343C, hover);
 		int track = ColorUtil.lerp(offTrack, OogaTheme.GOLD, on);
 		Render2D.roundRect(g, x, y, w, h, r, track);

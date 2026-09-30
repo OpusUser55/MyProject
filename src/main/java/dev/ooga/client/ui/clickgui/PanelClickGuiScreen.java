@@ -263,8 +263,9 @@ public class PanelClickGuiScreen extends Screen {
 		float statsW = OogaFonts.width(stats, Weight.REGULAR, S7);
 		float cx = screenW() / 2f;
 		float y = screenH() - 34f;
-		GlowRenderer.light(g, cx, y + 8f, 46f, OogaTheme.GOLD, 0.35f);
 		float x = cx - wordW / 2f;
+		// Neon wordmark: a tight glow hugging the letters.
+		GlowRenderer.glow(g, x, y + 2f, wordW, 11f, 3f, OogaTheme.GOLD, 0.8f, 5f);
 		int i = 0;
 		for (char ch : word.toCharArray()) {
 			String c = String.valueOf(ch);
@@ -300,9 +301,9 @@ public class PanelClickGuiScreen extends Screen {
 		boolean dragging = id.equals(draggingPanel);
 		float lift = anim("lift#" + id, 0f, 16f).update(dragging ? 1f : 0f);
 
-		// A soft ambient light around every panel; stronger (and lifted) while being dragged.
+		// Neon edge: a tight, bright glow hugging the border (wider while dragged).
 		float ambient = config.panelGlow.getFloat() * appear;
-		if (ambient + lift > 0.01f) GlowRenderer.glow(g, x, y, panelW(), h, radius(), OogaTheme.GOLD, 0.35f * ambient + 0.5f * lift, 7f + 3f * lift);
+		if (ambient + lift > 0.01f) GlowRenderer.glow(g, x, y, panelW(), h, radius(), OogaTheme.GOLD, 0.7f * ambient + 0.4f * lift, 2.5f + 3f * lift);
 		Render2D.roundRect(g, x, y, panelW(), h, radius(), ClientSettings.surface(0xEE0E0F12));
 
 		// Header: slightly lifted surface, gold icon, tracked caps title.
@@ -310,12 +311,22 @@ public class PanelClickGuiScreen extends Screen {
 		Render2D.roundRect(g, x, y, panelW(), Math.min(h, HEADER_H + radius()), radius(),
 				ClientSettings.surface(ColorUtil.lerp(0xF015171C, 0xF01A1C22, headerHover)));
 		if (h > HEADER_H + radius()) Render2D.rect(g, x, y + HEADER_H, panelW(), radius(), ClientSettings.surface(0xEE0E0F12));
+		GlowRenderer.glow(g, x + 7f, y + HEADER_H / 2f - 4f, 8f, 8f, 2f, OogaTheme.GOLD, 0.9f * appear, 3f);
 		icon.draw(g, x + 7f, y + HEADER_H / 2f - 4f, 8f, OogaTheme.GOLD);
 		float tx = x + 20f;
-		for (char ch : title.toUpperCase(Locale.ROOT).toCharArray()) {
+		String upper = title.toUpperCase(Locale.ROOT);
+		float titleW = 0;
+		for (char ch : upper.toCharArray()) titleW += OogaFonts.width(String.valueOf(ch), Weight.SEMIBOLD, S8) + 0.8f;
+		// The title glows faintly in the accent colour.
+		GlowRenderer.glow(g, tx, y + 6f, titleW, HEADER_H - 12f, 2f, OogaTheme.GOLD, 0.35f * appear, 4f);
+		int letter = 0;
+		for (char ch : upper.toCharArray()) {
 			String c = String.valueOf(ch);
-			OogaFonts.draw(g, c, tx, textY(y, HEADER_H, 8), OogaTheme.TEXT, Weight.SEMIBOLD, S8);
+			// Letters run along the accent gradient, tinted towards white.
+			int color = ColorUtil.lerp(OogaTheme.gradient(letter / (float) Math.max(1, upper.length() - 1)), 0xFFFFFFFF, 0.55f);
+			OogaFonts.draw(g, c, tx, textY(y, HEADER_H, 8), color, Weight.SEMIBOLD, S8);
 			tx += OogaFonts.width(c, Weight.SEMIBOLD, S8) + 0.8f;
+			letter++;
 		}
 		if (badge != null) {
 			OogaFonts.draw(g, badge, tx + 4f, textY(y, HEADER_H, 7), OogaTheme.TEXT_MUTED, Weight.SEMIBOLD, S7);
@@ -339,7 +350,7 @@ public class PanelClickGuiScreen extends Screen {
 			// A faint accent wash at the top of the body, like light spilling from the header.
 			Render2D.verticalGradient(g, x + 1f, y + HEADER_H + 1f, panelW() - 2f, 10f, OogaTheme.accent(0x14), 0x00000000);
 		}
-		Render2D.outline(g, x, y, panelW(), h, radius(), dragging ? OogaTheme.accent(0x66) : OogaTheme.BORDER);
+		Render2D.outline(g, x, y, panelW(), h, radius(), OogaTheme.accent(Math.round(0x40 + 0x60 * Math.min(1f, ambient + lift))));
 
 		// Header hits: chevron toggles collapse, anything else drags. Chevron added last = wins.
 		hits.add(new Hit(x, y, panelW(), HEADER_H, (button, mx, my) -> {
@@ -431,6 +442,10 @@ public class PanelClickGuiScreen extends Screen {
 		String name = OogaFonts.trim(m.getName(), Weight.REGULAR, S8, panelW() - 14f - controlsW);
 		// Rows lean in slightly toward the cursor.
 		float slide = 1.5f * hv + 1f * on;
+		// Enabled names glow.
+		if (on > 0.01f && !m.isSettingsOnly()) {
+			GlowRenderer.glow(g, x + 9f + slide, y + 4f, OogaFonts.width(name, Weight.REGULAR, S8), rowH() - 8f, 2f, OogaTheme.GOLD, 0.45f * on, 3.5f);
+		}
 		OogaFonts.draw(g, name, x + 9f + slide, textY(y, rowH(), 8), nameColor, Weight.REGULAR, S8);
 
 		float cy = y + rowH() / 2f;

@@ -8,8 +8,8 @@ charcoal UI with a restrained, sophisticated gold accent and a soft golden glow.
 ![ClickGUI panels](docs/previews/panels_expanded.png)
 ![HUD](docs/previews/hud.png)
 
-![Menu, Gold accent (mockup)](docs/previews/v07_glow_gold.png)
-![Menu, Violet accent (mockup)](docs/previews/v07_glow_violet.png)
+![Menu, Gold accent (mockup)](docs/previews/v08_neon_gold.png)
+![Menu, Ocean accent (mockup)](docs/previews/v08_neon_ocean.png)
 ![Combat settings (mockup)](docs/previews/v05_combat.png)
 ![Base finding HUD and ESP (mockup)](docs/previews/v02_basefinding.png)
 ![Slow Mine](docs/previews/v02_slowmine.png)
@@ -51,10 +51,11 @@ Client Settings → **Accent** picks the colour of everything: Gold, Amber, Hone
 Lemon, Ocean, Violet, Rose, Mint, Crimson, or **Chroma** (slowly cycles through every hue).
 Each accent has a second colour used for gradients.
 
-Glow is real soft light (a blurred sprite, not stepped rings) with **Bloom** blending, so it
-brightens what's behind it. Tune it with Glow Intensity / Radius / Pulse, or switch Glow
-Style to Classic. The menu blurs the world, has a drifting **Aurora** of accent light and
-floating **Particles** (ClickGUI settings), and every panel gives off a soft **Panel Glow**.
+Glow is real soft light (a blurred sprite, not stepped rings) with **Bloom** blending. It sits
+on the UI itself: neon panel borders (**Panel Glow**), glowing header titles and icons,
+glowing names and toggles on enabled modules. The menu blurs the world and has floating
+**Particles**; an optional **Aurora** of drifting light is off by default. Tune it with Glow
+Intensity / Radius / Pulse, or switch Glow Style to Classic.
 
 ### Chat commands
 
@@ -115,6 +116,9 @@ results stay current.
 | Trigger Bot | Attacks the entity under your crosshair once your attack has recharged (charge threshold and a small random delay are configurable) |
 | Aim Assist | Smoothly pulls your aim toward the nearest target within a FOV cone, eased per frame |
 | Auto Totem | Refills your offhand with a totem after one pops. **Inventory** mode (default) opens your inventory, swaps the totem in and closes it again, each step after a random delay in the range you set; **Instant** swaps without opening anything. **Hover Refill** also refills while you have your inventory open yourself |
+| Velocity | Take less (or no) knockback from hits and explosions |
+| Crystal Optimizer | Crystals disappear the moment you hit them, so the next one goes down faster |
+| Auto Double Hand | Holds a totem in your main hand when you're low or explosives are close |
 | Hitbox | Grows other players' (optionally mobs') pick area so they're easier to hit |
 | No Hit Delay | Removes the 10-tick lockout after swinging at air |
 | Shield Breaker | Hitting someone who's blocking swaps to an axe for that hit to disable their shield, then back |
@@ -144,6 +148,12 @@ results stay current.
 | Auto Respawn | Skips the death screen |
 | Anti AFK | Small random actions so you don't get kicked for idling |
 | Inventory / Armor / Potion HUD | Your inventory; armour and tool durability; active effects with time left |
+| Auto TPA | Accepts teleport requests (friends only by default) |
+| Chest Stealer | Empties chests, barrels and shulkers you open, with random delays |
+| Junk Dropper | Drops stone, dirt, netherrack and other mining junk automatically |
+| Spawner Protect | Alerts you (or logs you out) when a non-friend comes near spawners you're at |
+| No Fall / Step / Auto Walk (Movement) | No fall damage; walk up blocks; keep walking forward |
+| Fast Break (World) | No pause between blocks when mining |
 | Key Pearl | Bind a key to throw an ender pearl (or wind charge) from anywhere in your hotbar |
 | Target HUD (HUD) | Face, name, smooth health bar, distance and gear of whoever you're fighting |
 

@@ -1,6 +1,7 @@
 package dev.ooga.client.mixin;
 
 import dev.ooga.client.module.ModuleManager;
+import dev.ooga.client.module.impl.combat.CrystalOptimizerModule;
 import dev.ooga.client.module.impl.combat.MaceSwapModule;
 import dev.ooga.client.module.impl.combat.ShieldBreakerModule;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -22,5 +23,10 @@ public abstract class MultiPlayerGameModeMixin {
 		ModuleManager modules = ModuleManager.get();
 		modules.get(ShieldBreakerModule.class).beforeAttack(target);
 		modules.get(MaceSwapModule.class).beforeAttack(target);
+	}
+
+	@Inject(method = "attack", at = @At("TAIL"), require = 0)
+	private void ooga$afterAttack(Player player, Entity target, CallbackInfo ci) {
+		ModuleManager.get().get(CrystalOptimizerModule.class).afterAttack(target);
 	}
 }
