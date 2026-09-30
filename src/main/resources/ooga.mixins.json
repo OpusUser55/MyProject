@@ -14,9 +14,11 @@
 		"LivingEntityAccessor",
 		"LivingEntityMixin",
 		"LivingEntityRendererMixin",
+		"MinecraftAccessor",
 		"MinecraftMixin",
 		"MouseHandlerMixin",
-		"OptionInstanceAccessor"
+		"OptionInstanceAccessor",
+		"StringDecomposerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -8,7 +8,7 @@ charcoal UI with a restrained, sophisticated gold accent and a soft golden glow.
 ![ClickGUI panels](docs/previews/panels_expanded.png)
 ![HUD](docs/previews/hud.png)
 
-![New modules](docs/previews/v02_menu.png)
+![Menu](docs/previews/v04_menu.png)
 ![Base finding HUD and ESP (mockup)](docs/previews/v02_basefinding.png)
 ![Slow Mine](docs/previews/v02_slowmine.png)
 ![Admins, radar, region map and sus chunks (mockup)](docs/previews/v03_admins_radar_regions.png)
@@ -74,9 +74,31 @@ results stay current.
 | Tracers | Lines to nearby players, optionally hostile mobs |
 | Slow Mine | Mine at normal speed while your hand swings in slow motion. **Speed** sets how slow (35% by default); **When** picks mining only or every swing; **Full Swing** plays each swing all the way through. Purely visual |
 | Free Look | Orbit a third-person camera around yourself while you keep moving straight. With **Hold Key**, it lasts as long as you hold its keybind |
-| Freecam, Zoom, Fullbright | Detached flying camera, spyglass zoom, see in the dark |
+| Freecam | Detached flying camera. Scroll to change speed. **Stay Sneaking** keeps your parked body crouched if you were sneaking; **Steady View** turns off view bobbing and FOV effects while flying; it lands itself if you respawn or change dimension |
+| Zoom, Fullbright | Spyglass zoom, see in the dark |
 | Auto Tool (World) | Switches to the fastest hotbar tool for the block you're mining, skipping nearly broken ones, and back when you stop |
 | Sprint (Movement) | Always sprint |
+
+### Combat
+
+| Module | What it does |
+| --- | --- |
+| Trigger Bot | Attacks the entity under your crosshair once your attack has recharged (charge threshold and a small random delay are configurable) |
+| Aim Assist | Smoothly pulls your aim toward the nearest target within a FOV cone, eased per frame |
+| Auto Totem | Refills your offhand with a totem after one pops |
+
+### Misc
+
+| Module | What it does |
+| --- | --- |
+| Admin Detector | See the base-finding table above |
+| Name Protect | Replaces your username in everything drawn on screen (chat, tab, scoreboard, tags), for recordings |
+| Auto Reconnect | Reconnect button on the disconnect screen, plus an automatic countdown while enabled |
+| Auto Log | Disconnects on low health, when staff come online, or when a player gets close; then turns itself off |
+| Auto Eat | Eats the best hotbar food when hunger drops, skipping bad food |
+| Fast Place | Shortens the delay between placements |
+| Key Pearl | Bind a key to throw an ender pearl (or wind charge) from anywhere in your hotbar |
+| Target HUD (HUD) | Face, name, smooth health bar, distance and gear of whoever you're fighting |
 
 ### Music widget
 

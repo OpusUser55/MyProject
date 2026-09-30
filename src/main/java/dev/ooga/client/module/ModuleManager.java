@@ -19,6 +19,16 @@ import dev.ooga.client.module.impl.client.NotificationsModule;
 import dev.ooga.client.module.impl.client.RadarModule;
 import dev.ooga.client.module.impl.client.RegionMapModule;
 import dev.ooga.client.module.impl.misc.AdminDetectorModule;
+import dev.ooga.client.module.impl.combat.AimAssistModule;
+import dev.ooga.client.module.impl.combat.AutoTotemModule;
+import dev.ooga.client.module.impl.combat.TriggerBotModule;
+import dev.ooga.client.module.impl.client.TargetHudModule;
+import dev.ooga.client.module.impl.misc.AutoEatModule;
+import dev.ooga.client.module.impl.misc.AutoLogModule;
+import dev.ooga.client.module.impl.misc.AutoReconnectModule;
+import dev.ooga.client.module.impl.misc.FastPlaceModule;
+import dev.ooga.client.module.impl.misc.KeyPearlModule;
+import dev.ooga.client.module.impl.misc.NameProtectModule;
 import dev.ooga.client.module.impl.client.WatermarkModule;
 import dev.ooga.client.module.impl.movement.SprintModule;
 import dev.ooga.client.module.impl.render.BlockEspModule;
@@ -72,6 +82,18 @@ public final class ModuleManager {
 		register(new RadarModule());
 		register(new RegionMapModule());
 		register(new AdminDetectorModule());
+		register(new TargetHudModule());
+
+		register(new NameProtectModule());
+		register(new AutoReconnectModule());
+		register(new AutoLogModule());
+		register(new AutoEatModule());
+		register(new FastPlaceModule());
+		register(new KeyPearlModule());
+
+		register(new TriggerBotModule());
+		register(new AimAssistModule());
+		register(new AutoTotemModule());
 
 		register(new FreecamModule());
 		register(new FullbrightModule());
