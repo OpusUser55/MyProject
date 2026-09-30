@@ -8,7 +8,8 @@ charcoal UI with a restrained, sophisticated gold accent and a soft golden glow.
 ![ClickGUI panels](docs/previews/panels_expanded.png)
 ![HUD](docs/previews/hud.png)
 
-![Main tab (mockup)](docs/previews/v09_main.png)
+![Main tab (mockup)](docs/previews/v10_menu.png)
+![In game (mockup)](docs/previews/v10_ingame.png)
 ![Configs tab (mockup)](docs/previews/v09_configs.png)
 ![Finds tab (mockup)](docs/previews/v09_finds.png)
 ![Theme tab (mockup)](docs/previews/v09_theme.png)
