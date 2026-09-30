@@ -6,7 +6,10 @@ import dev.ooga.client.module.Module;
 import dev.ooga.client.module.ModuleManager;
 import dev.ooga.client.module.impl.client.MusicModule;
 import dev.ooga.client.module.impl.client.NotificationsModule;
+import dev.ooga.client.module.impl.misc.FakePayModule;
+import dev.ooga.client.module.impl.misc.FakeScoreboardModule;
 import dev.ooga.client.module.impl.render.FreecamModule;
+import dev.ooga.client.module.impl.render.FreelookModule;
 import dev.ooga.client.module.impl.render.FullbrightModule;
 import dev.ooga.client.render.WorldOverlay;
 import dev.ooga.client.ui.hud.HudManager;
@@ -17,6 +20,7 @@ import dev.ooga.client.world.ChunkScanner;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -64,8 +68,17 @@ public class OogaClient implements ClientModInitializer {
 			ConfigManager.get().tick();
 		});
 
+		// Fake Pay swallows your own /pay before it leaves the client.
+		ClientSendMessageEvents.ALLOW_COMMAND.register(command -> !modules.get(FakePayModule.class).handleCommand(command));
+
+		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+			modules.get(FakeScoreboardModule.class).onWorldJoin();
+			modules.get(FakePayModule.class).resetSpent();
+		});
+
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			modules.get(FreecamModule.class).setEnabled(false, false);
+			modules.get(FreelookModule.class).setEnabled(false, false);
 			CameraController.get().exit();
 			BlockEntityTracker.clear();
 			ChunkScanner.clear();

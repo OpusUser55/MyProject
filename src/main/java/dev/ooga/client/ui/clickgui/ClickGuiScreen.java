@@ -10,6 +10,7 @@ import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.ModeSetting;
 import dev.ooga.client.module.setting.NumberSetting;
 import dev.ooga.client.module.setting.Setting;
+import dev.ooga.client.module.setting.StringSetting;
 import dev.ooga.client.ui.OogaTheme;
 import dev.ooga.client.ui.hud.HudEditorScreen;
 import dev.ooga.client.ui.render.GlowRenderer;
@@ -88,6 +89,7 @@ public class ClickGuiScreen extends Screen {
 	private float sliderX;
 	private float sliderW;
 	private Module binding;
+	private StringSetting editing;
 
 	private Setting<?> hoveredSetting;
 	private long hoverStart;
@@ -626,7 +628,7 @@ public class ClickGuiScreen extends Screen {
 		float labelScale = 0.85f;
 		float labelY = y + 5f;
 		// Labels are trimmed to their column so they can never run under a control.
-		float labelMax = setting instanceof NumberSetting ? w * 0.36f - 6f : w * 0.6f;
+		float labelMax = setting instanceof NumberSetting ? w * 0.36f - 6f : setting instanceof StringSetting ? w * 0.55f - 6f : w * 0.6f;
 		OogaFonts.draw(g, OogaFonts.trim(setting.getName(), Weight.REGULAR, labelScale, labelMax), x, labelY, labelColor, Weight.REGULAR, labelScale);
 
 		if (setting instanceof BooleanSetting bool) {
@@ -684,6 +686,21 @@ public class ClickGuiScreen extends Screen {
 				else return false;
 				return true;
 			}));
+		} else if (setting instanceof StringSetting text) {
+			float fw = w * 0.45f, fh = 12f;
+			float fx = x + w - fw, fy = y + (h - fh) / 2f;
+			float hv = hover(setting, fx, fy, fw, fh);
+			Anim a = hovers.computeIfAbsent(setting.getName() + "#focus" + System.identityHashCode(setting), k -> new Anim(0f, 16f));
+			float focus = a.update(editing == text ? 1f : 0f);
+			Widgets.textField(g, fx, fy, fw, fh, text.get(), focus, hv, 0.75f);
+			hits.add(new Hit(fx, y, fw, h, (button, mx, my) -> {
+				if (button == 0) {
+					editing = text;
+					searchFocused = false;
+				} else if (button == 1) text.reset();
+				else return false;
+				return true;
+			}));
 		}
 	}
 
@@ -722,6 +739,8 @@ public class ClickGuiScreen extends Screen {
 			binding = null;
 			return true;
 		}
+		// Clicking off a text field commits it; clicking the field again re-focuses it below.
+		editing = null;
 		if (!inside(mx, my, 0, 0, windowWidth(), windowHeight())) {
 			searchFocused = false;
 			return true;
@@ -782,6 +801,10 @@ public class ClickGuiScreen extends Screen {
 			binding = null;
 			return true;
 		}
+		if (editing != null) {
+			if (!TextEdit.key(editing, event)) editing = null;
+			return true;
+		}
 		if (key == GLFW.GLFW_KEY_ESCAPE) {
 			if (!search.isEmpty() || searchFocused) {
 				search.setLength(0);
@@ -819,6 +842,10 @@ public class ClickGuiScreen extends Screen {
 	public boolean charTyped(CharacterEvent event) {
 		int codepoint = event.codepoint();
 		if (binding != null || Character.isISOControl(codepoint)) return false;
+		if (editing != null) {
+			TextEdit.type(editing, codepoint);
+			return true;
+		}
 		if (!searchFocused && Character.isWhitespace(codepoint)) return false;
 		// Typing anywhere starts a search — the fastest way to reach a module.
 		if (search.length() < 32) search.appendCodePoint(codepoint);
@@ -832,6 +859,7 @@ public class ClickGuiScreen extends Screen {
 		// Play the exit animation first; finishClose() runs once it's done.
 		closing = true;
 		binding = null;
+		editing = null;
 		draggingSlider = null;
 		draggingWindow = false;
 	}

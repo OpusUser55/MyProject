@@ -59,6 +59,33 @@ public final class Widgets {
 		return w;
 	}
 
+	/**
+	 * Single-line text box. Long text scrolls so the end (and the caret) stays in view.
+	 * {@code focus} and {@code hover} are animated 0..1 amounts.
+	 */
+	public static void textField(GuiGraphics g, float x, float y, float w, float h, String text, float focus, float hover, float scale) {
+		float r = OogaTheme.RADIUS_CONTROL;
+		if (focus > 0.01f) GlowRenderer.glow(g, x, y, w, h, r, OogaTheme.GOLD, 0.3f * focus);
+		Render2D.roundRect(g, x, y, w, h, r, ColorUtil.lerp(OogaTheme.SURFACE_INSET, OogaTheme.SURFACE_CONTROL, hover * (1f - focus)));
+		Render2D.outline(g, x, y, w, h, r, ColorUtil.lerp(ColorUtil.lerp(OogaTheme.BORDER, OogaTheme.accent(0x55), hover), OogaTheme.accent(0x99), focus));
+
+		float inner = w - 8f;
+		String shown = text;
+		while (shown.length() > 1 && OogaFonts.width(shown, Weight.REGULAR, scale) > inner) shown = shown.substring(1);
+		float capHeight = 9f * scale * 0.73f;
+		float ty = y + (h - capHeight) / 2f - 1.2f;
+		boolean focused = focus > 0.5f;
+		if (shown.isEmpty() && !focused) {
+			OogaFonts.draw(g, "empty", x + 4f, ty, OogaTheme.TEXT_MUTED, Weight.REGULAR, scale);
+		} else {
+			OogaFonts.draw(g, shown, x + 4f, ty, focused ? OogaTheme.TEXT : OogaTheme.GOLD_TEXT, Weight.REGULAR, scale);
+		}
+		if (focused && (System.currentTimeMillis() / 530) % 2 == 0) {
+			float cx = Math.min(x + w - 3f, x + 4.5f + OogaFonts.width(shown, Weight.REGULAR, scale));
+			Render2D.rect(g, cx, y + 2.5f, 0.75f, h - 5f, OogaTheme.GOLD);
+		}
+	}
+
 	public static void tooltip(GuiGraphics g, float mouseX, float mouseY, String text, float screenW, float screenH) {
 		float scale = 0.85f;
 		float maxW = 170f;

@@ -12,9 +12,12 @@ import dev.ooga.client.module.impl.client.ModuleListModule;
 import dev.ooga.client.module.impl.client.MusicModule;
 import dev.ooga.client.module.impl.client.NotificationsModule;
 import dev.ooga.client.module.impl.client.WatermarkModule;
+import dev.ooga.client.module.impl.misc.FakePayModule;
+import dev.ooga.client.module.impl.misc.FakeScoreboardModule;
 import dev.ooga.client.module.impl.movement.SprintModule;
 import dev.ooga.client.module.impl.render.EspModule;
 import dev.ooga.client.module.impl.render.FreecamModule;
+import dev.ooga.client.module.impl.render.FreelookModule;
 import dev.ooga.client.module.impl.render.FullbrightModule;
 import dev.ooga.client.module.impl.render.TracersModule;
 import dev.ooga.client.module.impl.render.ZoomModule;
@@ -57,6 +60,7 @@ public final class ModuleManager {
 		register(new MusicModule());
 
 		register(new FreecamModule());
+		register(new FreelookModule());
 		register(new FullbrightModule());
 		register(new ZoomModule());
 		register(new EspModule());
@@ -68,6 +72,9 @@ public final class ModuleManager {
 		register(new LightFinderModule());
 
 		register(new SprintModule());
+
+		register(new FakePayModule());
+		register(new FakeScoreboardModule());
 
 		for (Module module : modules) module.addListSetting();
 		SettingEvents.listen(setting -> markDirty());

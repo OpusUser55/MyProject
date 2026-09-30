@@ -34,6 +34,7 @@ The mod jar lands in `build/libs/`. Drop it, together with
 | Switch layout | ClickGUI settings → Layout: Panels (default) or Window |
 | Search | Just start typing (or `Ctrl+F`); `Enter` toggles the top result |
 | Reset a slider | Right-click its label |
+| Edit a text setting | Click the field, type, `Enter`/`Esc` or click away to finish; right-click resets |
 | Move HUD elements | **Edit HUD** in the menu header; scroll over an element to resize |
 
 Settings are saved automatically to `config/ooga/config.json`.
@@ -49,6 +50,23 @@ Settings are saved automatically to `config/ooga/config.json`.
 | Tracers (Render) | Lines to nearby players, optionally hostile mobs |
 
 Finders scan chunks in the background a few per tick, so enabling them never stalls the game.
+
+### Camera
+
+| Module | What it does |
+| --- | --- |
+| Freecam | Detach the camera and fly around while your body stays put |
+| Freelook | Hold `Left Alt` to orbit the camera around you while you keep walking the way you face (third or first person) |
+| Zoom | Hold `Z` to zoom; scroll to adjust |
+
+### Misc
+
+| Module | What it does |
+| --- | --- |
+| Fake Pay | Your own `/pay <player> <amount>` is caught before sending and shows the "You paid" message locally instead (amounts like `1.5k`, `2m`, `$2,500` work) |
+| Fake Scoreboard | Replaces the sidebar with your own money / shards / kills / deaths / playtime lines and an optional footer; the server's board returns when it's off. With Fake Pay's **Remove From Scoreboard** on, fake payments come off the money line |
+
+Both are client-side only: nothing is sent to the server, and only you see them.
 
 ### Music widget
 

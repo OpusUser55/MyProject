@@ -2,6 +2,7 @@ package dev.ooga.client.mixin;
 
 import dev.ooga.client.camera.CameraController;
 import dev.ooga.client.module.ModuleManager;
+import dev.ooga.client.module.impl.render.FreelookModule;
 import dev.ooga.client.module.impl.render.ZoomModule;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
@@ -24,10 +25,12 @@ public abstract class EntityMixin {
 		return ooga$isLocalPlayer() ? deltaPitch * ModuleManager.get().get(ZoomModule.class).sensitivityMultiplier() : deltaPitch;
 	}
 
-	/** Routes mouse look to a detached camera instead of turning the player. */
+	/** Routes mouse look to a detached camera (or Freelook) instead of turning the player. */
 	@Inject(method = "turn", at = @At("HEAD"), cancellable = true)
 	private void ooga$turnCamera(double deltaYaw, double deltaPitch, CallbackInfo ci) {
-		if (ooga$isLocalPlayer() && CameraController.get().onTurn(deltaYaw, deltaPitch)) {
+		if (!ooga$isLocalPlayer()) return;
+		if (CameraController.get().onTurn(deltaYaw, deltaPitch)
+				|| ModuleManager.get().get(FreelookModule.class).onTurn(deltaYaw, deltaPitch)) {
 			ci.cancel();
 		}
 	}

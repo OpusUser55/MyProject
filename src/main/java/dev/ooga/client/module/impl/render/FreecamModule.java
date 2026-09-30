@@ -4,6 +4,7 @@ import dev.ooga.client.camera.CameraController;
 import dev.ooga.client.camera.FreeCamera;
 import dev.ooga.client.module.Category;
 import dev.ooga.client.module.Module;
+import dev.ooga.client.module.ModuleManager;
 import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.ModeSetting;
 import dev.ooga.client.module.setting.NumberSetting;
@@ -45,6 +46,8 @@ public class FreecamModule extends Module {
 
 	@Override
 	protected void onEnable() {
+		// Freelook puts its perspective back first, so Freecam saves and restores the real one.
+		ModuleManager.get().get(FreelookModule.class).setEnabled(false, false);
 		// canEnable() guarantees a world, so entering can't fail here; onTick() is the safety net.
 		CameraController.get().enter(camera);
 	}

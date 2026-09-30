@@ -10,6 +10,7 @@ import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.ModeSetting;
 import dev.ooga.client.module.setting.NumberSetting;
 import dev.ooga.client.module.setting.Setting;
+import dev.ooga.client.module.setting.StringSetting;
 import dev.ooga.client.ui.OogaTheme;
 import dev.ooga.client.ui.hud.HudEditorScreen;
 import dev.ooga.client.ui.render.GlowRenderer;
@@ -65,6 +66,7 @@ public class PanelClickGuiScreen extends Screen {
 	private float sliderX;
 	private float sliderW;
 	private Module binding;
+	private StringSetting editing;
 
 	private float mouseX;
 	private float mouseY;
@@ -495,6 +497,17 @@ public class PanelClickGuiScreen extends Screen {
 				else return false;
 				return true;
 			}));
+		} else if (setting instanceof StringSetting text) {
+			float fw = w * 0.5f;
+			OogaFonts.draw(g, OogaFonts.trim(setting.getName(), Weight.REGULAR, scale, w - fw - 6f), x, textY(y, h, 7), label, Weight.REGULAR, scale);
+			float focus = anim("text#" + System.identityHashCode(setting), 0f, 16f).update(editing == text ? 1f : 0f);
+			Widgets.textField(g, x + w - fw, y + 1.5f, fw, h - 3f, text.get(), focus, hv, S7);
+			hits.add(new Hit(x + w - fw, y, fw + 4, h, (button, mx, my) -> {
+				if (button == 0) editing = text;
+				else if (button == 1) text.reset();
+				else return false;
+				return true;
+			}));
 		}
 		return y + h;
 	}
@@ -572,6 +585,8 @@ public class PanelClickGuiScreen extends Screen {
 			binding = null;
 			return true;
 		}
+		// Clicking off a text field commits it; clicking the field again re-focuses it below.
+		editing = null;
 		float mx = (float) event.x() / scale();
 		float my = (float) event.y() / scale();
 		for (int i = hits.size() - 1; i >= 0; i--) {
@@ -625,6 +640,10 @@ public class PanelClickGuiScreen extends Screen {
 			binding = null;
 			return true;
 		}
+		if (editing != null) {
+			if (!TextEdit.key(editing, event)) editing = null;
+			return true;
+		}
 		if (key == GLFW.GLFW_KEY_ESCAPE) {
 			if (!search.isEmpty()) search.setLength(0);
 			else onClose();
@@ -656,6 +675,10 @@ public class PanelClickGuiScreen extends Screen {
 	public boolean charTyped(CharacterEvent event) {
 		int codepoint = event.codepoint();
 		if (binding != null || Character.isISOControl(codepoint)) return false;
+		if (editing != null) {
+			TextEdit.type(editing, codepoint);
+			return true;
+		}
 		if (search.isEmpty() && Character.isWhitespace(codepoint)) return false;
 		if (search.length() < 32) search.appendCodePoint(codepoint);
 		return true;
@@ -665,6 +688,7 @@ public class PanelClickGuiScreen extends Screen {
 	public void onClose() {
 		closing = true;
 		binding = null;
+		editing = null;
 		draggingPanel = null;
 		draggingSlider = null;
 	}
