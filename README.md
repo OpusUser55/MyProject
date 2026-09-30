@@ -8,6 +8,10 @@ charcoal UI with a restrained, sophisticated gold accent and a soft golden glow.
 ![ClickGUI panels](docs/previews/panels_expanded.png)
 ![HUD](docs/previews/hud.png)
 
+![New modules](docs/previews/v02_menu.png)
+![Base finding HUD and ESP (mockup)](docs/previews/v02_basefinding.png)
+![Slow Mine](docs/previews/v02_slowmine.png)
+
 These are rendered offline from the real UI code by a stand-in renderer (Inter via Java2D),
 so text anti-aliasing differs slightly from in-game.
 
