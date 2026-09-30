@@ -9,6 +9,7 @@ charcoal UI with a restrained, sophisticated gold accent and a soft golden glow.
 ![HUD](docs/previews/hud.png)
 
 ![Menu](docs/previews/v04_menu.png)
+![Combat settings (mockup)](docs/previews/v05_combat.png)
 ![Base finding HUD and ESP (mockup)](docs/previews/v02_basefinding.png)
 ![Slow Mine](docs/previews/v02_slowmine.png)
 ![Admins, radar, region map and sus chunks (mockup)](docs/previews/v03_admins_radar_regions.png)
@@ -85,7 +86,9 @@ results stay current.
 | --- | --- |
 | Trigger Bot | Attacks the entity under your crosshair once your attack has recharged (charge threshold and a small random delay are configurable) |
 | Aim Assist | Smoothly pulls your aim toward the nearest target within a FOV cone, eased per frame |
-| Auto Totem | Refills your offhand with a totem after one pops |
+| Auto Totem | Refills your offhand with a totem after one pops. **Inventory** mode (default) opens your inventory, swaps the totem in and closes it again, each step after a random delay in the range you set; **Instant** swaps without opening anything. **Hover Refill** also refills while you have your inventory open yourself |
+| Auto Crystal | Hold right click with end crystals: places a crystal on the obsidian you aim at and breaks crystals under your crosshair at a random speed between Min and Max CPS. Can put obsidian down first, and pauses after a nearby kill so loot survives |
+| Auto Anchor | Look at a respawn anchor while holding right click: charges it with glowstone, switches to your detonate slot, blows it and picks anchors back up. Random delays between steps plus a skip chance; Only Own / Only Charge / Loot Protect options. Anchors only explode outside the Nether |
 
 ### Misc
 

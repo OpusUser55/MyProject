@@ -20,6 +20,8 @@ import dev.ooga.client.module.impl.client.RadarModule;
 import dev.ooga.client.module.impl.client.RegionMapModule;
 import dev.ooga.client.module.impl.misc.AdminDetectorModule;
 import dev.ooga.client.module.impl.combat.AimAssistModule;
+import dev.ooga.client.module.impl.combat.AutoAnchorModule;
+import dev.ooga.client.module.impl.combat.AutoCrystalModule;
 import dev.ooga.client.module.impl.combat.AutoTotemModule;
 import dev.ooga.client.module.impl.combat.TriggerBotModule;
 import dev.ooga.client.module.impl.client.TargetHudModule;
@@ -94,6 +96,8 @@ public final class ModuleManager {
 		register(new TriggerBotModule());
 		register(new AimAssistModule());
 		register(new AutoTotemModule());
+		register(new AutoCrystalModule());
+		register(new AutoAnchorModule());
 
 		register(new FreecamModule());
 		register(new FullbrightModule());
