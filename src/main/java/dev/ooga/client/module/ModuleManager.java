@@ -1,5 +1,6 @@
 package dev.ooga.client.module;
 
+import dev.ooga.client.module.impl.basefinding.DebrisFinderModule;
 import dev.ooga.client.module.impl.basefinding.LightFinderModule;
 import dev.ooga.client.module.impl.basefinding.SpawnerFinderModule;
 import dev.ooga.client.module.impl.basefinding.StorageEspModule;
@@ -12,8 +13,11 @@ import dev.ooga.client.module.impl.client.ModuleListModule;
 import dev.ooga.client.module.impl.client.MusicModule;
 import dev.ooga.client.module.impl.client.NotificationsModule;
 import dev.ooga.client.module.impl.client.WatermarkModule;
+import dev.ooga.client.module.impl.misc.DeathCoordsModule;
 import dev.ooga.client.module.impl.misc.FakePayModule;
 import dev.ooga.client.module.impl.misc.FakeScoreboardModule;
+import dev.ooga.client.module.impl.misc.NameProtectModule;
+import dev.ooga.client.module.impl.misc.VisualRangeModule;
 import dev.ooga.client.module.impl.movement.SprintModule;
 import dev.ooga.client.module.impl.render.EspModule;
 import dev.ooga.client.module.impl.render.FreecamModule;
@@ -70,11 +74,15 @@ public final class ModuleManager {
 		register(new SpawnerFinderModule());
 		register(new SusChunkFinderModule());
 		register(new LightFinderModule());
+		register(new DebrisFinderModule());
 
 		register(new SprintModule());
 
 		register(new FakePayModule());
 		register(new FakeScoreboardModule());
+		register(new NameProtectModule());
+		register(new DeathCoordsModule());
+		register(new VisualRangeModule());
 
 		for (Module module : modules) module.addListSetting();
 		SettingEvents.listen(setting -> markDirty());

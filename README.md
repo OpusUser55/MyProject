@@ -47,6 +47,7 @@ Settings are saved automatically to `config/ooga/config.json`.
 | Spawner Finder | Announces each spawner once (chat + notification with coordinates) and highlights it |
 | Sus Chunk Finder | Scores chunks for player-placed blocks (hoppers, observers, pistons, shulkers, beacons…) and fully grown kelp, which only grows while a chunk stays loaded; flagged chunks are marked and announced |
 | Light Finder | Torches and lanterns below a set height, where caves generate none |
+| Debris Finder | Ancient debris in the Nether, highlighted through netherrack with tracers and one chat line per vein. Only sees what the server sends: servers with anti-xray hide it |
 | Tracers (Render) | Lines to nearby players, optionally hostile mobs |
 
 Finders scan chunks in the background a few per tick, so enabling them never stalls the game.
@@ -66,7 +67,11 @@ Finders scan chunks in the background a few per tick, so enabling them never sta
 | Fake Pay | Your own `/pay <player> <amount>` is caught before sending and shows the "You paid" message locally instead (amounts like `1.5k`, `2m`, `$2,500` work) |
 | Fake Scoreboard | Replaces the sidebar with your own money / shards / kills / deaths / playtime lines and an optional footer; the server's board returns when it's off. With Fake Pay's **Remove From Scoreboard** on, fake payments come off the money line |
 
-Both are client-side only: nothing is sent to the server, and only you see them.
+| Name Protect | Replaces your username everywhere it's drawn (chat, tab, scoreboard, name tags) with a name you choose, for screenshots and streams |
+| Death Coords | Tells you where you died and marks the spot with a waypoint until you're back (on by default) |
+| Visual Range | Notifies you when players enter or leave render distance |
+
+All of these are client-side only: nothing extra is sent to the server.
 
 ### Music widget
 

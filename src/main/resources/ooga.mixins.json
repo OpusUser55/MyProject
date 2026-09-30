@@ -11,7 +11,8 @@
 		"KeyboardHandlerMixin",
 		"MinecraftMixin",
 		"MouseHandlerMixin",
-		"OptionInstanceAccessor"
+		"OptionInstanceAccessor",
+		"StringDecomposerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
