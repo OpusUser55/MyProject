@@ -27,6 +27,7 @@ import dev.ooga.client.module.impl.misc.FakePayModule;
 import dev.ooga.client.module.impl.misc.FakeScoreboardModule;
 import dev.ooga.client.module.impl.misc.MarkSpotModule;
 import dev.ooga.client.module.impl.misc.NameProtectModule;
+import dev.ooga.client.module.impl.misc.ShulkerPeekModule;
 import dev.ooga.client.module.impl.misc.VisualRangeModule;
 import dev.ooga.client.module.impl.movement.AutoJumpModule;
 import dev.ooga.client.module.impl.movement.AutoSwimModule;
@@ -132,6 +133,7 @@ public final class ModuleManager {
 		register(new DurabilityAlertModule());
 		register(new BetterChatModule());
 		register(new MarkSpotModule());
+		register(new ShulkerPeekModule());
 
 		for (Module module : modules) module.addListSetting();
 		SettingEvents.listen(setting -> markDirty());

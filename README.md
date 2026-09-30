@@ -80,6 +80,7 @@ Finders scan chunks in the background a few per tick, so enabling them never sta
 | Durability Alert | Warns once when your armor or held tool drops below a threshold (on by default) |
 | Better Chat | Timestamps, hides repeated spam lines, a hide-words filter, and a gold marker + ping when your name (or extra words) is mentioned |
 | Mark Spot | Bind a key; each press saves a waypoint where you stand (`mark1`, `mark2`, …) |
+| Shulker Peek | Shulker box tooltips list contents totalled per item, biggest first; hold Shift for the full list (on by default) |
 | Armor HUD (HUD) | Armor and held items with colour-coded durability percentages |
 | Item Count HUD (HUD) | Totems, crystals, XP bottles, golden apples, pearls, obsidian and food you're carrying |
 | Inventory HUD (HUD) | Your 27 inventory slots (optionally the hotbar too) in a panel |

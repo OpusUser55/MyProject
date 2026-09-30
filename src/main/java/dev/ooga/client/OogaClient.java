@@ -1,10 +1,12 @@
 package dev.ooga.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import dev.ooga.client.camera.CameraController;
 import dev.ooga.client.command.CommandManager;
 import dev.ooga.client.config.ConfigManager;
 import dev.ooga.client.module.Module;
 import dev.ooga.client.module.ModuleManager;
+import dev.ooga.client.module.impl.client.ClickGuiModule;
 import dev.ooga.client.module.impl.client.InfoHudModule;
 import dev.ooga.client.module.impl.client.MusicModule;
 import dev.ooga.client.module.impl.client.NotificationsModule;
@@ -19,6 +21,7 @@ import dev.ooga.client.ui.hud.HudManager;
 import dev.ooga.client.ui.hud.ScreenOverlay;
 import dev.ooga.client.ui.notify.Notification;
 import dev.ooga.client.ui.notify.NotificationManager;
+import dev.ooga.client.util.ChatUtil;
 import dev.ooga.client.world.BlockEntityTracker;
 import dev.ooga.client.world.ChunkScanner;
 import dev.ooga.client.world.ContainerMemory;
@@ -38,6 +41,9 @@ import net.minecraft.resources.Identifier;
 public class OogaClient implements ClientModInitializer {
 	public static final String MOD_ID = "ooga";
 	public static final String VERSION = "0.1.0";
+
+	/** Whether the one-time "how to open the menu" hint has been shown this launch. */
+	private static boolean welcomed;
 
 	@Override
 	public void onInitializeClient() {
@@ -98,6 +104,12 @@ public class OogaClient implements ClientModInitializer {
 			modules.get(AutoReconnectModule.class).onJoin();
 			ServerStats.reset();
 			modules.get(InfoHudModule.class).onJoin();
+			if (!welcomed) {
+				welcomed = true;
+				int key = modules.get(ClickGuiModule.class).getKey();
+				String keyName = key == -1 ? "its keybind" : InputConstants.Type.KEYSYM.getOrCreate(key).getDisplayName().getString();
+				ChatUtil.info("Ready. " + keyName + " opens the menu, " + CommandManager.PREFIX + "help lists commands.");
+			}
 		});
 
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
