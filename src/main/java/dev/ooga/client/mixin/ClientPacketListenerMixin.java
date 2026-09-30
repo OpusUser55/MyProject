@@ -1,6 +1,7 @@
 package dev.ooga.client.mixin;
 
 import dev.ooga.client.module.impl.combat.TotemPopsModule;
+import dev.ooga.client.module.impl.render.LogoutSpotsModule;
 import dev.ooga.client.module.impl.combat.VelocityModule;
 import dev.ooga.client.world.BlockUpdates;
 import net.minecraft.client.Minecraft;
@@ -8,6 +9,7 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
 import net.minecraft.network.protocol.game.ClientboundExplodePacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket;
 import org.spongepowered.asm.mixin.Mixin;
@@ -51,6 +53,12 @@ public abstract class ClientPacketListenerMixin {
 		if (packet.getEventId() != 35 || mc.level == null) return;
 		net.minecraft.world.entity.Entity entity = packet.getEntity(mc.level);
 		if (entity != null) TotemPopsModule.onPop(entity);
+	}
+
+	/** Logout Spots: see who is leaving before their entity disappears. */
+	@Inject(method = "handlePlayerInfoRemove", at = @At("HEAD"), require = 0)
+	private void ooga$logout(ClientboundPlayerInfoRemovePacket packet, CallbackInfo ci) {
+		if (Minecraft.getInstance().isSameThread()) LogoutSpotsModule.onRemove(packet.profileIds());
 	}
 
 	@Inject(method = "handleChunkBlocksUpdate", at = @At("TAIL"), require = 0)

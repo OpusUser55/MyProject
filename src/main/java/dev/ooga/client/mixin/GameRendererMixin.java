@@ -3,7 +3,11 @@ package dev.ooga.client.mixin;
 import dev.ooga.client.camera.CameraController;
 import dev.ooga.client.camera.FirstPersonRenderer;
 import dev.ooga.client.module.ModuleManager;
+import com.mojang.blaze3d.vertex.PoseStack;
 import dev.ooga.client.module.impl.render.BlockOutlineModule;
+import dev.ooga.client.module.impl.render.NoRenderModule;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import dev.ooga.client.module.impl.render.ZoomModule;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.GameRenderer;
@@ -28,6 +32,16 @@ public abstract class GameRendererMixin {
 	@Inject(method = "shouldRenderBlockOutline", at = @At("HEAD"), cancellable = true)
 	private void ooga$hideOutline(CallbackInfoReturnable<Boolean> cir) {
 		if (CameraController.get().blocksInteraction() || BlockOutlineModule.replacesVanilla()) cir.setReturnValue(false);
+	}
+
+	@Inject(method = "displayItemActivation", at = @At("HEAD"), cancellable = true, require = 0)
+	private void ooga$noTotem(ItemStack stack, CallbackInfo ci) {
+		if (NoRenderModule.totem() && stack.is(Items.TOTEM_OF_UNDYING)) ci.cancel();
+	}
+
+	@Inject(method = "bobHurt", at = @At("HEAD"), cancellable = true, require = 0)
+	private void ooga$noHurtCam(PoseStack pose, float partialTick, CallbackInfo ci) {
+		if (NoRenderModule.hurtCam()) ci.cancel();
 	}
 
 	@Inject(method = "renderItemInHand", at = @At("HEAD"), cancellable = true)

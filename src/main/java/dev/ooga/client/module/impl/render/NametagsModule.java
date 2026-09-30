@@ -37,6 +37,7 @@ public class NametagsModule extends Module {
 
 	public final BooleanSetting players = add(new BooleanSetting("Players", "Tags over other players.", true));
 	public final BooleanSetting hostiles = add(new BooleanSetting("Hostiles", "Tags over hostile mobs.", false));
+	public final BooleanSetting droppedItems = add(new BooleanSetting("Dropped Items", "Tags over items on the ground: name and count.", false));
 	public final BooleanSetting health = add(new BooleanSetting("Health", "Show health (including absorption).", true));
 	public final BooleanSetting distance = add(new BooleanSetting("Distance", "Show distance in blocks.", true));
 	public final BooleanSetting ping = add(new BooleanSetting("Ping", "Show each player's latency.", false));
@@ -58,6 +59,7 @@ public class NametagsModule extends Module {
 		if (!isEnabled() || mc.player == null || entity == mc.player) return false;
 		if (entity instanceof Player) return players.get();
 		if (entity instanceof Enemy) return hostiles.get();
+		if (entity instanceof net.minecraft.world.entity.item.ItemEntity) return droppedItems.get();
 		return false;
 	}
 
@@ -89,6 +91,10 @@ public class NametagsModule extends Module {
 	private void draw(GuiGraphics g, Tag tag) {
 		Entity entity = tag.entity();
 		String name = entity.getName().getString();
+		if (entity instanceof net.minecraft.world.entity.item.ItemEntity item) {
+			var stack = item.getItem();
+			name = stack.getHoverName().getString() + (stack.getCount() > 1 ? " x" + stack.getCount() : "");
+		}
 		String hp = null;
 		int hpColor = 0;
 		if (health.get() && entity instanceof LivingEntity living) {

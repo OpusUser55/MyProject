@@ -9,6 +9,7 @@
 		"EntityGlowMixin",
 		"EntityMixin",
 		"GameRendererMixin",
+		"GuiMixin",
 		"KeyboardHandlerMixin",
 		"LevelRendererMixin",
 		"LivingEntityAccessor",
@@ -21,7 +22,9 @@
 		"MultiPlayerGameModeMixin",
 		"OptionInstanceAccessor",
 		"PlayerInfoMixin",
-		"StringDecomposerMixin"
+		"ScreenEffectRendererMixin",
+		"StringDecomposerMixin",
+		"WeatherEffectRendererMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -61,6 +61,12 @@ public final class ConfigManager {
 				ClientSettings settings = ModuleManager.get().get(ClientSettings.class);
 				if (settings.accent.is("Gold")) settings.accent.set("Ocean");
 			}
+			// Before version 3 Zoom came bound to Z; modules no longer ship with keybinds.
+			int version = root.has("version") ? root.get("version").getAsInt() : 1;
+			if (version < 3) {
+				Module zoom = ModuleManager.get().byName("Zoom");
+				if (zoom != null && zoom.getKey() == org.lwjgl.glfw.GLFW.GLFW_KEY_Z) zoom.setKey(-1);
+			}
 		} catch (IOException | RuntimeException e) {
 			ModuleManager.LOGGER.error("Failed to load Ooga config; using defaults", e);
 		} finally {
@@ -97,7 +103,7 @@ public final class ConfigManager {
 	/** The whole current state as JSON: modules, keys, settings, HUD and menu layout. */
 	public JsonObject snapshot() {
 		JsonObject root = new JsonObject();
-		root.addProperty("version", 2);
+		root.addProperty("version", 3);
 		JsonObject modules = new JsonObject();
 		for (Module module : ModuleManager.get().getModules()) {
 			JsonObject data = new JsonObject();

@@ -25,7 +25,6 @@ public class ZoomModule extends Module {
 
 	public ZoomModule() {
 		super("Zoom", "Magnify your view like a spyglass.", Category.RENDER);
-		setDefaultKey(GLFW.GLFW_KEY_Z);
 	}
 
 	@Override

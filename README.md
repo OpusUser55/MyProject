@@ -36,7 +36,7 @@ The mod jar lands in `build/libs/`. Drop it, together with
 
 | Action | Default |
 | --- | --- |
-| Open the menu | `Right Shift` |
+| Open the menu | `Right Shift` (the only key bound by default; bind everything else yourself) |
 | Toggle a module | Left-click its row |
 | Show a module's settings | Right-click the row |
 | Bind a key | Middle-click the row, then press a key; `Esc`/`Backspace` unbinds |
@@ -149,6 +149,8 @@ results stay current.
 | Trigger Bot | Attacks the entity under your crosshair once your attack has recharged (charge threshold and a small random delay are configurable) |
 | Aim Assist | Smoothly pulls your aim toward the nearest target within a FOV cone, eased per frame |
 | Auto Totem | Refills your offhand with a totem after one pops. **Inventory** mode (default) opens your inventory, swaps the totem in and closes it again, each step after a random delay in the range you set; **Instant** swaps without opening anything. **Hover Refill** also refills while you have your inventory open yourself |
+| Auto Pot | Throws a splash healing potion at your feet when you're low |
+| Offhand Swap | One key flips your offhand between totem and crystals, gaps or shield |
 | Totem Pops | Counts each player's totem pops (shown on nametags too) and tells you when they die |
 | Auto Armor | Equips your best armour, one piece at a time with random delays |
 | Auto Gap | Eats a golden apple when your health drops |
@@ -179,6 +181,12 @@ results stay current.
 | Auto Mine | Holds attack for you while you look at a block |
 | Cord Snapper | One key copies your coordinates to the clipboard |
 | Friends (Client) | Middle-click players to befriend them: combat modules leave them alone and ESP, nametags and radar show them green. Saved in `config/ooga/friends.txt` |
+| Trajectories (Render) | The flight path and landing spot of pearls, arrows, tridents and potions in your hand |
+| Chunk Borders (Render) | Outlines the chunks around you |
+| Breadcrumbs (Render) | A trail of where you've been, so you know what you've searched |
+| Logout Spots (Render) | Marks where players logged out near you, with name, health and time |
+| No Render (Render) | Hides fire overlay, totem animation, weather, pumpkin blur and hurt shake |
+| Time Changer (Render) | Sets the time of day on your screen |
 | Custom Crosshair (Render) | Cross, dot or circle crosshair that spreads while your attack recharges and turns red on targets |
 | Block Outline (Render) | Accent-coloured outline and fill on the block you look at |
 | Hit Particles (Render) | Extra crit / sharpness particles on your hits |
