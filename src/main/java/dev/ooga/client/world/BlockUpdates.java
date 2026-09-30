@@ -25,7 +25,7 @@ public final class BlockUpdates {
 		LISTENERS.add(listener);
 	}
 
-	/** Called on the client thread by {@code ClientLevelMixin}. */
+	/** Called on the client thread by {@code ClientPacketListenerMixin}. */
 	public static void fire(BlockPos pos, BlockState state) {
 		BlockPos immutable = pos.immutable();
 		for (Listener listener : LISTENERS) listener.blockChanged(immutable, state);

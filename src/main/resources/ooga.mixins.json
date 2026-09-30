@@ -5,7 +5,7 @@
 	"client": [
 		"CameraAccessor",
 		"CameraMixin",
-		"ClientLevelMixin",
+		"ClientPacketListenerMixin",
 		"EntityGlowMixin",
 		"EntityMixin",
 		"GameRendererMixin",

@@ -95,6 +95,14 @@ public class FreelookModule extends Module {
 		if (mc.options.getCameraType() != wanted) mc.options.setCameraType(wanted);
 	}
 
+	public float yaw() {
+		return yaw;
+	}
+
+	public float pitch() {
+		return pitch;
+	}
+
 	/** Mouse look. Returns true if it turned the free camera instead of the player. */
 	public boolean onTurn(double deltaYaw, double deltaPitch) {
 		if (!isEnabled()) return false;
