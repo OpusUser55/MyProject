@@ -17,6 +17,7 @@
 		"MinecraftAccessor",
 		"MinecraftMixin",
 		"MouseHandlerMixin",
+		"MultiPlayerGameModeMixin",
 		"OptionInstanceAccessor",
 		"StringDecomposerMixin"
 	],

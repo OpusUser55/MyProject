@@ -1,6 +1,7 @@
 package dev.ooga.client.mixin;
 
 import dev.ooga.client.module.ModuleManager;
+import dev.ooga.client.module.impl.client.FriendsModule;
 import dev.ooga.client.module.impl.render.FreecamModule;
 import dev.ooga.client.module.impl.render.ZoomModule;
 import dev.ooga.client.util.ClickTracker;
@@ -25,6 +26,8 @@ public abstract class MouseHandlerMixin {
 
 	@Inject(method = "onButton", at = @At("HEAD"))
 	private void ooga$trackClicks(long window, MouseButtonInfo info, int action, CallbackInfo ci) {
-		if (action == GLFW.GLFW_PRESS && Minecraft.getInstance().screen == null) ClickTracker.onPress(info.button());
+		if (action != GLFW.GLFW_PRESS || Minecraft.getInstance().screen != null) return;
+		ClickTracker.onPress(info.button());
+		if (info.button() == GLFW.GLFW_MOUSE_BUTTON_MIDDLE) ModuleManager.get().get(FriendsModule.class).onMiddleClick();
 	}
 }

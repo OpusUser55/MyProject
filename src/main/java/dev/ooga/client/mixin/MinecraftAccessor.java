@@ -11,4 +11,7 @@ public interface MinecraftAccessor {
 
 	@Accessor("rightClickDelay")
 	void ooga$setRightClickDelay(int delay);
+
+	@Accessor("missTime")
+	void ooga$setMissTime(int ticks);
 }

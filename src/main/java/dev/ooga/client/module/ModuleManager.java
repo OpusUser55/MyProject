@@ -19,6 +19,18 @@ import dev.ooga.client.module.impl.client.NotificationsModule;
 import dev.ooga.client.module.impl.client.RadarModule;
 import dev.ooga.client.module.impl.client.RegionMapModule;
 import dev.ooga.client.module.impl.misc.AdminDetectorModule;
+import dev.ooga.client.module.impl.combat.HitboxModule;
+import dev.ooga.client.module.impl.combat.NoHitDelayModule;
+import dev.ooga.client.module.impl.combat.ShieldBreakerModule;
+import dev.ooga.client.module.impl.combat.MaceSwapModule;
+import dev.ooga.client.module.impl.combat.JumpResetModule;
+import dev.ooga.client.module.impl.combat.ElytraSwapModule;
+import dev.ooga.client.module.impl.misc.AutoClickerModule;
+import dev.ooga.client.module.impl.misc.AutoFireworkModule;
+import dev.ooga.client.module.impl.misc.AutoMineModule;
+import dev.ooga.client.module.impl.misc.CordSnapperModule;
+import dev.ooga.client.module.impl.render.RealHitboxModule;
+import dev.ooga.client.module.impl.client.FriendsModule;
 import dev.ooga.client.module.impl.combat.AimAssistModule;
 import dev.ooga.client.module.impl.combat.AutoAnchorModule;
 import dev.ooga.client.module.impl.combat.AutoCrystalModule;
@@ -98,6 +110,19 @@ public final class ModuleManager {
 		register(new AutoTotemModule());
 		register(new AutoCrystalModule());
 		register(new AutoAnchorModule());
+		register(new HitboxModule());
+		register(new NoHitDelayModule());
+		register(new ShieldBreakerModule());
+		register(new MaceSwapModule());
+		register(new JumpResetModule());
+		register(new ElytraSwapModule());
+
+		register(new AutoClickerModule());
+		register(new AutoFireworkModule());
+		register(new AutoMineModule());
+		register(new CordSnapperModule());
+		register(new RealHitboxModule());
+		register(new FriendsModule());
 
 		register(new FreecamModule());
 		register(new FullbrightModule());

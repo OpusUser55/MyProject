@@ -2,6 +2,7 @@ package dev.ooga.client.module.impl.render;
 
 import dev.ooga.client.module.Category;
 import dev.ooga.client.module.Module;
+import dev.ooga.client.module.impl.client.FriendsModule;
 import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.ModeSetting;
 import dev.ooga.client.module.setting.NumberSetting;
@@ -58,6 +59,7 @@ public class EspModule extends Module {
 		for (Entity entity : mc.level.entitiesForRendering()) {
 			if (!wanted(entity)) continue;
 			int rgb = color.is("Team") ? entity.getTeamColor() : color.is("White") ? 0xFFFFFF : OogaTheme.GOLD & 0xFFFFFF;
+			if (FriendsModule.highlights(entity)) rgb = FriendsModule.COLOR & 0xFFFFFF;
 			if (entity instanceof Player && !color.is("Team") && entity.isInvisible()) rgb = 0xB57EDC;
 			// Interpolate so boxes glide with the entity instead of stepping each tick.
 			Vec3 now = entity.getPosition(partialTick);
@@ -68,7 +70,9 @@ public class EspModule extends Module {
 
 	/** @return an RGB colour override, or -1 to keep vanilla's. */
 	public int outlineColor(Entity entity) {
-		if (!shouldOutline(entity) || color.is("Team")) return -1;
+		if (!shouldOutline(entity)) return -1;
+		if (FriendsModule.highlights(entity)) return FriendsModule.COLOR & 0xFFFFFF;
+		if (color.is("Team")) return -1;
 		return color.is("White") ? 0xFFFFFF : OogaTheme.GOLD & 0xFFFFFF;
 	}
 }

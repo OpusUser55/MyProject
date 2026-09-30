@@ -1,5 +1,6 @@
 package dev.ooga.client.ui.hud;
 
+import dev.ooga.client.module.impl.client.FriendsModule;
 import dev.ooga.client.module.impl.client.RadarModule;
 import dev.ooga.client.module.setting.NumberSetting;
 import dev.ooga.client.ui.OogaTheme;
@@ -99,7 +100,7 @@ public class RadarHud extends HudElement {
 				Render2D.circle(g, dotX, dotY, 1.4f, HOSTILE);
 				continue;
 			}
-			int dot = dotColor();
+			int dot = FriendsModule.highlights(entity) ? FriendsModule.COLOR : dotColor();
 			Render2D.circle(g, dotX, dotY, 3.2f, dot & 0x40FFFFFF);
 			Render2D.circle(g, dotX, dotY, 2f, dot);
 			String label = module.names.get() ? entity.getName().getString()

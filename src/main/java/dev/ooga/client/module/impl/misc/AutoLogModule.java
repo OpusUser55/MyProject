@@ -3,6 +3,7 @@ package dev.ooga.client.module.impl.misc;
 import dev.ooga.client.module.Category;
 import dev.ooga.client.module.Module;
 import dev.ooga.client.module.ModuleManager;
+import dev.ooga.client.module.impl.client.FriendsModule;
 import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.NumberSetting;
 import net.minecraft.network.chat.Component;
@@ -48,7 +49,7 @@ public class AutoLogModule extends Module {
 		double range = playerRange.get();
 		if (range > 0) {
 			for (Entity entity : mc.level.entitiesForRendering()) {
-				if (entity instanceof Player other && other != mc.player && other.distanceTo(mc.player) <= range) {
+				if (entity instanceof Player other && other != mc.player && !FriendsModule.protects(other) && other.distanceTo(mc.player) <= range) {
 					logOut(other.getName().getString() + " came within " + Math.round(other.distanceTo(mc.player)) + "m");
 					return;
 				}

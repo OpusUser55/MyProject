@@ -8,7 +8,7 @@ charcoal UI with a restrained, sophisticated gold accent and a soft golden glow.
 ![ClickGUI panels](docs/previews/panels_expanded.png)
 ![HUD](docs/previews/hud.png)
 
-![Menu](docs/previews/v04_menu.png)
+![Menu](docs/previews/v06_menu.png)
 ![Combat settings (mockup)](docs/previews/v05_combat.png)
 ![Base finding HUD and ESP (mockup)](docs/previews/v02_basefinding.png)
 ![Slow Mine](docs/previews/v02_slowmine.png)
@@ -87,6 +87,12 @@ results stay current.
 | Trigger Bot | Attacks the entity under your crosshair once your attack has recharged (charge threshold and a small random delay are configurable) |
 | Aim Assist | Smoothly pulls your aim toward the nearest target within a FOV cone, eased per frame |
 | Auto Totem | Refills your offhand with a totem after one pops. **Inventory** mode (default) opens your inventory, swaps the totem in and closes it again, each step after a random delay in the range you set; **Instant** swaps without opening anything. **Hover Refill** also refills while you have your inventory open yourself |
+| Hitbox | Grows other players' (optionally mobs') pick area so they're easier to hit |
+| No Hit Delay | Removes the 10-tick lockout after swinging at air |
+| Shield Breaker | Hitting someone who's blocking swaps to an axe for that hit to disable their shield, then back |
+| Mace Swap | Attacking mid-fall swaps to your mace for the smash hit, then back |
+| Auto Jump Reset | Jumps the moment a hit lands on the ground to take less knockback |
+| Elytra Swap | One key swaps between elytra and your best chestplate |
 | Auto Crystal | Hold right click with end crystals: places a crystal on the obsidian you aim at and breaks crystals under your crosshair at a random speed between Min and Max CPS. Can put obsidian down first, and pauses after a nearby kill so loot survives |
 | Auto Anchor | Look at a respawn anchor while holding right click: charges it with glowstone, switches to your detonate slot, blows it and picks anchors back up. Random delays between steps plus a skip chance; Only Own / Only Charge / Loot Protect options. Anchors only explode outside the Nether |
 
@@ -100,6 +106,12 @@ results stay current.
 | Auto Log | Disconnects on low health, when staff come online, or when a player gets close; then turns itself off |
 | Auto Eat | Eats the best hotbar food when hunger drops, skipping bad food |
 | Fast Place | Shortens the delay between placements |
+| Auto Clicker | Clicks at a random CPS while you hold attack (entities only by default) |
+| Auto Firework | Fires hotbar rockets while gliding whenever you slow down |
+| Auto Mine | Holds attack for you while you look at a block |
+| Cord Snapper | One key copies your coordinates to the clipboard |
+| Friends (Client) | Middle-click players to befriend them: combat modules leave them alone and ESP, nametags and radar show them green. Saved in `config/ooga/friends.txt` |
+| Real Hitbox (Render) | Shows true hitboxes, eye height and look direction (and the expanded Hitbox area) |
 | Key Pearl | Bind a key to throw an ender pearl (or wind charge) from anywhere in your hotbar |
 | Target HUD (HUD) | Face, name, smooth health bar, distance and gear of whoever you're fighting |
 

@@ -3,6 +3,7 @@ package dev.ooga.client.module.impl.render;
 import dev.ooga.client.OogaClient;
 import dev.ooga.client.module.Category;
 import dev.ooga.client.module.Module;
+import dev.ooga.client.module.impl.client.FriendsModule;
 import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.NumberSetting;
 import dev.ooga.client.render.Projector;
@@ -108,7 +109,7 @@ public class NametagsModule extends Module {
 		g.pose().scale(s, s);
 		float x = -w / 2f, y = -h;
 		Render2D.roundRect(g, x, y, w, h, OogaTheme.RADIUS_CONTROL, 0xC80E0F12);
-		Render2D.outline(g, x, y, w, h, OogaTheme.RADIUS_CONTROL, entity instanceof Player ? OogaTheme.accent(0x80) : OogaTheme.BORDER);
+		Render2D.outline(g, x, y, w, h, OogaTheme.RADIUS_CONTROL, FriendsModule.highlights(entity) ? FriendsModule.COLOR : entity instanceof Player ? OogaTheme.accent(0x80) : OogaTheme.BORDER);
 		float tx = x + pad, ty = y + 2.5f;
 		OogaFonts.draw(g, name, tx, ty, OogaTheme.TEXT, Weight.SEMIBOLD);
 		tx += OogaFonts.width(name, Weight.SEMIBOLD) + gap;

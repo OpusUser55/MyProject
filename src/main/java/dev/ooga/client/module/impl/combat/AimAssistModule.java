@@ -3,6 +3,7 @@ package dev.ooga.client.module.impl.combat;
 import dev.ooga.client.OogaClient;
 import dev.ooga.client.module.Category;
 import dev.ooga.client.module.Module;
+import dev.ooga.client.module.impl.client.FriendsModule;
 import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.NumberSetting;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
@@ -77,7 +78,7 @@ public class AimAssistModule extends Module {
 
 	private boolean wanted(Entity entity) {
 		if (!(entity instanceof LivingEntity living) || !living.isAlive() || entity == mc.player || entity.isInvisible()) return false;
-		if (entity instanceof Player) return players.get();
+		if (entity instanceof Player) return players.get() && !FriendsModule.protects(entity);
 		return entity instanceof Enemy && hostiles.get();
 	}
 

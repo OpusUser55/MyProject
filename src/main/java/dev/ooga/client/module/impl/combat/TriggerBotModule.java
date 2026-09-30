@@ -2,6 +2,7 @@ package dev.ooga.client.module.impl.combat;
 
 import dev.ooga.client.module.Category;
 import dev.ooga.client.module.Module;
+import dev.ooga.client.module.impl.client.FriendsModule;
 import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.NumberSetting;
 import net.minecraft.world.InteractionHand;
@@ -49,7 +50,7 @@ public class TriggerBotModule extends Module {
 
 	private boolean wanted(Entity entity) {
 		if (!(entity instanceof LivingEntity living) || !living.isAlive() || entity == mc.player) return false;
-		if (entity instanceof Player) return players.get();
+		if (entity instanceof Player) return players.get() && !FriendsModule.protects(entity);
 		if (entity instanceof Enemy) return hostiles.get();
 		return passive.get();
 	}

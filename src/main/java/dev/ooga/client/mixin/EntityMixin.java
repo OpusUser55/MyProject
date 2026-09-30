@@ -2,6 +2,7 @@ package dev.ooga.client.mixin;
 
 import dev.ooga.client.camera.CameraController;
 import dev.ooga.client.module.ModuleManager;
+import dev.ooga.client.module.impl.combat.HitboxModule;
 import dev.ooga.client.module.impl.render.ZoomModule;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
@@ -11,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin {
@@ -30,6 +32,13 @@ public abstract class EntityMixin {
 		if (ooga$isLocalPlayer() && CameraController.get().onTurn(deltaYaw, deltaPitch)) {
 			ci.cancel();
 		}
+	}
+
+	/** Hitbox: grows the radius used when picking the entity under the crosshair. */
+	@Inject(method = "getPickRadius", at = @At("RETURN"), cancellable = true, require = 0)
+	private void ooga$hitbox(CallbackInfoReturnable<Float> cir) {
+		float extra = HitboxModule.extra((Entity) (Object) this);
+		if (extra > 0) cir.setReturnValue(cir.getReturnValueF() + extra);
 	}
 
 	@Unique
