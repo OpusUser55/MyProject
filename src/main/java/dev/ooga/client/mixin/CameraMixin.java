@@ -3,6 +3,7 @@ package dev.ooga.client.mixin;
 import dev.ooga.client.camera.CameraController;
 import dev.ooga.client.module.ModuleManager;
 import dev.ooga.client.module.impl.render.FreelookModule;
+import dev.ooga.client.render.Projection;
 import net.minecraft.client.Camera;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -18,5 +19,7 @@ public abstract class CameraMixin {
 	private void ooga$applyCameraMode(Level level, Entity entity, boolean detached, boolean mirror, float partialTick, CallbackInfo ci) {
 		CameraController.get().apply((CameraAccessor) this, partialTick);
 		ModuleManager.get().get(FreelookModule.class).apply((CameraAccessor) this, entity, partialTick);
+		CameraAccessor camera = (CameraAccessor) this;
+		Projection.captureCamera(camera.ooga$getPosition(), camera.ooga$getYRot(), camera.ooga$getXRot());
 	}
 }

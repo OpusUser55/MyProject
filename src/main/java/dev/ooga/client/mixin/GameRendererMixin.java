@@ -4,6 +4,7 @@ import dev.ooga.client.camera.CameraController;
 import dev.ooga.client.camera.FirstPersonRenderer;
 import dev.ooga.client.module.ModuleManager;
 import dev.ooga.client.module.impl.render.ZoomModule;
+import dev.ooga.client.render.Projection;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,6 +22,7 @@ public abstract class GameRendererMixin {
 		if (!useFovSetting) return;
 		float zoom = ModuleManager.get().get(ZoomModule.class).currentZoom();
 		if (zoom != 1f) cir.setReturnValue(cir.getReturnValue() / zoom);
+		Projection.captureFov(cir.getReturnValue());
 	}
 
 	/** A detached camera that can't interact shouldn't highlight the block the body is facing. */

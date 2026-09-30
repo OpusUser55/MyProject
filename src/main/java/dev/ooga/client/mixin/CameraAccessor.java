@@ -16,4 +16,13 @@ public interface CameraAccessor {
 
 	@Accessor("detached")
 	void ooga$setDetached(boolean detached);
+
+	@Accessor("position")
+	Vec3 ooga$getPosition();
+
+	@Accessor("yRot")
+	float ooga$getYRot();
+
+	@Accessor("xRot")
+	float ooga$getXRot();
 }

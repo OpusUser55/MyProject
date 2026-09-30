@@ -3,6 +3,7 @@ package dev.ooga.client.command;
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.ooga.client.module.Module;
 import dev.ooga.client.module.ModuleManager;
+import dev.ooga.client.social.FriendStore;
 import dev.ooga.client.util.ChatUtil;
 import dev.ooga.client.waypoint.Waypoint;
 import dev.ooga.client.waypoint.WaypointStore;
@@ -33,7 +34,7 @@ public final class CommandManager {
 	}
 
 	private static final Map<String, Command> COMMANDS = new LinkedHashMap<>();
-	private static final Map<String, String> ALIASES = Map.of("t", "toggle", "b", "bind", "wp", "waypoint", "h", "help");
+	private static final Map<String, String> ALIASES = Map.of("t", "toggle", "b", "bind", "wp", "waypoint", "h", "help", "f", "friend");
 
 	private CommandManager() {
 	}
@@ -76,6 +77,24 @@ public final class CommandManager {
 			}
 		}));
 		COMMANDS.put("waypoint", new Command("wp <add|remove|list|clear> [name] [x y z]", "Manage waypoints for this server.", CommandManager::waypoint));
+		COMMANDS.put("friend", new Command("friend <add|remove|list> [name]", "Manage friends (alias .f). Visual Range ignores them.", args -> {
+			String sub = args.length == 0 ? "list" : args[0].toLowerCase(Locale.ROOT);
+			switch (sub) {
+				case "add" -> {
+					if (args.length < 2) ChatUtil.info("Usage: " + PREFIX + "friend add <name>");
+					else ChatUtil.info(FriendStore.add(args[1]) ? "Added " + args[1] + " as a friend" : args[1] + " is already a friend");
+				}
+				case "remove", "del" -> {
+					if (args.length < 2) ChatUtil.info("Usage: " + PREFIX + "friend remove <name>");
+					else ChatUtil.info(FriendStore.remove(args[1]) ? "Removed " + args[1] : args[1] + " isn't a friend");
+				}
+				case "list" -> {
+					List<String> friends = FriendStore.all();
+					ChatUtil.info(friends.isEmpty() ? "No friends yet. " + PREFIX + "friend add <name>" : "Friends: " + String.join(", ", friends));
+				}
+				default -> ChatUtil.info("Usage: " + PREFIX + "friend <add|remove|list> [name]");
+			}
+		}));
 		COMMANDS.put("coords", new Command("coords", "Copy your coordinates to the clipboard.", args -> {
 			Minecraft mc = Minecraft.getInstance();
 			if (mc.player == null) return;

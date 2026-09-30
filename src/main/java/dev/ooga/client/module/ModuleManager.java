@@ -9,6 +9,7 @@ import dev.ooga.client.module.impl.client.ArmorHudModule;
 import dev.ooga.client.module.impl.client.ClickGuiModule;
 import dev.ooga.client.module.impl.client.ClientSettings;
 import dev.ooga.client.module.impl.client.InfoHudModule;
+import dev.ooga.client.module.impl.client.ItemCountHudModule;
 import dev.ooga.client.module.impl.client.KeystrokesModule;
 import dev.ooga.client.module.impl.client.ModuleListModule;
 import dev.ooga.client.module.impl.client.MusicModule;
@@ -67,6 +68,7 @@ public final class ModuleManager {
 		register(new InfoHudModule());
 		register(new KeystrokesModule());
 		register(new ArmorHudModule());
+		register(new ItemCountHudModule());
 		register(new MusicModule());
 
 		register(new FreecamModule());

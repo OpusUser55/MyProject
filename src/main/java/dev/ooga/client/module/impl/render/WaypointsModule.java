@@ -27,6 +27,9 @@ public class WaypointsModule extends Module {
 	private static final int COLOR = 0x5CC8FF;
 
 	public final BooleanSetting tracers = add(new BooleanSetting("Tracers", "Lines from your view to each waypoint.", false));
+	public final BooleanSetting labels = add(new BooleanSetting("Labels", "Name and distance floating above each waypoint.", true));
+	public final NumberSetting labelScale = add(new NumberSetting("Label Scale", "Size of the floating labels.", 1.0, 0.5, 2.0, 0.05, "x")
+			.visibleWhen(labels::get));
 	public final BooleanSetting beams = add(new BooleanSetting("Beams", "Tall line above each waypoint so it's visible from afar.", true));
 	public final BooleanSetting crossDimension = add(new BooleanSetting("Cross Dimension", "Show Overworld waypoints in the Nether at /8, and Nether ones in the Overworld at x8.", true));
 	public final BooleanSetting hud = add(new BooleanSetting("HUD List", "List the nearest waypoints with their distance.", true));

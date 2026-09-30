@@ -15,6 +15,7 @@ import dev.ooga.client.module.impl.render.FreelookModule;
 import dev.ooga.client.module.impl.render.FullbrightModule;
 import dev.ooga.client.render.WorldOverlay;
 import dev.ooga.client.ui.hud.HudManager;
+import dev.ooga.client.ui.hud.ScreenOverlay;
 import dev.ooga.client.ui.notify.Notification;
 import dev.ooga.client.ui.notify.NotificationManager;
 import dev.ooga.client.world.BlockEntityTracker;
@@ -40,6 +41,8 @@ public class OogaClient implements ClientModInitializer {
 		ModuleManager modules = ModuleManager.get();
 		modules.init();
 		// Registered last so toasts always draw above other HUD elements.
+		// World labels and screen flashes sit under the toasts but over the other HUD elements.
+		HudManager.get().register(new ScreenOverlay());
 		HudManager.get().register(NotificationManager.get());
 
 		// One toggle, every system in sync: notification, HUD list (reads state live),
