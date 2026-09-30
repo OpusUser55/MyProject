@@ -153,6 +153,22 @@ public final class CommandManager {
 				default -> ChatUtil.info("Usage: " + PREFIX + "profile <save|load|list|delete> [name]");
 			}
 		}));
+		COMMANDS.put("nether", new Command("nether [x z]", "Convert coordinates between the Overworld and the Nether (yours if none given).", args -> {
+			Minecraft mc = Minecraft.getInstance();
+			if (mc.player == null) return;
+			double x = mc.player.getX(), z = mc.player.getZ();
+			if (args.length >= 2) {
+				x = Double.parseDouble(args[0]);
+				z = Double.parseDouble(args[1]);
+			}
+			boolean inNether = args.length < 2 && WaypointStore.currentDimension().equals("nether");
+			if (inNether) {
+				ChatUtil.info(String.format("Nether %.0f, %.0f  →  Overworld %.0f, %.0f", x, z, x * 8, z * 8));
+			} else {
+				ChatUtil.info(String.format("Overworld %.0f, %.0f  →  Nether %.0f, %.0f", x, z, x / 8, z / 8));
+				if (args.length >= 2) ChatUtil.info(String.format("Nether %.0f, %.0f  →  Overworld %.0f, %.0f", x, z, x * 8, z * 8));
+			}
+		}));
 		COMMANDS.put("coords", new Command("coords", "Copy your coordinates to the clipboard.", args -> {
 			Minecraft mc = Minecraft.getInstance();
 			if (mc.player == null) return;

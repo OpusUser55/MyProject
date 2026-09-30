@@ -22,6 +22,7 @@ import java.util.List;
  */
 public class InfoHud extends HudElement {
 	private static final String[] COMPASS = {"S", "SW", "W", "NW", "N", "NE", "E", "SE"};
+	private static final java.time.format.DateTimeFormatter CLOCK = java.time.format.DateTimeFormatter.ofPattern("HH:mm");
 	private static final float LINE = 11f;
 	private static final float PAD = 5f;
 	private static final float LABEL_SCALE = 0.62f;
@@ -81,6 +82,8 @@ public class InfoHud extends HudElement {
 			String extra = silent > 3 ? String.format("no response %.0fs", silent) : null;
 			if (tps >= 0) lines.add(new Line("TPS", String.format("%.1f", tps), extra));
 		}
+		if (module.clock.get()) lines.add(new Line("TIME", java.time.LocalTime.now().format(CLOCK), null));
+		if (module.session.get() && module.sessionTime() != null) lines.add(new Line("PLAY", module.sessionTime(), null));
 		if (module.server.get() && mc.getCurrentServer() != null) lines.add(new Line("IP", mc.getCurrentServer().ip, null));
 		return lines;
 	}

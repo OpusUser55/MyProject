@@ -25,6 +25,7 @@ import dev.ooga.client.module.impl.misc.DeathCoordsModule;
 import dev.ooga.client.module.impl.misc.DurabilityAlertModule;
 import dev.ooga.client.module.impl.misc.FakePayModule;
 import dev.ooga.client.module.impl.misc.FakeScoreboardModule;
+import dev.ooga.client.module.impl.misc.MarkSpotModule;
 import dev.ooga.client.module.impl.misc.NameProtectModule;
 import dev.ooga.client.module.impl.misc.VisualRangeModule;
 import dev.ooga.client.module.impl.movement.AutoJumpModule;
@@ -39,6 +40,7 @@ import dev.ooga.client.module.impl.render.EspModule;
 import dev.ooga.client.module.impl.render.FreecamModule;
 import dev.ooga.client.module.impl.render.FreelookModule;
 import dev.ooga.client.module.impl.render.FullbrightModule;
+import dev.ooga.client.module.impl.render.NametagsModule;
 import dev.ooga.client.module.impl.render.TracersModule;
 import dev.ooga.client.module.impl.render.TrajectoriesModule;
 import dev.ooga.client.module.impl.render.WaypointsModule;
@@ -96,6 +98,7 @@ public final class ModuleManager {
 		register(new TracersModule());
 		register(new BlockEspModule());
 		register(new TrajectoriesModule());
+		register(new NametagsModule());
 		register(new WaypointsModule());
 
 		register(new StorageEspModule());
@@ -126,6 +129,7 @@ public final class ModuleManager {
 		register(new AutoRespawnModule());
 		register(new DurabilityAlertModule());
 		register(new BetterChatModule());
+		register(new MarkSpotModule());
 
 		for (Module module : modules) module.addListSetting();
 		SettingEvents.listen(setting -> markDirty());

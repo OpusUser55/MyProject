@@ -63,6 +63,7 @@ Finders scan chunks in the background a few per tick, so enabling them never sta
 | Waypoints | Saved places per server, drawn as a box + beam with a floating name/distance label, optional tracers and a nearest-first HUD list. Overworld waypoints show in the Nether at /8 (purple) and vice versa |
 | Block ESP | Highlights any blocks you list by ID (`diamond_ore, spawner, beacon`…), from chunk data and live block updates, with optional tracers |
 | Trajectories | Predicts where ender pearls, snowballs, eggs, potions, XP bottles, tridents and drawn bows / charged crossbows will land |
+| Nametags | Readable tags over players with health (red→green) and distance; friends in blue |
 
 ### Misc
 
@@ -78,6 +79,7 @@ Finders scan chunks in the background a few per tick, so enabling them never sta
 | Auto Respawn | Respawns automatically after a short delay |
 | Durability Alert | Warns once when your armor or held tool drops below a threshold (on by default) |
 | Better Chat | Timestamps, hides repeated spam lines, a hide-words filter, and a gold marker + ping when your name (or extra words) is mentioned |
+| Mark Spot | Bind a key; each press saves a waypoint where you stand (`mark1`, `mark2`, …) |
 | Armor HUD (HUD) | Armor and held items with colour-coded durability percentages |
 | Item Count HUD (HUD) | Totems, crystals, XP bottles, golden apples, pearls, obsidian and food you're carrying |
 | Inventory HUD (HUD) | Your 27 inventory slots (optionally the hotbar too) in a panel |
@@ -125,6 +127,7 @@ Type these in chat; they're handled by the client and never sent. Start a messag
 | `.set <module> <setting> <value>` | Change a setting (`.set debris finder range 200`, `.set better chat timestamps off`) |
 | `.reset <module> [setting]` | Reset one setting or all of a module's settings |
 | `.profile <save\|load\|list\|delete> [name]` | Save whole setups (modules, binds, settings, HUD layout) and switch between them |
+| `.nether [x z]` | Convert your (or given) coordinates between the Overworld and the Nether |
 | `.coords` | Copy your coordinates to the clipboard |
 | `.modules` | List modules and whether they're on |
 

@@ -5,6 +5,7 @@ import dev.ooga.client.command.CommandManager;
 import dev.ooga.client.config.ConfigManager;
 import dev.ooga.client.module.Module;
 import dev.ooga.client.module.ModuleManager;
+import dev.ooga.client.module.impl.client.InfoHudModule;
 import dev.ooga.client.module.impl.client.MusicModule;
 import dev.ooga.client.module.impl.client.NotificationsModule;
 import dev.ooga.client.module.impl.misc.AutoReconnectModule;
@@ -95,6 +96,7 @@ public class OogaClient implements ClientModInitializer {
 			modules.get(FakePayModule.class).resetSpent();
 			modules.get(AutoReconnectModule.class).onJoin();
 			ServerStats.reset();
+			modules.get(InfoHudModule.class).onJoin();
 		});
 
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {

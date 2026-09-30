@@ -17,6 +17,8 @@ public class InfoHudModule extends Module {
 	public final BooleanSetting speed = add(new BooleanSetting("Speed", "Horizontal speed in blocks per second.", false));
 	public final BooleanSetting ping = add(new BooleanSetting("Ping", "Latency to the server.", true));
 	public final BooleanSetting tps = add(new BooleanSetting("TPS", "Server ticks per second (20 is healthy), estimated from time updates.", true));
+	public final BooleanSetting clock = add(new BooleanSetting("Clock", "Your local time.", false));
+	public final BooleanSetting session = add(new BooleanSetting("Session", "How long you've been on this server.", false));
 	public final BooleanSetting server = add(new BooleanSetting("Server", "The address of the server you're on.", false));
 	public final NumberSetting decimals = add(new NumberSetting("Decimals", "Decimal places for coordinates.", 0, 0, 2, 1)
 			.visibleWhen(coords::get));
@@ -24,6 +26,7 @@ public class InfoHudModule extends Module {
 	public final NumberSetting scale = add(new NumberSetting("Scale", "Panel size.", 1.0, 0.5, 2.0, 0.05, "x"));
 
 	private Vec3 lastPosition;
+	private long joinedAt = -1;
 	private double blocksPerSecond;
 
 	public InfoHudModule() {
@@ -31,6 +34,18 @@ public class InfoHudModule extends Module {
 		hideFromList();
 		enableByDefault();
 		HudManager.get().register(new InfoHud(this));
+	}
+
+	/** Called when joining a world, to start the session timer. */
+	public void onJoin() {
+		joinedAt = System.currentTimeMillis();
+	}
+
+	/** "1h 05m" since joining, or null outside a world. */
+	public String sessionTime() {
+		if (joinedAt < 0 || mc.player == null) return null;
+		long minutes = (System.currentTimeMillis() - joinedAt) / 60000;
+		return minutes >= 60 ? String.format("%dh %02dm", minutes / 60, minutes % 60) : minutes + "m";
 	}
 
 	@Override
