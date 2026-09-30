@@ -1,11 +1,13 @@
 package dev.ooga.client;
 
 import dev.ooga.client.camera.CameraController;
+import dev.ooga.client.command.CommandManager;
 import dev.ooga.client.config.ConfigManager;
 import dev.ooga.client.module.Module;
 import dev.ooga.client.module.ModuleManager;
 import dev.ooga.client.module.impl.client.MusicModule;
 import dev.ooga.client.module.impl.client.NotificationsModule;
+import dev.ooga.client.module.impl.misc.AutoReconnectModule;
 import dev.ooga.client.module.impl.misc.FakePayModule;
 import dev.ooga.client.module.impl.misc.FakeScoreboardModule;
 import dev.ooga.client.module.impl.render.FreecamModule;
@@ -26,6 +28,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.client.gui.screens.DisconnectedScreen;
 import net.minecraft.resources.Identifier;
 
 public class OogaClient implements ClientModInitializer {
@@ -56,6 +59,14 @@ public class OogaClient implements ClientModInitializer {
 
 		// Music controls are clickable while chat is open, the same way chat links are.
 		ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
+			if (screen instanceof DisconnectedScreen) {
+				AutoReconnectModule reconnect = modules.get(AutoReconnectModule.class);
+				ScreenEvents.afterRender(screen).register((s, g, mouseX, mouseY, tickDelta) -> {
+					String status = reconnect.status();
+					if (status != null) g.drawCenteredString(client.font, status, s.width / 2, 12, 0xFFFFD36B);
+				});
+				return;
+			}
 			if (!(screen instanceof ChatScreen)) return;
 			MusicModule music = modules.get(MusicModule.class);
 			ScreenMouseEvents.allowMouseClick(screen).register((s, event) -> !music.hud().handleClick(event.x(), event.y(), event.button()));
@@ -68,12 +79,17 @@ public class OogaClient implements ClientModInitializer {
 			ConfigManager.get().tick();
 		});
 
+		// ".command" chat lines are handled locally; "..text" sends ".text".
+		ClientSendMessageEvents.ALLOW_CHAT.register(message -> !CommandManager.handle(message));
+		ClientSendMessageEvents.MODIFY_CHAT.register(CommandManager::unescape);
+
 		// Fake Pay swallows your own /pay before it leaves the client.
 		ClientSendMessageEvents.ALLOW_COMMAND.register(command -> !modules.get(FakePayModule.class).handleCommand(command));
 
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
 			modules.get(FakeScoreboardModule.class).onWorldJoin();
 			modules.get(FakePayModule.class).resetSpent();
+			modules.get(AutoReconnectModule.class).onJoin();
 		});
 
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {

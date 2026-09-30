@@ -59,6 +59,7 @@ Finders scan chunks in the background a few per tick, so enabling them never sta
 | Freecam | Detach the camera and fly around while your body stays put |
 | Freelook | Hold `Left Alt` to orbit the camera around you while you keep walking the way you face (third or first person) |
 | Zoom | Hold `Z` to zoom; scroll to adjust |
+| Waypoints | Saved places per server, drawn as a box + beam (optional tracers) with a nearest-first HUD list. Overworld waypoints show in the Nether at /8 (purple) and vice versa |
 
 ### Misc
 
@@ -70,8 +71,26 @@ Finders scan chunks in the background a few per tick, so enabling them never sta
 | Name Protect | Replaces your username everywhere it's drawn (chat, tab, scoreboard, name tags) with a name you choose, for screenshots and streams |
 | Death Coords | Tells you where you died and marks the spot with a waypoint until you're back (on by default) |
 | Visual Range | Notifies you when players enter or leave render distance |
+| Auto Reconnect | Rejoins the last server after a kick or connection loss, with a countdown on the disconnect screen |
+| Auto Respawn | Respawns automatically after a short delay |
+| Durability Alert | Warns once when your armor or held tool drops below a threshold (on by default) |
+| Armor HUD (HUD) | Armor and held items with colour-coded durability percentages |
 
 All of these are client-side only: nothing extra is sent to the server.
+
+### Chat commands
+
+Type these in chat; they're handled by the client and never sent. Start a message with `..` to send a literal `.`.
+
+| Command | What it does |
+| --- | --- |
+| `.help` | List commands |
+| `.t <module>` | Toggle a module (`.t freecam`, `.t debris finder`) |
+| `.b <module> <key\|none>` | Bind a key (`.b freelook left.alt`) |
+| `.wp add <name> [x y z]` | Save a waypoint here (or at coordinates) |
+| `.wp remove <name>` / `.wp list` / `.wp clear` | Manage this server's waypoints |
+| `.coords` | Copy your coordinates to the clipboard |
+| `.modules` | List modules and whether they're on |
 
 ### Music widget
 

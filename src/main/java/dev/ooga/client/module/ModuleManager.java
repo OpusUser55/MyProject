@@ -5,6 +5,7 @@ import dev.ooga.client.module.impl.basefinding.LightFinderModule;
 import dev.ooga.client.module.impl.basefinding.SpawnerFinderModule;
 import dev.ooga.client.module.impl.basefinding.StorageEspModule;
 import dev.ooga.client.module.impl.basefinding.SusChunkFinderModule;
+import dev.ooga.client.module.impl.client.ArmorHudModule;
 import dev.ooga.client.module.impl.client.ClickGuiModule;
 import dev.ooga.client.module.impl.client.ClientSettings;
 import dev.ooga.client.module.impl.client.InfoHudModule;
@@ -13,7 +14,10 @@ import dev.ooga.client.module.impl.client.ModuleListModule;
 import dev.ooga.client.module.impl.client.MusicModule;
 import dev.ooga.client.module.impl.client.NotificationsModule;
 import dev.ooga.client.module.impl.client.WatermarkModule;
+import dev.ooga.client.module.impl.misc.AutoReconnectModule;
+import dev.ooga.client.module.impl.misc.AutoRespawnModule;
 import dev.ooga.client.module.impl.misc.DeathCoordsModule;
+import dev.ooga.client.module.impl.misc.DurabilityAlertModule;
 import dev.ooga.client.module.impl.misc.FakePayModule;
 import dev.ooga.client.module.impl.misc.FakeScoreboardModule;
 import dev.ooga.client.module.impl.misc.NameProtectModule;
@@ -24,6 +28,7 @@ import dev.ooga.client.module.impl.render.FreecamModule;
 import dev.ooga.client.module.impl.render.FreelookModule;
 import dev.ooga.client.module.impl.render.FullbrightModule;
 import dev.ooga.client.module.impl.render.TracersModule;
+import dev.ooga.client.module.impl.render.WaypointsModule;
 import dev.ooga.client.module.impl.render.ZoomModule;
 import dev.ooga.client.module.setting.SettingEvents;
 import org.slf4j.Logger;
@@ -61,6 +66,7 @@ public final class ModuleManager {
 		register(new NotificationsModule());
 		register(new InfoHudModule());
 		register(new KeystrokesModule());
+		register(new ArmorHudModule());
 		register(new MusicModule());
 
 		register(new FreecamModule());
@@ -69,6 +75,7 @@ public final class ModuleManager {
 		register(new ZoomModule());
 		register(new EspModule());
 		register(new TracersModule());
+		register(new WaypointsModule());
 
 		register(new StorageEspModule());
 		register(new SpawnerFinderModule());
@@ -83,6 +90,9 @@ public final class ModuleManager {
 		register(new NameProtectModule());
 		register(new DeathCoordsModule());
 		register(new VisualRangeModule());
+		register(new AutoReconnectModule());
+		register(new AutoRespawnModule());
+		register(new DurabilityAlertModule());
 
 		for (Module module : modules) module.addListSetting();
 		SettingEvents.listen(setting -> markDirty());

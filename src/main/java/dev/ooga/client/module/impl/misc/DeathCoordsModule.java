@@ -9,6 +9,8 @@ import dev.ooga.client.ui.notify.Notification;
 import dev.ooga.client.ui.notify.NotificationManager;
 import dev.ooga.client.util.ChatUtil;
 import dev.ooga.client.util.ColorUtil;
+import dev.ooga.client.waypoint.Waypoint;
+import dev.ooga.client.waypoint.WaypointStore;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -23,6 +25,7 @@ public class DeathCoordsModule extends Module {
 	public final BooleanSetting waypoint = add(new BooleanSetting("Waypoint", "Mark the spot through walls until you get back to it.", true));
 	public final BooleanSetting tracer = add(new BooleanSetting("Tracer", "Line from your view to the death spot.", true)
 			.visibleWhen(waypoint::get));
+	public final BooleanSetting saveWaypoint = add(new BooleanSetting("Save Waypoint", "Also save a permanent \"death\" waypoint (see Waypoints).", true));
 
 	private boolean wasDead;
 	private BlockPos deathPos;
@@ -47,6 +50,7 @@ public class DeathCoordsModule extends Module {
 			String where = deathPos.getX() + ", " + deathPos.getY() + ", " + deathPos.getZ() + " (" + dimensionName(deathDimension) + ")";
 			if (chat.get()) ChatUtil.info("You died at " + where);
 			NotificationManager.get().push("Death", where, Notification.Kind.INFO);
+			if (saveWaypoint.get()) WaypointStore.add(new Waypoint("death", deathPos, WaypointStore.currentDimension()));
 		}
 		wasDead = dead;
 
