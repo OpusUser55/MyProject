@@ -21,6 +21,7 @@ import dev.ooga.client.ui.notify.Notification;
 import dev.ooga.client.ui.notify.NotificationManager;
 import dev.ooga.client.world.BlockEntityTracker;
 import dev.ooga.client.world.ChunkScanner;
+import dev.ooga.client.world.ContainerMemory;
 import dev.ooga.client.world.ServerStats;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -110,6 +111,7 @@ public class OogaClient implements ClientModInitializer {
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
 			modules.get(FreecamModule.class).setEnabled(false, false);
 			modules.get(FullbrightModule.class).restoreGamma();
+			ContainerMemory.save();
 			ConfigManager.get().save();
 		});
 	}

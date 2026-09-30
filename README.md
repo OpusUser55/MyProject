@@ -108,6 +108,7 @@ These press the normal game keys for you and hand them back when they stop, so y
 | Auto Tool | Switches to the fastest hotbar tool while you mine and back afterwards; skips tools about to break |
 | Auto Eat | Eats the most filling hotbar food when hunger drops to a threshold, then switches back; skips golden apples, bad food and chorus fruit unless allowed |
 | Auto Fish | Reels in when the bobber dips and recasts after a delay |
+| Chest Memory | Remembers what's in every chest, barrel and shulker you open (on by default). `.find <item>` lists where it is and highlights those containers |
 
 ESP and Tracers colour `.friend`s blue (Tracers can skip them entirely).
 
@@ -128,6 +129,7 @@ Type these in chat; they're handled by the client and never sent. Start a messag
 | `.reset <module> [setting]` | Reset one setting or all of a module's settings |
 | `.profile <save\|load\|list\|delete> [name]` | Save whole setups (modules, binds, settings, HUD layout) and switch between them |
 | `.nether [x z]` | Convert your (or given) coordinates between the Overworld and the Nether |
+| `.find <item>` | Where did I put that? Searches Chest Memory by item name or ID and highlights matches (`.find clear` forgets this server) |
 | `.coords` | Copy your coordinates to the clipboard |
 | `.modules` | List modules and whether they're on |
 

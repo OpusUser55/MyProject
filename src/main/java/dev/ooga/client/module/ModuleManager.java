@@ -48,6 +48,7 @@ import dev.ooga.client.module.impl.render.ZoomModule;
 import dev.ooga.client.module.impl.world.AutoEatModule;
 import dev.ooga.client.module.impl.world.AutoFishModule;
 import dev.ooga.client.module.impl.world.AutoToolModule;
+import dev.ooga.client.module.impl.world.ChestMemoryModule;
 import dev.ooga.client.module.setting.SettingEvents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,6 +120,7 @@ public final class ModuleManager {
 		register(new AutoToolModule());
 		register(new AutoEatModule());
 		register(new AutoFishModule());
+		register(new ChestMemoryModule());
 
 		register(new FakePayModule());
 		register(new FakeScoreboardModule());

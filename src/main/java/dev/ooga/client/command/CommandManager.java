@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import dev.ooga.client.config.ConfigManager;
 import dev.ooga.client.module.Module;
 import dev.ooga.client.module.ModuleManager;
+import dev.ooga.client.module.impl.world.ChestMemoryModule;
 import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.ModeSetting;
 import dev.ooga.client.module.setting.NumberSetting;
@@ -13,6 +14,7 @@ import dev.ooga.client.social.FriendStore;
 import dev.ooga.client.util.ChatUtil;
 import dev.ooga.client.waypoint.Waypoint;
 import dev.ooga.client.waypoint.WaypointStore;
+import dev.ooga.client.world.ContainerMemory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 
@@ -168,6 +170,17 @@ public final class CommandManager {
 				ChatUtil.info(String.format("Overworld %.0f, %.0f  →  Nether %.0f, %.0f", x, z, x / 8, z / 8));
 				if (args.length >= 2) ChatUtil.info(String.format("Nether %.0f, %.0f  →  Overworld %.0f, %.0f", x, z, x * 8, z * 8));
 			}
+		}));
+		COMMANDS.put("find", new Command("find <item>", "Search the containers Chest Memory has seen, e.g. .find diamond, or .find clear.", args -> {
+			if (args.length == 0) {
+				ChatUtil.info("Usage: " + PREFIX + "find <item name or id>");
+				return;
+			}
+			if (args.length == 1 && args[0].equalsIgnoreCase("clear")) {
+				ChatUtil.info("Forgot " + ContainerMemory.clearWorld() + " containers on this server.");
+				return;
+			}
+			ModuleManager.get().get(ChestMemoryModule.class).find(String.join(" ", args));
 		}));
 		COMMANDS.put("coords", new Command("coords", "Copy your coordinates to the clipboard.", args -> {
 			Minecraft mc = Minecraft.getInstance();
