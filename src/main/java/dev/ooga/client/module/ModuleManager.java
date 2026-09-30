@@ -19,6 +19,12 @@ import dev.ooga.client.module.impl.client.NotificationsModule;
 import dev.ooga.client.module.impl.client.RadarModule;
 import dev.ooga.client.module.impl.client.RegionMapModule;
 import dev.ooga.client.module.impl.misc.AdminDetectorModule;
+import dev.ooga.client.module.impl.world.WaypointsModule;
+import dev.ooga.client.module.impl.client.InventoryHudModule;
+import dev.ooga.client.module.impl.client.ArmorHudModule;
+import dev.ooga.client.module.impl.client.PotionHudModule;
+import dev.ooga.client.module.impl.misc.AutoRespawnModule;
+import dev.ooga.client.module.impl.misc.AntiAfkModule;
 import dev.ooga.client.module.impl.combat.HitboxModule;
 import dev.ooga.client.module.impl.combat.NoHitDelayModule;
 import dev.ooga.client.module.impl.combat.ShieldBreakerModule;
@@ -123,6 +129,12 @@ public final class ModuleManager {
 		register(new CordSnapperModule());
 		register(new RealHitboxModule());
 		register(new FriendsModule());
+		register(new WaypointsModule());
+		register(new InventoryHudModule());
+		register(new ArmorHudModule());
+		register(new PotionHudModule());
+		register(new AutoRespawnModule());
+		register(new AntiAfkModule());
 
 		register(new FreecamModule());
 		register(new FullbrightModule());

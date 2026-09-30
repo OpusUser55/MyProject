@@ -1,6 +1,7 @@
 package dev.ooga.client;
 
 import dev.ooga.client.camera.CameraController;
+import dev.ooga.client.command.Commands;
 import dev.ooga.client.config.ConfigManager;
 import dev.ooga.client.module.Module;
 import dev.ooga.client.module.ModuleManager;
@@ -46,6 +47,7 @@ public class OogaClient implements ClientModInitializer {
 		WorldOverlay.init();
 		BlockEntityTracker.init();
 		ChunkScanner.init();
+		Commands.init();
 
 		HudElementRegistry.addLast(Identifier.fromNamespaceAndPath(MOD_ID, "hud"), HudManager.get()::render);
 

@@ -75,6 +75,21 @@ public class FriendsModule extends Module {
 		return name != null && names.contains(name.toLowerCase(Locale.ROOT));
 	}
 
+	/** Adds or removes a friend by name; returns true if they're a friend afterwards. */
+	public boolean setFriend(String name, boolean friend) {
+		load();
+		String key = name.toLowerCase(Locale.ROOT);
+		if (friend) names.add(key);
+		else names.remove(key);
+		save();
+		return friend;
+	}
+
+	public java.util.Collection<String> friends() {
+		load();
+		return java.util.Collections.unmodifiableSet(names);
+	}
+
 	/** Called on a middle click with no screen open. */
 	public void onMiddleClick() {
 		if (!isEnabled() || !middleClick.get() || !(mc.crosshairPickEntity instanceof Player player)) return;

@@ -8,7 +8,8 @@ charcoal UI with a restrained, sophisticated gold accent and a soft golden glow.
 ![ClickGUI panels](docs/previews/panels_expanded.png)
 ![HUD](docs/previews/hud.png)
 
-![Menu](docs/previews/v06_menu.png)
+![Menu, Gold accent (mockup)](docs/previews/v07_glow_gold.png)
+![Menu, Violet accent (mockup)](docs/previews/v07_glow_violet.png)
 ![Combat settings (mockup)](docs/previews/v05_combat.png)
 ![Base finding HUD and ESP (mockup)](docs/previews/v02_basefinding.png)
 ![Slow Mine](docs/previews/v02_slowmine.png)
@@ -43,6 +44,33 @@ The mod jar lands in `build/libs/`. Drop it, together with
 | Move HUD elements | **Edit HUD** in the menu header; scroll over an element to resize |
 
 Settings are saved automatically to `config/ooga/config.json`.
+
+### Look and feel
+
+Client Settings → **Accent** picks the colour of everything: Gold, Amber, Honey, Champagne,
+Lemon, Ocean, Violet, Rose, Mint, Crimson, or **Chroma** (slowly cycles through every hue).
+Each accent has a second colour used for gradients.
+
+Glow is real soft light (a blurred sprite, not stepped rings) with **Bloom** blending, so it
+brightens what's behind it. Tune it with Glow Intensity / Radius / Pulse, or switch Glow
+Style to Classic. The menu blurs the world, has a drifting **Aurora** of accent light and
+floating **Particles** (ClickGUI settings), and every panel gives off a soft **Panel Glow**.
+
+### Chat commands
+
+Type these in chat; they never reach the server.
+
+| Command | What it does |
+| --- | --- |
+| `.help` | List commands |
+| `.toggle <module>` | Turn a module on or off |
+| `.bind <module> <key>` | Bind a key (`none` unbinds) |
+| `.set <module> <setting> <value>` | Change a setting (use_underscores for spaces) |
+| `.friend add/remove/list <name>` | Manage friends |
+| `.wp add [name]` / `del <name>` / `list` / `clear` | Waypoints here |
+| `.finds [clear]` | List or forget recent finds |
+| `.coords` | Copy your coordinates |
+| `.modules` | List modules that are on |
 
 ### Base finding
 
@@ -112,6 +140,10 @@ results stay current.
 | Cord Snapper | One key copies your coordinates to the clipboard |
 | Friends (Client) | Middle-click players to befriend them: combat modules leave them alone and ESP, nametags and radar show them green. Saved in `config/ooga/friends.txt` |
 | Real Hitbox (Render) | Shows true hitboxes, eye height and look direction (and the expanded Hitbox area) |
+| Waypoints (World) | Glowing beams and on-screen labels with distance. Its keybind drops a waypoint; your death point is saved automatically. Per server and dimension |
+| Auto Respawn | Skips the death screen |
+| Anti AFK | Small random actions so you don't get kicked for idling |
+| Inventory / Armor / Potion HUD | Your inventory; armour and tool durability; active effects with time left |
 | Key Pearl | Bind a key to throw an ender pearl (or wind charge) from anywhere in your hotbar |
 | Target HUD (HUD) | Face, name, smooth health bar, distance and gear of whoever you're fighting |
 
