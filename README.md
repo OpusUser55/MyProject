@@ -48,6 +48,7 @@ Settings are saved automatically to `config/ooga/config.json`.
 | Sus Chunk Finder | Scores chunks for player-placed blocks (hoppers, observers, pistons, shulkers, beacons…) and fully grown kelp, which only grows while a chunk stays loaded; flagged chunks are marked and announced |
 | Light Finder | Torches and lanterns below a set height, where caves generate none |
 | Debris Finder | Ancient debris in the Nether, one box per vein (nearest first) with tracers and one chat line per vein. Also catches debris the server reveals later via block updates (mining, TNT), which is what works on anti-xray servers; **Revealed Only** ignores fake ores in chunk data |
+| Stash Finder | Chunks packed with chests, barrels and shulkers (threshold adjustable, shulkers count triple), outlined with tracers, announced once, optionally saved as waypoints |
 | Tracers (Render) | Lines to nearby players, optionally hostile mobs |
 
 Finders scan chunks in the background a few per tick, so enabling them never stalls the game.
@@ -74,6 +75,7 @@ Finders scan chunks in the background a few per tick, so enabling them never sta
 | Auto Reconnect | Rejoins the last server after a kick or connection loss, with a countdown on the disconnect screen |
 | Auto Respawn | Respawns automatically after a short delay |
 | Durability Alert | Warns once when your armor or held tool drops below a threshold (on by default) |
+| Better Chat | Timestamps, hides repeated spam lines, a hide-words filter, and a gold marker + ping when your name (or extra words) is mentioned |
 | Armor HUD (HUD) | Armor and held items with colour-coded durability percentages |
 | Item Count HUD (HUD) | Totems, crystals, XP bottles, golden apples, pearls, obsidian and food you're carrying |
 | Inventory HUD (HUD) | Your 27 inventory slots (optionally the hotbar too) in a panel |
@@ -91,8 +93,17 @@ All of these are client-side only: nothing extra is sent to the server.
 | Parkour | Jumps at the last moment before you run off an edge |
 | Auto Jump | Sprint-jumps continuously while you move |
 | Auto Swim | Holds jump in water and lava so you float; hold sneak to dive |
+| Elytra Swap | Puts a fresh elytra from your inventory on before the worn one breaks |
 
 These press the normal game keys for you and hand them back when they stop, so your own key presses always win.
+
+### World
+
+| Module | What it does |
+| --- | --- |
+| Auto Tool | Switches to the fastest hotbar tool while you mine and back afterwards; skips tools about to break |
+
+ESP and Tracers colour `.friend`s blue (Tracers can skip them entirely).
 
 ### Chat commands
 

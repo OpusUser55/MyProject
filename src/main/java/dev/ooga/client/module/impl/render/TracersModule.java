@@ -7,6 +7,7 @@ import dev.ooga.client.module.setting.ModeSetting;
 import dev.ooga.client.module.setting.NumberSetting;
 import dev.ooga.client.render.TracerOrigin;
 import dev.ooga.client.render.WorldOverlay;
+import dev.ooga.client.social.FriendStore;
 import dev.ooga.client.ui.OogaTheme;
 import dev.ooga.client.util.ColorUtil;
 import net.minecraft.world.entity.Entity;
@@ -20,6 +21,8 @@ public class TracersModule extends Module {
 	public final BooleanSetting hostiles = add(new BooleanSetting("Hostiles", "Trace hostile mobs.", false));
 	public final ModeSetting color = add(new ModeSetting("Color", "Accent, or colour by distance (near = red, far = green).", "Accent", "Accent", "Distance"));
 	public final NumberSetting range = add(new NumberSetting("Range", "Maximum distance.", 128, 16, 512, 8, "m"));
+	public final BooleanSetting friendColor = add(new BooleanSetting("Friend Color", "Trace .friend players in blue.", true));
+	public final BooleanSetting skipFriends = add(new BooleanSetting("Skip Friends", "No tracers to friends at all.", false));
 	public final NumberSetting opacity = add(new NumberSetting("Opacity", "Line opacity.", 0.75, 0.1, 1.0, 0.05));
 
 	public TracersModule() {
@@ -35,12 +38,15 @@ public class TracersModule extends Module {
 			if (entity == mc.player) continue;
 			boolean wanted = (entity instanceof Player && players.get()) || (entity instanceof Enemy && hostiles.get());
 			if (!wanted) continue;
+			boolean friend = entity instanceof Player p && FriendStore.isFriend(p.getName().getString());
+			if (friend && skipFriends.get()) continue;
 			Vec3 pos = entity.getPosition(partialTick).add(0, entity.getBbHeight() / 2.0, 0);
 			double distance = pos.distanceTo(drawer.camera());
 			if (distance > max) continue;
 			int rgb = color.is("Distance")
 					? ColorUtil.lerp(0xFFE5484D, 0xFF46C37B, (float) Math.min(1, distance / 64.0)) & 0xFFFFFF
 					: OogaTheme.GOLD & 0xFFFFFF;
+			if (friend && friendColor.get()) rgb = 0x5CC8FF;
 			float fade = (float) (1 - 0.6 * distance / max);
 			drawer.line(origin, pos, ColorUtil.withAlpha(rgb, Math.round(255 * opacity.getFloat() * fade)));
 		}

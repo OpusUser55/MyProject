@@ -3,6 +3,7 @@ package dev.ooga.client.module;
 import dev.ooga.client.module.impl.basefinding.DebrisFinderModule;
 import dev.ooga.client.module.impl.basefinding.LightFinderModule;
 import dev.ooga.client.module.impl.basefinding.SpawnerFinderModule;
+import dev.ooga.client.module.impl.basefinding.StashFinderModule;
 import dev.ooga.client.module.impl.basefinding.StorageEspModule;
 import dev.ooga.client.module.impl.basefinding.SusChunkFinderModule;
 import dev.ooga.client.module.impl.client.ArmorHudModule;
@@ -19,6 +20,7 @@ import dev.ooga.client.module.impl.client.RegionMapModule;
 import dev.ooga.client.module.impl.client.WatermarkModule;
 import dev.ooga.client.module.impl.misc.AutoReconnectModule;
 import dev.ooga.client.module.impl.misc.AutoRespawnModule;
+import dev.ooga.client.module.impl.misc.BetterChatModule;
 import dev.ooga.client.module.impl.misc.DeathCoordsModule;
 import dev.ooga.client.module.impl.misc.DurabilityAlertModule;
 import dev.ooga.client.module.impl.misc.FakePayModule;
@@ -28,6 +30,7 @@ import dev.ooga.client.module.impl.misc.VisualRangeModule;
 import dev.ooga.client.module.impl.movement.AutoJumpModule;
 import dev.ooga.client.module.impl.movement.AutoSwimModule;
 import dev.ooga.client.module.impl.movement.AutoWalkModule;
+import dev.ooga.client.module.impl.movement.ElytraSwapModule;
 import dev.ooga.client.module.impl.movement.ParkourModule;
 import dev.ooga.client.module.impl.movement.SafeWalkModule;
 import dev.ooga.client.module.impl.movement.SprintModule;
@@ -38,6 +41,7 @@ import dev.ooga.client.module.impl.render.FullbrightModule;
 import dev.ooga.client.module.impl.render.TracersModule;
 import dev.ooga.client.module.impl.render.WaypointsModule;
 import dev.ooga.client.module.impl.render.ZoomModule;
+import dev.ooga.client.module.impl.world.AutoToolModule;
 import dev.ooga.client.module.setting.SettingEvents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +97,7 @@ public final class ModuleManager {
 		register(new SusChunkFinderModule());
 		register(new LightFinderModule());
 		register(new DebrisFinderModule());
+		register(new StashFinderModule());
 
 		register(new SprintModule());
 		register(new AutoWalkModule());
@@ -100,6 +105,9 @@ public final class ModuleManager {
 		register(new ParkourModule());
 		register(new AutoJumpModule());
 		register(new AutoSwimModule());
+		register(new ElytraSwapModule());
+
+		register(new AutoToolModule());
 
 		register(new FakePayModule());
 		register(new FakeScoreboardModule());
@@ -109,6 +117,7 @@ public final class ModuleManager {
 		register(new AutoReconnectModule());
 		register(new AutoRespawnModule());
 		register(new DurabilityAlertModule());
+		register(new BetterChatModule());
 
 		for (Module module : modules) module.addListSetting();
 		SettingEvents.listen(setting -> markDirty());

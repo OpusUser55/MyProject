@@ -5,6 +5,7 @@ import dev.ooga.client.module.Module;
 import dev.ooga.client.module.setting.BooleanSetting;
 import dev.ooga.client.module.setting.ModeSetting;
 import dev.ooga.client.module.setting.NumberSetting;
+import dev.ooga.client.social.FriendStore;
 import dev.ooga.client.ui.OogaTheme;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
@@ -24,6 +25,7 @@ public class EspModule extends Module {
 	public final BooleanSetting invisible = add(new BooleanSetting("Invisible", "Also outline invisible entities.", true));
 	public final NumberSetting range = add(new NumberSetting("Range", "Only outline entities within this distance.", 128, 8, 256, 4, "m"));
 	public final ModeSetting color = add(new ModeSetting("Color", "Accent colour, each entity's team colour, or white.", "Accent", "Accent", "Team", "White"));
+	public final BooleanSetting friendColor = add(new BooleanSetting("Friend Color", "Outline .friend players in blue.", true));
 
 	public EspModule() {
 		super("ESP", "See players and mobs through walls.", Category.RENDER);
@@ -43,7 +45,9 @@ public class EspModule extends Module {
 
 	/** @return an RGB colour override, or -1 to keep vanilla's. */
 	public int outlineColor(Entity entity) {
-		if (!shouldOutline(entity) || color.is("Team")) return -1;
+		if (!shouldOutline(entity)) return -1;
+		if (friendColor.get() && entity instanceof Player p && FriendStore.isFriend(p.getName().getString())) return 0x5CC8FF;
+		if (color.is("Team")) return -1;
 		return color.is("White") ? 0xFFFFFF : OogaTheme.GOLD & 0xFFFFFF;
 	}
 }
